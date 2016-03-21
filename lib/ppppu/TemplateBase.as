@@ -2,6 +2,7 @@ package ppppu
 {
 	import com.greensock.TimelineLite;
 	import com.greensock.TimelineMax;
+	import com.greensock.TweenLite;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.MovieClip;
@@ -11,6 +12,7 @@ package ppppu
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
+	import flash.utils.*;
 	//import EyeContainer;
 	//import MouthContainer;
 	/**
@@ -21,7 +23,7 @@ package ppppu
 	{
 		/*Master timeline for the template animation. Contains all the timelines for parts of the animation that are 
 		 * controlled  by series of tweens defined by a motion xml.*/
-		private var masterTimeline:TimelineLite = new TimelineLite( { useFrames:false, smoothChildTiming:true, paused:true } );
+		private var masterTimeline:TimelineMax = new TimelineMax( { useFrames:false, smoothChildTiming:false, paused:true, repeat: -1 /*,onUpdate:DEBUG__MTLOutput, onUpdateParams:["{self}"]*/ } );
 		
 		public var currentAnimationName:String = "None";
 		
@@ -37,12 +39,16 @@ package ppppu
 		//TODO: allow this to be set, which is needed for animations with non-standard frames(not 120)
 		private var currentAnimationTotalFrames:int = 120;
 		
+		private var latestAnimationDuration:Number;
+		
 		//The primary movie clip for the flash in terms as asset displaying.
 		private var m_ppppuStage:PPPPU_Stage;
 		
 		private var animationPaused:Boolean = false;
 		
 		public var timelineLib:TimelineLibrary;
+		
+		public var maskedContainerIndexes:Vector.<Sprite> = new Vector.<Sprite>();
 		
 		public function TemplateBase()
 		{
@@ -62,7 +68,7 @@ package ppppu
 			var timeline:TimelineMax = null;
 			if (target)
 			{
-				timeline = new TimelineMax( { repeat: -1, paused: true, useFrames:false } );
+				timeline = new TimelineMax( { /*repeat: -1,*/ paused: true, useFrames:false/**/ });
 				timeline.data = target;
 				for (var i:int = 0, l:int = tweenData.length; i < l; ++i)
 				{
@@ -80,6 +86,15 @@ package ppppu
 					else
 					{
 						timeline.set(target, currentTweenData);
+					}
+					
+					//Visibility fallback check for first tween. Assume that it is to be visible if there was no visible property specified.
+					if (i == 0)
+					{
+						if (!("visible" in currentTweenData))
+						{
+							currentTweenData.visible = true;
+						}
 					}
 				}
 			}
@@ -108,13 +123,12 @@ package ppppu
 		public function ImmediantLayoutUpdate():void
 		{
 			//Get current time 
-			var currentTime:Number = (masterTimeline.getChildren(true, false)[0] as TimelineMax).time();
+			var currentTime:Number = masterTimeline.time();
 			//Start at the end and work backwards
 			for (var i:int = elementDepthLayoutChangeFrames.length - 1; i >= 0; --i)
 			{
 				var layoutChangeTime:Number = elementDepthLayoutChangeFrames[i];
-				//frame = frame.substring(1);
-				//var depthChangeFrame:int = parseInt(frame, 10);
+
 				if (currentTime >= layoutChangeTime)
 				{
 					latestFrameDepthLayout = currentAnimationElementDepthLayout[elementDepthLayoutChangeFrames[i]];
@@ -144,9 +158,24 @@ package ppppu
 			//UpdateAnchoredElements();
 		}*/
 		
-		//TODO: Let the timelines handle element visibility. This function should only touch on the visibility of elements that are not to be seen at most.
+		
 		public function ChangeElementDepths(depthLayout:Object):void
 		{
+			
+			//If there are any maskedContainers being used, remove them.
+			for (var x:int = maskedContainerIndexes.length-1, y:int = 0; x >= y; --x)
+			{
+				var container:DisplayObjectContainer = maskedContainerIndexes[x];
+				maskedContainerIndexes.removeAt(x);
+				while (container.numChildren > 0)
+				{
+					//Put the child element in the container back where it came from
+					this.addChild(container.getChildAt(0));
+				}
+				//Remove the container from the template base, allowing it to be garbage collected (optimization: Allow them to be reused, avoiding costly GC)
+				this.removeChild(container);
+			}
+			
 			var templateChildrenCount:uint = numChildren;
 			var templateElements:Vector.<DisplayObject> = new Vector.<DisplayObject>(templateChildrenCount);
 			//var ShaftMask:DisplayObject = null, Shaft:DisplayObject = null, HeadMask:DisplayObject = null, Head:DisplayObject = null;
@@ -158,16 +187,42 @@ package ppppu
 			for (var childIndex:uint = 0; childIndex < templateChildrenCount; ++childIndex)
 			{
 				var element:DisplayObject = templateElements[childIndex];
-				element.visible = false;
+				//element.visible = false;
 				var elementName:String = element.name;
 
+				var elementTweens:Array = masterTimeline.getTweensOf(element, true);
+				
 				if (elementName in depthLayout)
 				{	
 					sortedDepthElements[sortedDepthElements.length] = [element, depthLayout[elementName]];
+					
+					if (elementTweens.length > 0)
+					{
+						var timelineToStart:TimelineMax = (elementTweens[0] as TweenLite).timeline as TimelineMax;
+						if (!timelineToStart.isActive())
+						{
+							timelineToStart.seek(0);
+							timelineToStart.play(masterTimeline.time());
+						}
+					}
+				}
+				else
+				{
+					//Check that there are tweens. If there are, then a timeline is currently associated with the element. Stop this timeline.
+					if (elementTweens.length > 0)
+					{
+						//Stop the timeline to reduce processing strain
+						((elementTweens[0] as TweenLite).timeline as TimelineMax).stop();
+						
+						//timelineToStop.stop();
+					}
+					element.visible = false;
 				}
 			}
 			
 			sortedDepthElements.sort(SortElementsByDepthPriority);
+			
+			
 			
 			//var topDepth:int = templateChildrenCount - 1;
 			//var lastDepthIndex:int = -1;
@@ -178,7 +233,7 @@ package ppppu
 				var currentElement:Sprite = sortedDepthElements[arrayPosition][0];
 				if (currentElement)
 				{
-					currentElement.visible = true;
+					//currentElement.visible = true;
 				}
 				/*If depth for the element has a decimal value then it is to be masked. Since as3 has a 1 element per mask limitation,
 				what needs to be done is creating a container for all elements to be masked then have that [the container] be masked.*/
@@ -189,7 +244,9 @@ package ppppu
 					{
 						latestMaskedContainer = new Sprite();
 						latestMaskedContainer.name = latestElement.name + "MaskedContainer";
-						this.addChildAt(latestMaskedContainer, this.getChildIndex(latestElement));
+						var indexOfLatestElement:int = this.getChildIndex(latestElement);
+						this.addChildAt(latestMaskedContainer, indexOfLatestElement);
+						maskedContainerIndexes.push(latestMaskedContainer);
 						latestMaskedContainer.mask = latestElement;
 					}
 					latestMaskedContainer.addChild(currentElement);
@@ -230,28 +287,29 @@ package ppppu
 		{
 			masterTimeline.timeScale(speed);
 			//Get all timelines currently used
-			var childTimelines:Array = masterTimeline.getChildren(!true, false);
-			for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
+			//var childTimelines:Array = masterTimeline.getChildren(!true, false);
+			/*for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
 			{
 				//Tell the child timeline to play at the specified time
 				(childTimelines[i] as TimelineMax).timeScale(speed);
-			}
+				//trace((childTimelines[i] as TimelineMax).data.name + "Time: " + (childTimelines[i] as TimelineMax).time());
+			}*/
 		}
 		
-		//Starts playing the currently set animation at a specified frame.
-		public function PlayAnimation(startAtFrame:uint):void
+		//Starts playing the currently set animation at a specified time in seconds.
+		public function PlayAnimation(startTime:Number):void
 		{
 			//--startAtFrame;
 			if (animationPaused) { animationPaused = false;}
-			masterTimeline.play(startAtFrame);
+			masterTimeline.play(startTime);
 			//Get all timelines currently used
 			var childTimelines:Array = masterTimeline.getChildren(!true, false);
 			for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
 			{
 				//Tell the child timeline to play at the specified time
-				(childTimelines[i] as TimelineMax).play(startAtFrame);
+				(childTimelines[i] as TimelineMax).play(startTime);
 			}
-			//ImmediantLayoutUpdate(startAtFrame);
+			ImmediantLayoutUpdate();
 		}
 		
 		public function ResumePlayingAnimation():void
@@ -259,12 +317,12 @@ package ppppu
 			animationPaused = false;
 			masterTimeline.play();
 			//Get all timelines currently used
-			var childTimelines:Array = masterTimeline.getChildren(!true, false);
+			/*var childTimelines:Array = masterTimeline.getChildren(!true, false);
 			for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
 			{
 				//Tell the child timeline to play at the specified time
 				(childTimelines[i] as TimelineMax).play(frameCounter);
-			}
+			}*/
 		}
 		
 		public function JumpToFrameAnimation(frame:uint):void
@@ -343,15 +401,6 @@ package ppppu
 			for (var i:uint = 0, l:uint = timelinesToAdd.length; i < l; ++i)
 			{
 				AddTimeline(timelinesToAdd[i] as TimelineMax);
-				/*if (i == 0)
-				{
-					var tl:TimelineMax = timelinesToAdd[i] as TimelineMax;
-					tl.vars["onStart"] = start;
-					tl.vars["onComplete"] = complete;
-					tl.vars["onRepeat"] = repeat;
-					tl.vars["onUpdate"] = update;
-				}*/
-				//trace(i + ": " + timelinesToAdd[i].data.targetElement.name )
 			}
 		}
 		
@@ -363,42 +412,27 @@ package ppppu
 			
 			//The display object that the timeline controls
 			var timelineDisplayObject:DisplayObject = tlToAdd.data as DisplayObject;
-			//Get the name of the element that the timeline controls
-			var timelineForPart:String = timelineDisplayObject.name;
+			//Check to see if the master timeline already has a nested timeline for the specified display object.
+			//If it does, then replace it. Otherwise, add it.
 			
-			//Make the display object visible
-			timelineDisplayObject.visible = true;
-			var currentFrame:int = this.currentFrame;
-			
-			if (timelineForPart)
+			//Optimized version
+			var elementTweens:Array = masterTimeline.getTweensOf(timelineDisplayObject, true);
+			if (elementTweens.length > 0)
 			{
-				//Check to see if the master timeline already has a nested timeline for the specified display object.
-				//If it does, then replace it. Otherwise, add it.
-				
-				//Get all active timelines
-				var childTimelines:Array = masterTimeline.getChildren(true, false);
-				var childTlForPart:String;
-				var childTimeline:TimelineMax;
-				//Iterating through the active timelines array.
-				for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
-				{
-					childTimeline = childTimelines[i] as TimelineMax;
-					if (childTimeline)
-					{
-						childTlForPart = childTimeline.data.name as String;
-						if (timelineForPart == childTlForPart)
-						{
-							//Match was found, so replace the match with tlToAdd.
-							ReplaceTimeline(childTimeline, tlToAdd);
-							return; //Finished, so return to exit out the function early. 
-						}
-					}
-				}
-				//Looked through all the timelines nested in the master timeline and there were no matches for tlToAdd to override.
-				masterTimeline.add(tlToAdd,0);
-				//tlToAdd.seek(this.currentFrame);
-				//tlToAdd.seek(((((this.parent as MovieClip).currentFrame-2) % 120) * millisecPerFrame) / 1000.0);
+				var childTimeline:TimelineMax = (elementTweens[0] as TweenLite).timeline as TimelineMax;
+				ReplaceTimeline(childTimeline, tlToAdd);
+				return;
 			}
+
+			//Looked through all the timelines nested in the master timeline and there were no matches for tlToAdd to override.
+			masterTimeline.add(tlToAdd, 0);
+			tlToAdd.seek(0);
+			tlToAdd.play(masterTimeline.time());
+		}
+		
+		public function DEBUG__MTLOutput(masterTimeline:TimelineMax):void
+		{
+			trace(masterTimeline.duration());
 		}
 		
 		//Replaces a specified timeline with another and then sets the newly added timeline to the frame that the removed one was on.
@@ -406,9 +440,14 @@ package ppppu
 		{
 			if (tlToRemove != tlToAdd)
 			{
+				tlToRemove.pause();
+				tlToRemove.stop();
 				masterTimeline.remove(tlToRemove);
-				masterTimeline.add(tlToAdd,0);
-				//tlToAdd.seek(this.currentFrame);
+				masterTimeline.add(tlToAdd, 0);
+				//Start from the first tween so visibility is set correct during mid-animation switches.
+				tlToAdd.seek(0);
+				//Now start playing from the master timeline's current time
+				tlToAdd.play(masterTimeline.time());
 				//tlToAdd.seek(((((this.parent as MovieClip).currentFrame-2) % 120) * millisecPerFrame) / 1000.0);
 			}
 		}
