@@ -28,6 +28,9 @@ package ppppu
 		 *Concise version: vector[anim] > vector[char] > vector[type] > vector[timelines]*/
 		private var supplementTimelinesCollection:Vector.<Vector.<Vector.<Vector.<TimelineMax>>>> = new Vector.<Vector.<Vector.<Vector.<TimelineMax>>>>();
 		
+		//Flag variable that tells if there is atleast 1 usable base timeline loaded.
+		private var HasValidBaseTimeline:Boolean = false;
+		
 		public function TimelineLibrary() 
 		{
 			
@@ -38,11 +41,18 @@ package ppppu
 		
 		public function AddBaseTimelinesToLibrary(animationID:int, timelines:Vector.<TimelineMax> ):void
 		{
+			while (animationID > baseTimelinesCollection.length)
+			{
+				baseTimelinesCollection[baseTimelinesCollection.length] = null;
+			}
+			//baseTimelinesCollection.insertAt(animationID, timelines);
 			baseTimelinesCollection[animationID] = timelines;
+			if (baseTimelinesCollection.length > 0) { HasValidBaseTimeline = true;}
 		}
 		
 		public function AddReplacementTimelinesToLibrary(animationID:int, characterID:int, setName:String, timelines:Vector.<TimelineMax> ):void
 		{
+			if (characterID == -1 || animationID == -1) { return;}
 			DoesCharacterSetExists(animationID, characterID, setName);
 			var timelineSetDictionary:Dictionary = replacementTimelinesCollection[animationID][characterID];
 			if (timelineSetDictionary == null)
@@ -204,6 +214,7 @@ package ppppu
 				}
 			}
 			
+			
 			/*while (supplementTimelinesCollection.length <= animationID)
 			{
 				supplementTimelinesCollection[supplementTimelinesCollection.length] = new Vector.<Vector.<Vector.<TimelineMax>>>();
@@ -217,6 +228,11 @@ package ppppu
 				supplementTimelinesCollection[animationID][something][TYPE_EYE] = new Vector.<TimelineMax>();
 				
 			}*/
+		}
+		
+		public function HasValidBaseAnimation():Boolean
+		{
+			return HasValidBaseTimeline;
 		}
 	}
 

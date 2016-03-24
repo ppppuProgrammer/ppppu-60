@@ -23,7 +23,7 @@ package ppppu
 	{
 		/*Master timeline for the template animation. Contains all the timelines for parts of the animation that are 
 		 * controlled  by series of tweens defined by a motion xml.*/
-		private var masterTimeline:TimelineMax = new TimelineMax( { useFrames:false, smoothChildTiming:false, paused:true, repeat: -1 /*,onUpdate:DEBUG__MTLOutput, onUpdateParams:["{self}"]*/ } );
+		private var masterTimeline:TimelineMax = new TimelineMax( { useFrames:false, smoothChildTiming:false, paused:true, repeat: -1 /*,onRepeat:DEBUG__MTLOutput, onRepeatParams:["{self}"], onStart:DEBUG__MTLOutput2, onStartParams:["{self}"]*/ } );
 		
 		public var currentAnimationName:String = "None";
 		
@@ -163,14 +163,14 @@ package ppppu
 		{
 			
 			//If there are any maskedContainers being used, remove them.
-			for (var x:int = maskedContainerIndexes.length-1, y:int = 0; x >= y; --x)
+			while ( maskedContainerIndexes.length > 0)
 			{
-				var container:DisplayObjectContainer = maskedContainerIndexes[x];
-				maskedContainerIndexes.removeAt(x);
+				var container:DisplayObjectContainer = maskedContainerIndexes.pop();
 				while (container.numChildren > 0)
 				{
 					//Put the child element in the container back where it came from
 					this.addChild(container.getChildAt(0));
+					
 				}
 				//Remove the container from the template base, allowing it to be garbage collected (optimization: Allow them to be reused, avoiding costly GC)
 				this.removeChild(container);
@@ -299,6 +299,10 @@ package ppppu
 		//Starts playing the currently set animation at a specified time in seconds.
 		public function PlayAnimation(startTime:Number):void
 		{
+			if (startTime == -1)
+			{
+				startTime = masterTimeline.time();
+			}
 			//--startAtFrame;
 			if (animationPaused) { animationPaused = false;}
 			masterTimeline.play(startTime);
@@ -309,7 +313,10 @@ package ppppu
 				//Tell the child timeline to play at the specified time
 				(childTimelines[i] as TimelineMax).play(startTime);
 			}
-			ImmediantLayoutUpdate();
+			if (childTimelines.length > 0)
+			{
+				ImmediantLayoutUpdate();
+			}
 		}
 		
 		public function ResumePlayingAnimation():void
@@ -364,7 +371,7 @@ package ppppu
 			var timelines:Vector.<TimelineMax> = timelineLib.GetBaseTimelinesFromLibrary(animationIndex);
 			if (timelines)
 			{
-				ClearTimelines();
+				//ClearTimelines();
 				AddTimelines(timelines);
 			}
 		}
@@ -398,9 +405,16 @@ package ppppu
 		//Adds the timelines contained in a vector to the master timeline.
 		public function AddTimelines(timelinesToAdd:Vector.<TimelineMax>):void
 		{
+			//CUrrent way of handling when a replacement timeline doesn't exist. Works poorly by keeping the default.
+			if (timelinesToAdd == null || timelinesToAdd.length == 0)
+			{
+				return;
+			}
+			
 			for (var i:uint = 0, l:uint = timelinesToAdd.length; i < l; ++i)
 			{
 				AddTimeline(timelinesToAdd[i] as TimelineMax);
+				//trace(timelinesToAdd[i].data.name + ": " + timelinesToAdd[i].duration());
 			}
 		}
 		
@@ -428,11 +442,6 @@ package ppppu
 			masterTimeline.add(tlToAdd, 0);
 			tlToAdd.seek(0);
 			tlToAdd.play(masterTimeline.time());
-		}
-		
-		public function DEBUG__MTLOutput(masterTimeline:TimelineMax):void
-		{
-			trace(masterTimeline.duration());
 		}
 		
 		//Replaces a specified timeline with another and then sets the newly added timeline to the frame that the removed one was on.
@@ -486,6 +495,21 @@ package ppppu
 		
 		function RoundToNearest(roundTo:Number, value:Number):Number{
 		return Math.round(value/roundTo)*roundTo;
+		}
+		
+		public function DEBUG__MTLOutput(masterTimeline:TimelineMax):void
+		{ 
+			//trace("Animation finished");
+		}
+		
+		public function DEBUG__MTLOutput2(masterTimeline:TimelineMax):void
+		{
+			//trace("Animation Started at " + getTimer());
+		}
+		
+		public function GetDurationOfCurrentAnimation():Number
+		{
+			return masterTimeline.duration();
 		}
 	}
 

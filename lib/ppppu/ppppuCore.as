@@ -6,6 +6,9 @@ package ppppu
 	import Animations.TimelineDefinition;
 	import Characters.*;
 	import com.greensock.easing.Linear;
+	import com.greensock.events.LoaderEvent;
+	import com.greensock.loading.LoaderMax;
+	import com.greensock.loading.SWFLoader;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Loader;
@@ -16,6 +19,7 @@ package ppppu
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.KeyboardEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Point;
 	import flash.net.registerClassAlias;
 	import flash.net.URLLoader;
@@ -29,8 +33,10 @@ package ppppu
 	import com.greensock.data.TweenLiteVars;
 	import com.greensock.*;
 	import flash.geom.Rectangle;
+	import Mod.ppppuMod;
 	import ppppu.TemplateBase;
 	import flash.ui.Keyboard;
+	import flash.utils.*;
 	
 	/**
 	 * Responsible for all the various aspects of ppppuNX. 
@@ -55,7 +61,7 @@ package ppppu
 		//Keeps track of what keys were pressed and/or held down
 		private var keyDownStatus:Array = [];
 		//Contains the names of the various animations that the master template can switch between. The names are indexed by their position in the vector.
-		private var animationNameIndexes:Vector.<String> = new <String>["Cowgirl", "LeanBack", "LeanForward", "Grind", "ReverseCowgirl", "Paizuri", "Blowjob", "SideRide", "Swivel", "Anal"];
+		private var animationNameIndexes:Vector.<String> = new Vector.< String > ();// ["Cowgirl", "LeanBack", "LeanForward", "Grind", "ReverseCowgirl", "Paizuri", "Blowjob", "SideRide", "Swivel", "Anal"];
 		private var characterList:Vector.<ppppuCharacter> = new Vector.<ppppuCharacter>();//[new PeachCharacter, new RosalinaCharacter];
 		private var defaultCharacter:ppppuCharacter;// = characterList[0];
 		private var defaultCharacterName:String;// = defaultCharacter.GetName();
@@ -78,10 +84,21 @@ package ppppu
 		//public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX");
 		//public var userSettings:ppppuUserSettings = new ppppuUserSettings();
 		
+		//Counter to see just how long the flash has been running in milliseconds. Used for timing purposes such as controlling when to change characters.
+		public var ppppuRunTimeCounter:Number = 0;
+		private var previousUpdateTime:Number;
+		//private var runTimer:Timer;
+		private var firstTimeInLoop:Boolean = true;
+		//public var counter:int = 0;
+		
+		//Holds the duration of the master timeline contained in the master template. Used to avoid needing to call masterTemplate.GetDurationOfCurrentAnimation in the run loop.
+		private var animationDuration:Number = 0;
+		
 		public var backgroundMasterTimeline:TimelineMax = new TimelineMax({paused:true, repeat: -1});
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
+		private var startupLoader:LoaderMax = new LoaderMax({name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF});
 		//Constructor
 		public function ppppuCore() 
 		{
@@ -91,6 +108,8 @@ package ppppu
 			mainStage.TransitionDiamond.visible = mainStage.Compositor.visible = mainStage.DisplayArea.visible = false;
 			
 			mainStage.stop();
+			//Hide the master template until everything is initialized
+			mainStage.Compositor.visible = false;
 			addChild(mainStage);
 			
 			//masterTemplate = //mainStage.DisplayArea.MasterTemplateInstance;
@@ -104,7 +123,7 @@ package ppppu
 				{flashStartFrame = label.frame;}
 			}
 			//Add an event listener that'll allow for frame checking.
-			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
+			//mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
 			//this.cacheAsBitmap = true;
 			//this.scrollRect = new Rectangle(0, 0, 480, 720);
 			/*var test:CustomElementContainer = new CustomElementContainer();
@@ -112,6 +131,7 @@ package ppppu
 			test.x = test.y = 200; 
 			addChild(test);*/
 			masterTemplate = mainStage.Compositor;
+			
 			masterTemplate.Initialize(timelineLib);
 			//masterTemplate.visible = false;
 			//characterList[0].SetID(0);
@@ -198,49 +218,100 @@ package ppppu
 			var transitDiaTLDef:TimelineDefinition = new TransitionDiamondTimelineData();
 			backgroundMasterTimeline.add(masterTemplate.CreateTimelineFromData(transitDiaTLDef.GetTimelineData(), mainStage),0);
 			
-			//Initialize test animation for Cowgirl animation
-			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedLoadingSWF);
-			var cowgirlURL:URLRequest = new URLRequest("CowgirlAnimation.swf");
-			loader.load(cowgirlURL);
-			addChild(loader);
 			
-			var loader2:Loader = new Loader();
-			loader2.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedLoadingSWF);
-			var rosaCowgirlURL:URLRequest = new URLRequest("RosaCowgirlAnimation.swf");
-			loader2.load(rosaCowgirlURL);
-			addChild(loader2);
 			
 			//(loader as AnimationInfo).GetDataForTimelinesCreation();
 			//var animation:AnimationInfo = (loader as AnimationInfo);
 			//animation.GetDataForTimelinesCreation();
 			//Test purposes
-			SwitchCharacter(0);
-			masterTemplate.visible = true;
-			//SwitchTemplateAnimation(0);
+			
+			//
 			//masterTemplate.PlayAnimation(0);
 			//mainStage.play();
+			
+			startupLoader.autoLoad = true;
+			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
+			startupLoader.append(new SWFLoader("PistonAnimation.swf"));
+			startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
+			startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
+			startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
+			startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
+			//startupLoader.load();
+			//Initialize test animation for Cowgirl animation
+			/*var loader:Loader = new Loader();
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedLoadingSWF);
+			var cowgirlURL:URLRequest = new URLRequest();
+			loader.load(cowgirlURL);
+			addChild(loader);
+			
+			var loader2:Loader = new Loader();
+			loader2.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedLoadingSWF);
+			var rosaCowgirlURL:URLRequest = new URLRequest();
+			loader2.load(rosaCowgirlURL);
+			addChild(loader2);*/
 		}
 		
 		//The "heart beat" of the flash. Ran every frame to monitor and react to certain, often frame sensitive, events
 		private function RunLoop(e:Event):void
 		{
-			if (backgroundMasterTimeline.paused())
+			//Checks if the timeline lib has a valid base animation set. If it doesn't, return until there is one loaded in.
+			if (!timelineLib.HasValidBaseAnimation())
 			{
-				backgroundMasterTimeline.play();
-				var array:Array = backgroundMasterTimeline.getChildren(true, false);
-				for each (var tl:TimelineMax in array)
-				{
-					tl.play();
-				}
+				return;
 			}
-			var mainStageMC:MovieClip = (e.target as MovieClip);
-			var frameNum:int = mainStageMC.currentFrame; //The current frame that the main stage is at.
-			var animationFrame:int = ((frameNum -2) % 120) + 1; //The frame that an animation should be on. Animations are typically 120 frames / 4 seconds long
-			if (animationFrame && animationFrame != lastPlayedFrame)
+			if (firstTimeInLoop)
 			{
-				if (frameNum == flashStartFrame)
+				SwitchCharacter(0);
+				SwitchTemplateAnimation(0);
+				backgroundMasterTimeline.play(0);
+				var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
+				for each (var tl:TimelineMax in bgTimelines)
 				{
+					tl.play(0);
+				}
+				masterTemplate.PlayAnimation(0);
+				masterTemplate.visible = true;
+				firstTimeInLoop = false;
+				previousUpdateTime = (getTimer() / 1000.0);
+				ppppuRunTimeCounter = 0;
+			}
+			else
+			{
+				var latestUpdateTime:Number = (getTimer() / 1000.0);
+				ppppuRunTimeCounter += (latestUpdateTime - previousUpdateTime);
+				//trace(ppppuRunTimeCounter);
+				previousUpdateTime = latestUpdateTime;
+			}
+			
+			//Note: This assumes that master timeline's time and the run loop's time are sync'd. Worse case might require accessing the master timeline's time every update.
+			if (ppppuRunTimeCounter >= animationDuration)
+			{
+				//Time to switch to a random animation and the other character
+				//Hardcoded for 60 fps test. Do not do this for the NX version
+				var currentCharID:int = currentCharacter.GetID();
+				if (currentCharID == 1)
+				{
+					SwitchCharacter(0);
+				}
+				else
+				{
+					SwitchCharacter(++currentCharID);
+				}
+				
+				/*var randomAnimSelect:int = Math.floor((Math.random() * animationNameIndexes.length));
+				while (!timelineLib.DoesBaseTimelinesForAnimationExist(randomAnimSelect))
+				{
+					randomAnimSelect = Math.floor((Math.random() * animationNameIndexes.length));
+				}*/
+				//SwitchTemplateAnimation(randomAnimSelect);
+				
+				ppppuRunTimeCounter -= animationDuration;
+				//trace("mstTL: " + masterTemplate.m)
+			}
+			//if (animationFrame && animationFrame != lastPlayedFrame)
+			//{
+				//if (frameNum == flashStartFrame)
+				//{
 					/*if (userSettings.firstTimeRun == true)
 					{
 						UpdateKeyBindsForHelpScreen();
@@ -265,29 +336,34 @@ package ppppu
 					mainStage.InnerDiamond.gotoAndPlay(animationFrame);
 					mainStage.TransitionDiamond.gotoAndPlay(animationFrame);
 					mainStage.Backlight.gotoAndPlay(animationFrame);*/
-					masterTemplate.visible = true;
+					//masterTemplate.visible = true;
 					//Go to the 
-					SwitchTemplateAnimation(currentAnimationIndex);
-					masterTemplate.PlayAnimation(animationFrame);
+					//SwitchTemplateAnimation(currentAnimationIndex);
+					//masterTemplate.PlayAnimation(animationFrame);
 					
 					////mainStage.setChildIndex(masterTemplate, //mainStage.numChildren - 1);
-				}
-				masterTemplate.Update(/*animationFrame*/);
+				//}
+				//masterTemplate.Update(/*animationFrame*/);
 				//masterTemplate.UpdateAnchoredElements(); //Called by master template's update functions
-				if (playSounds)
-				{
+				//if (playSounds)
+				//{
 					//charVoiceSystem.Tick(animationFrame);
-				}
-				//Make sure the background movie clips stay synced after reaching the loop end point on the main stage
-				if (frameNum == mainStageLoopStartFrame)
-				{
-					/*mainStage.OuterDiamond.gotoAndPlay(animationFrame);
-					mainStage.InnerDiamond.gotoAndPlay(animationFrame);
-					mainStage.TransitionDiamond.gotoAndPlay(animationFrame);
-					mainStage.Backlight.gotoAndPlay(animationFrame);*/
-				}
-			}
-			lastPlayedFrame = animationFrame;
+				//}
+		}
+		
+		private function StartupLoadsComplete(e:LoaderEvent):void
+		{
+			//Add an event listener that'll allow for frame checking.
+			//mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
+			
+			
+			//mainStage.play();
+			//lastRecordedTime = getTimer();
+			
+			TweenLite.ticker.addEventListener("tick", RunLoop,false,0,true);
+			//runTimer = new Timer(1000.0 / stage.frameRate);
+			//runTimer.addEventListener(TimerEvent.TIMER, this.RunLoop);
+			//runTimer.start();
 		}
 		
 		//Activated if a key is detected to be released. Sets the keys "down" status to false
@@ -312,7 +388,7 @@ package ppppu
 				{
 					var randomAnimIndex:int = Math.floor(Math.random() * animationNameIndexes.length);
 					SwitchTemplateAnimation(randomAnimIndex);
-					masterTemplate.PlayAnimation(0);
+					masterTemplate.PlayAnimation(-1);
 				}
 				else if((!(49 > keyPressed) && !(keyPressed > 57)) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
 				{
@@ -321,8 +397,11 @@ package ppppu
 					{
 						keyPressed = keyPressed - 48;
 					}
+					if (timelineLib.DoesBaseTimelinesForAnimationExist(keyPressed - 49))
+					{
 					SwitchTemplateAnimation(keyPressed - 49);
-					masterTemplate.PlayAnimation(0);
+					}
+					masterTemplate.PlayAnimation(-1);
 				}
 				
 				if (keyPressed == Keyboard.UP)
@@ -343,7 +422,7 @@ package ppppu
 					{
 						currentCharacter = characterList[0];
 						//masterTemplate.ClearTimelines();
-						masterTemplate.AddTimelines(timelineLib.GetBaseTimelinesFromLibrary(0));
+						masterTemplate.AddTimelines(timelineLib.GetBaseTimelinesFromLibrary(this.currentAnimationIndex));
 						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
 						masterTemplate.ImmediantLayoutUpdate();
 						//masterTemplate.ResumePlayingAnimation();
@@ -354,8 +433,9 @@ package ppppu
 				{
 					if (currentCharacter.GetID() != 1)
 					{
+						//Can crash if character isn't found, range error.
 						currentCharacter = characterList[1];
-						masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(0, 1, "Standard"));
+						masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(this.currentAnimationIndex, currentCharacter.GetID(), "Standard"));
 						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
 						masterTemplate.ImmediantLayoutUpdate();
 						//masterTemplate.ResumePlayingAnimation();
@@ -458,17 +538,23 @@ package ppppu
 		//Switches to a templated animation of a specified name
 		private function SwitchTemplateAnimation(animationIndex:uint):void
 		{
+			if (animationIndex >= animationNameIndexes.length) { return;}
 			var animationName:String = animationNameIndexes[animationIndex];
 			var currentCharacterName:String = currentCharacter.GetName();
 			masterTemplate.currentAnimationName = animationName;
 
 			
-			if(!timelineLib.DoesBaseTimelinesForAnimationExist(animationIndex))
-			{
+			//if(!timelineLib.DoesBaseTimelinesForAnimationExist(animationIndex))
+			//{
+				//return;
 				//CreateTimelinesForCharacterAnimation(defaultCharacterName, animationIndex);
-			}
+			//}
 			//var defaultLayerInfo:Object = layerInfoDict[defaultCharacterName][animationName];
 			var currentCharLayerInfo:Object = layerInfoDict[currentCharacterName][animationName];
+			if (currentCharLayerInfo == null && currentCharacterName != defaultCharacterName)
+			{
+				currentCharLayerInfo = layerInfoDict[defaultCharacterName][animationName];
+			}
 			//masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
 			masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
 			
@@ -485,16 +571,19 @@ package ppppu
 			
 			if (currentCharacter != defaultCharacter)
 			{
-				if (!timelineLib.DoesCharacterSetExists(animationIndex, currentCharacter.GetID(), "Standard"))
+				if (timelineLib.DoesCharacterSetExists(animationIndex, currentCharacter.GetID(), "Standard"))
 				{
-					//CreateTimelinesForCharacterAnimation(currentCharacterName, animationIndex);
+					masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationIndex, currentCharacter.GetID(), "Standard"));
 				}
-				masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationIndex, currentCharacter.GetID(), "Standard"));
+				
+				
 			}
 			masterTemplate.ImmediantLayoutUpdate();
 			//masterTemplate.EnsureTimelineIsUpToDate();
 			//Change the animation info
 			//masterTemplate.currentAnimationInfo = animInfoDict["Cowgirl"];
+			
+			animationDuration = masterTemplate.GetDurationOfCurrentAnimation();
 			
 			//Sync the animation to the main stage's timeline (main stage's current frame - animation start frame % 120 + 1 to avoid setting it to frame 0)
 			//masterTemplate.PlayAnimation((mainStage.currentFrame -2) % 120 + 1);
@@ -571,10 +660,11 @@ package ppppu
 			trace("Was unable to load file \"MouthTest.txt\"");
 		}
 		
-		private function FinishedLoadingSWF(e:Event):void
+		private function FinishedLoadingSWF(e:LoaderEvent):void
 		{
-			var animInfo:AnimationInfo = e.target.content as AnimationInfo;
-			//addChild(test);
+			var mod:ppppuMod = (e.target.content.rawContent as ppppuMod);
+			var animInfo:AnimationInfo = e.target.content.rawContent as AnimationInfo;
+			addChild(animInfo);
 			//Get stuff from target swf
 			if (animInfo)
 			{
@@ -584,6 +674,23 @@ package ppppu
 				
 				var charName:String = animInfo.GetCharacterName();
 				var animName:String = animInfo.GetAnimationName();
+				
+				//var isDefaultCharacter:Boolean = false;
+				/*if (charName == defaultCharacterName)
+				{
+					isDefaultCharacter = true; 
+				}*/
+
+				
+				var animationIndex:int = animationNameIndexes.indexOf(animName);
+				//Animations can not be added until the default character has their data for the particular animation loaded in.
+				if (animationIndex == -1)
+				{
+					animationIndex = animationNameIndexes.length;
+					animationNameIndexes[animationIndex] = animName;
+					
+				}
+				
 				//If the layer info dictionary for the character doesn't exist, create it.
 				if (layerInfoDict[charName] == null) 
 				{ layerInfoDict[charName] = new Dictionary(); }
@@ -595,19 +702,27 @@ package ppppu
 					timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i],masterTemplate);
 					
 				}
-				if (animInfo.GetCharacterName() == defaultCharacterName)
+				if (charName == defaultCharacterName)
 				{
-					timelineLib.AddBaseTimelinesToLibrary(0, timelines);
+					timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
 				}
 				else
 				{
-					timelineLib.AddReplacementTimelinesToLibrary(0, 1, "Standard", timelines);
+					var charID:int = -1;
+					for (var x:int = 0, y:int = characterList.length; x < y; ++x)
+					{
+						if (charName == characterList[x].GetName())
+						{
+							charID = x; 
+						}
+					}
+					timelineLib.AddReplacementTimelinesToLibrary(animationIndex, charID, "Standard", timelines);
 				}
 				
 				
 			}
 			//remove it
-			removeChild(e.target.loader);
+			removeChild(animInfo);
 		}
 	}
 
