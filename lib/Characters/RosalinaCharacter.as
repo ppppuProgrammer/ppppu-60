@@ -14,6 +14,7 @@ package Characters
 		public function RosalinaCharacter() 
 		{
 			m_name = "Rosalina";
+			m_defaultMusicName = "Beep Block Skyway";
 		}
 		
 	}

@@ -511,6 +511,11 @@ package ppppu
 		{
 			return masterTimeline.duration();
 		}
+		
+		public function GetTimeInCurrentAnimation():Number
+		{
+			return masterTimeline.time();
+		}
 	}
 
 }

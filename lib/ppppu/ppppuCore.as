@@ -33,6 +33,8 @@ package ppppu
 	import com.greensock.data.TweenLiteVars;
 	import com.greensock.*;
 	import flash.geom.Rectangle;
+	import Mod.ModArchive;
+	import Mod.MusicMod;
 	import Mod.ppppuMod;
 	import ppppu.TemplateBase;
 	import flash.ui.Keyboard;
@@ -69,6 +71,7 @@ package ppppu
 		private var currentAnimationIndex:uint = 0;
 		//private var embedTweenDataConverter:TweenDataParser = new TweenDataParser();
 		
+		private var musicPlayer:MusicPlayer = new MusicPlayer();
 		//private var charVoiceSystem:SoundEffectSystem;
 		
 		private var playSounds:Boolean = false;
@@ -218,7 +221,7 @@ package ppppu
 			var transitDiaTLDef:TimelineDefinition = new TransitionDiamondTimelineData();
 			backgroundMasterTimeline.add(masterTemplate.CreateTimelineFromData(transitDiaTLDef.GetTimelineData(), mainStage),0);
 			
-			
+			musicPlayer.SetUpdateRate(stage.frameRate);
 			
 			//(loader as AnimationInfo).GetDataForTimelinesCreation();
 			//var animation:AnimationInfo = (loader as AnimationInfo);
@@ -236,6 +239,7 @@ package ppppu
 			startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
 			startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
 			startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
+			startupLoader.append(new SWFLoader("bbskywayMusic.swf"));
 			//startupLoader.load();
 			//Initialize test animation for Cowgirl animation
 			/*var loader:Loader = new Loader();
@@ -272,15 +276,18 @@ package ppppu
 				masterTemplate.PlayAnimation(0);
 				masterTemplate.visible = true;
 				firstTimeInLoop = false;
-				previousUpdateTime = (getTimer() / 1000.0);
+				previousUpdateTime = backgroundMasterTimeline.totalTime();//(getTimer() / 1000.0);
 				ppppuRunTimeCounter = 0;
+				musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
+				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
 			else
 			{
-				var latestUpdateTime:Number = (getTimer() / 1000.0);
+				var latestUpdateTime:Number = backgroundMasterTimeline.totalTime();// (getTimer() / 1000.0);
 				ppppuRunTimeCounter += (latestUpdateTime - previousUpdateTime);
 				//trace(ppppuRunTimeCounter);
 				previousUpdateTime = latestUpdateTime;
+				//trace("bg:" + backgroundMasterTimeline.totalTime() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
 			
 			//Note: This assumes that master timeline's time and the run loop's time are sync'd. Worse case might require accessing the master timeline's time every update.
@@ -298,12 +305,12 @@ package ppppu
 					SwitchCharacter(++currentCharID);
 				}
 				
-				/*var randomAnimSelect:int = Math.floor((Math.random() * animationNameIndexes.length));
+				var randomAnimSelect:int = Math.floor((Math.random() * animationNameIndexes.length));
 				while (!timelineLib.DoesBaseTimelinesForAnimationExist(randomAnimSelect))
 				{
 					randomAnimSelect = Math.floor((Math.random() * animationNameIndexes.length));
-				}*/
-				//SwitchTemplateAnimation(randomAnimSelect);
+				}
+				SwitchTemplateAnimation(randomAnimSelect);
 				
 				ppppuRunTimeCounter -= animationDuration;
 				//trace("mstTL: " + masterTemplate.m)
@@ -443,20 +450,18 @@ package ppppu
 					//masterTemplate["HairFront"].ChangeDisplayedSprite(1);
 				}
 				
+				//Debugger
+				if (keyPressed == Keyboard.S)
+				{
+					mainStage.stop();
+					backgroundMasterTimeline.stop();
+					masterTemplate.StopAnimation();
+				}
 				/*if (keyPressed == Keyboard.Z)
 				{
 				}
 				
-				//Debugger
-				if (keyPressed == Keyboard.S)
-				{
-					//mainStage.stop();
-					//mainStage.OuterDiamond.stop();
-					//mainStage.InnerDiamond.stop();
-					//mainStage.TransitionDiamond.stop();
-					//mainStage.Backlight.stop();
-					masterTemplate.StopAnimation();
-				}
+				
 				else if (keyPressed == Keyboard.R)
 				{
 					//mainStage.play();
@@ -663,66 +668,103 @@ package ppppu
 		private function FinishedLoadingSWF(e:LoaderEvent):void
 		{
 			var mod:ppppuMod = (e.target.content.rawContent as ppppuMod);
-			var animInfo:AnimationInfo = e.target.content.rawContent as AnimationInfo;
-			addChild(animInfo);
-			//Get stuff from target swf
-			if (animInfo)
+			//Add the mod to the stage so the first frame function can get started, allowing the content to be ready to be used.
+			addChild(mod);
+			var modType:int = mod.GetModType();
+			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
+			if (modType == ppppuMod.MOD_ARCHIVE)
 			{
-				var data:Vector.<Object> = animInfo.GetDataForTimelinesCreation();
-				var timelines:Vector.<TimelineMax> = new Vector.<TimelineMax>();
-				var displayLayout:Object = JSON.parse(animInfo.GetDisplayOrderList());
-				
-				var charName:String = animInfo.GetCharacterName();
-				var animName:String = animInfo.GetAnimationName();
-				
-				//var isDefaultCharacter:Boolean = false;
-				/*if (charName == defaultCharacterName)
+				var archive:ModArchive = mod as ModArchive;
+				if (archive)
 				{
-					isDefaultCharacter = true; 
-				}*/
-
-				
-				var animationIndex:int = animationNameIndexes.indexOf(animName);
-				//Animations can not be added until the default character has their data for the particular animation loaded in.
-				if (animationIndex == -1)
-				{
-					animationIndex = animationNameIndexes.length;
-					animationNameIndexes[animationIndex] = animName;
-					
-				}
-				
-				//If the layer info dictionary for the character doesn't exist, create it.
-				if (layerInfoDict[charName] == null) 
-				{ layerInfoDict[charName] = new Dictionary(); }
-				//Set the layer info for an animation of the character
-				layerInfoDict[charName][animName] = displayLayout;
-				
-				for (var i:int = 0, l:int = data.length; i < l; ++i)
-				{
-					timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i],masterTemplate);
-					
-				}
-				if (charName == defaultCharacterName)
-				{
-					timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
-				}
-				else
-				{
-					var charID:int = -1;
-					for (var x:int = 0, y:int = characterList.length; x < y; ++x)
+					var archiveModList:Vector.<ppppuMod> = archive.GetModsList();
+					for (var i:int = 0, l:int = archiveModList.length; i < l; ++i)
 					{
-						if (charName == characterList[x].GetName())
-						{
-							charID = x; 
-						}
+						var childMod:ppppuMod = archiveModList[i];
+						ProcessMod(childMod, modType);
 					}
-					timelineLib.AddReplacementTimelinesToLibrary(animationIndex, charID, "Standard", timelines);
 				}
-				
+			}
+			else
+			{
+				//A singular mod. Just need to process it.
+				ProcessMod(mod, modType);
+			}
+			//remove the mod file.
+			removeChild(mod);
+		}
+		
+		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter
+		and the mod could not be added.*/
+		private function ProcessMod(mod:ppppuMod, modType:int):Boolean
+		{
+			if (modType == ppppuMod.MOD_ANIMATION)
+			{
+				var animation:AnimationInfo = mod as AnimationInfo;
+				if (animation)
+				{
+					var data:Vector.<Object> = animation.GetDataForTimelinesCreation();
+					var timelines:Vector.<TimelineMax> = new Vector.<TimelineMax>();
+					var displayLayout:Object = JSON.parse(animation.GetDisplayOrderList());
+					
+					var charName:String = animation.GetCharacterName();
+					var animName:String = animation.GetAnimationName();
+					
+					var animationIndex:int = animationNameIndexes.indexOf(animName);
+					//Animations can not be added until the default character has their data for the particular animation loaded in.
+					if (animationIndex == -1)
+					{
+						animationIndex = animationNameIndexes.length;
+						animationNameIndexes[animationIndex] = animName;
+						
+					}
+					
+					//If the layer info dictionary for the character doesn't exist, create it.
+					if (layerInfoDict[charName] == null) 
+					{ layerInfoDict[charName] = new Dictionary(); }
+					//Set the layer info for an animation of the character
+					layerInfoDict[charName][animName] = displayLayout;
+					
+					for (var i:int = 0, l:int = data.length; i < l; ++i)
+					{
+						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i],masterTemplate);
+						
+					}
+					if (charName == defaultCharacterName)
+					{
+						timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
+					}
+					else
+					{
+						var charID:int = -1;
+						for (var x:int = 0, y:int = characterList.length; x < y; ++x)
+						{
+							if (charName == characterList[x].GetName())
+							{
+								charID = x; 
+							}
+						}
+						timelineLib.AddReplacementTimelinesToLibrary(animationIndex, charID, "Standard", timelines);
+					}
+					return true;
+				}
+			}
+			else if (modType == ppppuMod.MOD_CHARACTER)
+			{
+			}
+			else if (modType == ppppuMod.MOD_MUSIC)
+			{
+				var music:MusicMod = mod as MusicMod;
+				if (music)
+				{
+					musicPlayer.AddMusic(music.GetMusicData(), music.GetName(), music.GetStartLoopTime(), music.GetEndLoopTime(), music.GetStartTime());
+				}
+			}
+			else if (modType == ppppuMod.MOD_ASSETS)
+			{
 				
 			}
-			//remove it
-			removeChild(animInfo);
+			return false;
 		}
 	}
 

@@ -14,6 +14,7 @@ package Characters
 		public function PeachCharacter() 
 		{
 			m_name = "Peach";	
+			m_defaultMusicName = "Beep Block Skyway";
 		}
 		
 	}

@@ -1,6 +1,5 @@
 package Animations 
 {
-	import flash.display.Sprite;
 	import Mod.ppppuMod;
 	/**
 	 * Class that holds the various timelines used to animate various elements on the master template/compositor to create an animation.
@@ -14,10 +13,9 @@ package Animations
 		protected var characterName:String;
 		protected var animationName:String;
 		
-		modType:int = ppppuMod.MOD_ANIMATION; 
-		
 		public function AnimationInfo() 
 		{
+			modType = ppppuMod.MOD_ANIMATION; 
 			timelinesData = new Vector.<Object>();
 		}
 		

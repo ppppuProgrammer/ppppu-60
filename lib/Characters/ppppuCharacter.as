@@ -21,10 +21,14 @@
 		
 		protected var m_Id:int = -1; //The id number of the character. Can change depending on the order that characters
 		protected var m_name:String;
-		protected var m_playAnimationFrame:int = 0;
+		//protected var m_playAnimationFrame:int = 0;
 		protected var m_randomizePlayAnim:Boolean = true;
 		protected var m_lockedAnimation:Vector.<Boolean>; //Keeps track if an animation can be switched to.
-
+		
+		protected var m_defaultMusicName:String = "";
+		
+		//The music to play for this specific character
+		protected var selectedMusicId:int = -1;
 		//private var m_numOfLockedAnimations:int = 0;
 
 		public function SetID(idNumber:int):void
@@ -37,6 +41,7 @@
 		}
 		public function GetID():int { return m_Id;}
 		public function GetName():String { return m_name; }
+		public function GetDefaultMusicName():String { return m_defaultMusicName;}
 		/*public function GetDiamondColor1():uint { return m_innerDiamondColor1;}
 		public function GetDiamondColor2():uint{ return m_innerDiamondColor2;}
 		public function GetDiamondColor3():uint { return m_innerDiamondColor3;}
