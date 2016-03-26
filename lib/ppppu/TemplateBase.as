@@ -70,14 +70,20 @@ package ppppu
 			{
 				timeline = new TimelineMax( { /*repeat: -1,*/ paused: true, useFrames:false/**/ });
 				timeline.data = target;
+				var currentTweenData:Object;
+				var duration:int;
 				for (var i:int = 0, l:int = tweenData.length; i < l; ++i)
 				{
-					var currentTweenData:Object = tweenData[i];
-					var duration:int = 0;
+					currentTweenData = tweenData[i];
+					
 					if ("duration" in currentTweenData)
 					{
 						duration = currentTweenData.duration;
 						delete currentTweenData.duration; //Remove duration from tween data so it can be passed used for the tween's var property
+					}
+					else
+					{
+						duration = 0;
 					}
 					if (duration)
 					{
@@ -124,48 +130,32 @@ package ppppu
 		{
 			//Get current time 
 			var currentTime:Number = masterTimeline.time();
+			var layoutChangeTime:Number;
 			//Start at the end and work backwards
 			for (var i:int = elementDepthLayoutChangeFrames.length - 1; i >= 0; --i)
 			{
-				var layoutChangeTime:Number = elementDepthLayoutChangeFrames[i];
+				layoutChangeTime = elementDepthLayoutChangeFrames[i];
 
 				if (currentTime >= layoutChangeTime)
 				{
 					latestFrameDepthLayout = currentAnimationElementDepthLayout[elementDepthLayoutChangeFrames[i]];
+					//var changeEle:int = getTimer();
 					ChangeElementDepths(latestFrameDepthLayout);
+					//trace("\tTook ChangeElementDepths " + (getTimer() - changeEle) + " millisecs to complete");
 					break; //Break out the for loop
 				}
 			}
 			//UpdateAnchoredElements();
-		}
-		 
-		//Frame based ver
-		/*public function ImmediantLayoutUpdate(animFrame:int):void
-		{
-			//Start at the end and work backwards
-			for (var i:int = elementDepthLayoutChangeFrames.length - 1; i >= 0; --i)
-			{
-				var frame:String = elementDepthLayoutChangeFrames[i];
-				//frame = frame.substring(1);
-				var depthChangeFrame:int = parseInt(frame, 10);
-				if (animFrame >= depthChangeFrame)
-				{
-					latestFrameDepthLayout = currentAnimationElementDepthLayout[elementDepthLayoutChangeFrames[i]];
-					ChangeElementDepths(latestFrameDepthLayout);
-					break; //Break out the for loop
-				}
-			}
-			//UpdateAnchoredElements();
-		}*/
-		
+		}	
 		
 		public function ChangeElementDepths(depthLayout:Object):void
 		{
 			
+			var container:DisplayObjectContainer;
 			//If there are any maskedContainers being used, remove them.
 			while ( maskedContainerIndexes.length > 0)
 			{
-				var container:DisplayObjectContainer = maskedContainerIndexes.pop();
+				container = maskedContainerIndexes.pop();
 				while (container.numChildren > 0)
 				{
 					//Put the child element in the container back where it came from
@@ -184,13 +174,17 @@ package ppppu
 				templateElements[i] = getChildAt(i);
 			}
 			var sortedDepthElements:Array = new Array();
+			var element:DisplayObject;
+			var elementName:String;
+			var elementTweens:Array;
+			var timelineToStart:TimelineMax;
 			for (var childIndex:uint = 0; childIndex < templateChildrenCount; ++childIndex)
 			{
-				var element:DisplayObject = templateElements[childIndex];
+				element = templateElements[childIndex];
 				//element.visible = false;
-				var elementName:String = element.name;
+				elementName = element.name;
 
-				var elementTweens:Array = masterTimeline.getTweensOf(element, true);
+				elementTweens = masterTimeline.getTweensOf(element, true);
 				
 				if (elementName in depthLayout)
 				{	
@@ -198,7 +192,7 @@ package ppppu
 					
 					if (elementTweens.length > 0)
 					{
-						var timelineToStart:TimelineMax = (elementTweens[0] as TweenLite).timeline as TimelineMax;
+						timelineToStart = (elementTweens[0] as TweenLite).timeline as TimelineMax;
 						if (!timelineToStart.isActive())
 						{
 							timelineToStart.seek(0);
@@ -228,24 +222,26 @@ package ppppu
 			//var lastDepthIndex:int = -1;
 			var latestElement:Sprite = null;
 			var latestMaskedContainer:Sprite = null;
+			var currentElement:Sprite;
+			var depth:Number;
 			for (var arrayPosition:int = 0, length:int = sortedDepthElements.length; arrayPosition < length; ++arrayPosition )
 			{
-				var currentElement:Sprite = sortedDepthElements[arrayPosition][0];
+				currentElement = sortedDepthElements[arrayPosition][0];
 				if (currentElement)
 				{
 					//currentElement.visible = true;
 				}
 				/*If depth for the element has a decimal value then it is to be masked. Since as3 has a 1 element per mask limitation,
 				what needs to be done is creating a container for all elements to be masked then have that [the container] be masked.*/
-				var depth:Number = sortedDepthElements[arrayPosition][1];
+				depth = sortedDepthElements[arrayPosition][1];
 				if (depth % 1 != 0)
 				{
 					if (!latestMaskedContainer)
 					{
 						latestMaskedContainer = new Sprite();
 						latestMaskedContainer.name = latestElement.name + "MaskedContainer";
-						var indexOfLatestElement:int = this.getChildIndex(latestElement);
-						this.addChildAt(latestMaskedContainer, indexOfLatestElement);
+						//var indexOfLatestElement:int = this.getChildIndex(latestElement);
+						this.addChildAt(latestMaskedContainer, this.getChildIndex(latestElement));
 						maskedContainerIndexes.push(latestMaskedContainer);
 						latestMaskedContainer.mask = latestElement;
 					}
@@ -366,11 +362,15 @@ package ppppu
 		}
 		
 		/*Removes all currently active timelines and adds the base timelines for a specified animation.*/
-		public function ChangeBaseTimelinesUsed(animationIndex:uint):void
+		public function ChangeBaseTimelinesUsed(animationIndex:uint, clearCurrentTimelines:Boolean=false):void
 		{
 			var timelines:Vector.<TimelineMax> = timelineLib.GetBaseTimelinesFromLibrary(animationIndex);
 			if (timelines)
 			{
+				if (clearCurrentTimelines)
+				{
+					masterTimeline.clear();
+				}
 				//ClearTimelines();
 				AddTimelines(timelines);
 			}
@@ -403,7 +403,68 @@ package ppppu
 		}
 		
 		//Adds the timelines contained in a vector to the master timeline.
-		public function AddTimelines(timelinesToAdd:Vector.<TimelineMax>):void
+		[Inline]
+		final public function AddTimelines(timelinesToAdd:Vector.<TimelineMax>):void
+		{
+			//CUrrent way of handling when a replacement timeline doesn't exist. Works poorly by keeping the default.
+			if (timelinesToAdd == null || timelinesToAdd.length == 0)
+			{
+				return;
+			}
+			var timelinesPendingRemoval:Array = [];
+			var timelinesOkForAdding:Array = [];
+			var tlToAdd:TimelineMax;
+			var timelineDisplayObject:DisplayObject;
+			var elementTweens:Array;
+			var childTimeline:TimelineMax;
+			for (var i:uint = 0, l:uint = timelinesToAdd.length; i < l; ++i)
+			{
+				tlToAdd = timelinesToAdd[i];
+				//If the timeline to add is null, return out the function.
+				if (tlToAdd != null) 
+				{
+					//The display object that the timeline controls
+					timelineDisplayObject = tlToAdd.data as DisplayObject;
+					//Check to see if the master timeline already has a nested timeline for the specified display object.
+					//If it does, then replace it. Otherwise, add it.
+					
+					//Optimized version
+					elementTweens = masterTimeline.getTweensOf(timelineDisplayObject, true);
+					if (elementTweens.length > 0)
+					{
+						childTimeline = (elementTweens[0] as TweenLite).timeline as TimelineMax;
+						//Remove old timeline for element if needed
+						if (childTimeline != tlToAdd)
+						{
+							childTimeline.pause();
+							timelinesPendingRemoval[timelinesPendingRemoval.length] = childTimeline;
+							//masterTimeline.remove(childTimeline);
+							//masterTimeline.add(tlToAdd, 0);
+							//Start from the first tween so visibility is set correct during mid-animation switches.
+							//tlToAdd.seek(0);
+							//Now start playing from the master timeline's current time
+							//tlToAdd.play(masterTimeline.time());
+							//tlToAdd.seek(((((this.parent as MovieClip).currentFrame-2) % 120) * millisecPerFrame) / 1000.0);
+						}
+						//return;
+					}
+					
+					//Looked through all the timelines nested in the master timeline and there were no matches for tlToAdd to override.
+					//masterTimeline.add(tlToAdd, 0);
+					tlToAdd.seek(0);
+					tlToAdd.play(masterTimeline.time());
+					timelinesOkForAdding[timelinesOkForAdding.length] = tlToAdd;
+					//trace(timelinesToAdd[i].data.name + ": " + timelinesToAdd[i].duration());
+				}
+			}
+			masterTimeline.remove(timelinesPendingRemoval);
+			masterTimeline.add(timelinesOkForAdding, 0);
+		}
+		
+		
+		//Adds the timelines contained in a vector to the master timeline.
+		/*[Inline]
+		final public function AddTimelines(timelinesToAdd:Vector.<TimelineMax>):void
 		{
 			//CUrrent way of handling when a replacement timeline doesn't exist. Works poorly by keeping the default.
 			if (timelinesToAdd == null || timelinesToAdd.length == 0)
@@ -419,7 +480,8 @@ package ppppu
 		}
 		
 		//Adds a specified Timeline to the master timeline.
-		public function AddTimeline(tlToAdd:TimelineMax):void
+		[Inline]
+		final public function AddTimeline(tlToAdd:TimelineMax):void
 		{
 			//If the timeline to add is null, return out the function.
 			if (tlToAdd == null) { return; }
@@ -437,7 +499,7 @@ package ppppu
 				ReplaceTimeline(childTimeline, tlToAdd);
 				return;
 			}
-
+			
 			//Looked through all the timelines nested in the master timeline and there were no matches for tlToAdd to override.
 			masterTimeline.add(tlToAdd, 0);
 			tlToAdd.seek(0);
@@ -445,12 +507,12 @@ package ppppu
 		}
 		
 		//Replaces a specified timeline with another and then sets the newly added timeline to the frame that the removed one was on.
-		public function ReplaceTimeline(tlToRemove:TimelineMax, tlToAdd:TimelineMax):void
+		[Inline]
+		final public function ReplaceTimeline(tlToRemove:TimelineMax, tlToAdd:TimelineMax):void
 		{
 			if (tlToRemove != tlToAdd)
 			{
 				tlToRemove.pause();
-				tlToRemove.stop();
 				masterTimeline.remove(tlToRemove);
 				masterTimeline.add(tlToAdd, 0);
 				//Start from the first tween so visibility is set correct during mid-animation switches.
@@ -459,7 +521,7 @@ package ppppu
 				tlToAdd.play(masterTimeline.time());
 				//tlToAdd.seek(((((this.parent as MovieClip).currentFrame-2) % 120) * millisecPerFrame) / 1000.0);
 			}
-		}
+		}*/
 		
 		public function SetElementDepthLayout(layout:Object):void
 		{
@@ -469,7 +531,7 @@ package ppppu
 			{
 				elementDepthLayoutChangeFrames[elementDepthLayoutChangeFrames.length] = index;
 			}
-			elementDepthLayoutChangeFrames.sort(Array.NUMERIC);
+			//elementDepthLayoutChangeFrames.sort(Array.NUMERIC);
 			currentAnimationElementDepthLayout = layout;
 			
 		}

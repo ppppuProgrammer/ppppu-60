@@ -68,7 +68,7 @@ package ppppu
 		private var defaultCharacter:ppppuCharacter;// = characterList[0];
 		private var defaultCharacterName:String;// = defaultCharacter.GetName();
 		private var currentCharacter:ppppuCharacter;// = defaultCharacter;
-		private var currentAnimationIndex:uint = 0;
+		private var currentAnimationIndex:int = -1;
 		//private var embedTweenDataConverter:TweenDataParser = new TweenDataParser();
 		
 		private var musicPlayer:MusicPlayer = new MusicPlayer();
@@ -77,11 +77,11 @@ package ppppu
 		private var playSounds:Boolean = false;
 		
 		//For stopping animation
-		private var lastPlayedFrame:int = -1;
+		//private var lastPlayedFrame:int = -1;
 		
 		//private var displayWidthLimit:int;
-		private var flashStartFrame:int;
-		private var mainStageLoopStartFrame:int;
+		//private var flashStartFrame:int;
+		//private var mainStageLoopStartFrame:int;
 		
 		//Settings related
 		//public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX");
@@ -110,21 +110,12 @@ package ppppu
 			mainStage.Backlight.visible = mainStage.OuterDiamond.visible = mainStage.InnerDiamond.visible = 
 			mainStage.TransitionDiamond.visible = mainStage.Compositor.visible = mainStage.DisplayArea.visible = false;
 			
-			mainStage.stop();
+			//mainStage.stop();
 			//Hide the master template until everything is initialized
 			mainStage.Compositor.visible = false;
 			addChild(mainStage);
 			
 			//masterTemplate = //mainStage.DisplayArea.MasterTemplateInstance;
-			var frameLabels:Array = mainStage.currentLabels;
-			for (var i:int = 0, l:int = frameLabels.length; i < l;++i)
-			{
-				var label:FrameLabel = frameLabels[i] as FrameLabel;
-				if (label.name == "re")
-				{mainStageLoopStartFrame = label.frame; }
-				else if (label.name == "Start")
-				{flashStartFrame = label.frame;}
-			}
 			//Add an event listener that'll allow for frame checking.
 			//mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
 			//this.cacheAsBitmap = true;
@@ -235,10 +226,10 @@ package ppppu
 			startupLoader.autoLoad = true;
 			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
 			startupLoader.append(new SWFLoader("PistonAnimation.swf"));
-			startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
+			//startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
 			startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
 			startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
-			startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
+			//startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
 			startupLoader.append(new SWFLoader("bbskywayMusic.swf"));
 			//startupLoader.load();
 			//Initialize test animation for Cowgirl animation
@@ -310,8 +301,9 @@ package ppppu
 				{
 					randomAnimSelect = Math.floor((Math.random() * animationNameIndexes.length));
 				}
+				//var animSwitchStart:int = getTimer();
 				SwitchTemplateAnimation(randomAnimSelect);
-				
+				//trace("Took SwitchTemplateAnimation" + (getTimer() - animSwitchStart) + " milliseconds to switch\n");
 				ppppuRunTimeCounter -= animationDuration;
 				//trace("mstTL: " + masterTemplate.m)
 			}
@@ -453,91 +445,22 @@ package ppppu
 				//Debugger
 				if (keyPressed == Keyboard.S)
 				{
-					mainStage.stop();
+					//mainStage.stop();
 					backgroundMasterTimeline.stop();
 					masterTemplate.StopAnimation();
 				}
-				/*if (keyPressed == Keyboard.Z)
-				{
-				}
-				
-				
 				else if (keyPressed == Keyboard.R)
 				{
-					//mainStage.play();
-					//mainStage.OuterDiamond.play();
-					//mainStage.InnerDiamond.play();
-					//mainStage.TransitionDiamond.play();
-					//mainStage.Backlight.play();
+					backgroundMasterTimeline.play();
+					var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
+					for each (var tl:TimelineMax in bgTimelines)
+					{
+						tl.play(0);
+					}
 					masterTemplate.ResumePlayingAnimation();
 				}
-				else if (keyPressed == Keyboard.D)
-				{
-					masterTemplate.ToggleDebugModeText();
-				}
-				else if (keyPressed == Keyboard.F)
-				{
-					masterTemplate.ToggleHairVisibility();
-				}
-				else if (keyPressed == Keyboard.G)
-				{
-					masterTemplate.DEBUG_HairBackTesting();
-				}
-				else if (keyPressed == Keyboard.M)
-				{
-					masterTemplate.Mouth.ChangeExpression("Smile");
-				}
-				else if (keyPressed == Keyboard.N)
-				{
-					masterTemplate.Mouth.ChangeExpression("TearShape");
-				}
-				else if (keyPressed == Keyboard.O)
-				{
-					masterTemplate.Mouth.ChangeExpression("Oh");
-				}
-				else if (keyPressed == Keyboard.L)
-				{
-					var myTextLoader:URLLoader = new URLLoader();
-					myTextLoader.addEventListener(Event.COMPLETE, mouthLoadTest);
-					myTextLoader.addEventListener(IOErrorEvent.IO_ERROR, loadFail);
-					myTextLoader.load(new URLRequest("MouthTest.txt"));
-				}*/
-				
+				keyDownStatus[keyEvent.keyCode] = true;
 			}
-			/*if (keyPressed == Keyboard.LEFT)
-			{
-				//mainStage.prevFrame();
-				var frame:int = (//mainStage.currentFrame -2) % 120 + 1;
-				
-				//mainStage.OuterDiamond.gotoAndStop(frame);
-				//mainStage.InnerDiamond.gotoAndStop(frame);
-				//mainStage.TransitionDiamond.gotoAndStop(frame);
-				//mainStage.Backlight.gotoAndStop(frame);
-				masterTemplate.PlayAnimation(frame);
-				masterTemplate.StopAnimation();
-			}
-			else if (keyPressed == Keyboard.RIGHT)
-			{
-				//mainStage.nextFrame();
-				var frame:int = (//mainStage.currentFrame -2) % 120 + 1;
-				
-				//mainStage.OuterDiamond.gotoAndStop(frame);
-				//mainStage.InnerDiamond.gotoAndStop(frame);
-				//mainStage.TransitionDiamond.gotoAndStop(frame);
-				//mainStage.Backlight.gotoAndStop(frame);
-				masterTemplate.PlayAnimation(frame);
-				masterTemplate.StopAnimation();
-			}
-			if (keyPressed == Keyboard.UP)
-			{
-				//ScaleFromCenter(//mainStage.DisplayArea, //mainStage.DisplayArea.scaleX + .05, //mainStage.DisplayArea.scaleY + .05);
-			}
-			else if (keyPressed == Keyboard.DOWN)
-			{
-				//ScaleFromCenter(//mainStage.DisplayArea, //mainStage.DisplayArea.scaleX - .05, //mainStage.DisplayArea.scaleY - .05);
-			}*/
-			
-			keyDownStatus[keyEvent.keyCode] = true;
 		}
 		
 		//Switches to a templated animation of a specified name
@@ -561,29 +484,38 @@ package ppppu
 				currentCharLayerInfo = layerInfoDict[defaultCharacterName][animationName];
 			}
 			//masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
+			//trace("character: " + currentCharacterName + ", animation: " + animationName);
+			//var eleStart:int = getTimer();
 			masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
+			//trace("Took SetElementDepthLayout " + (getTimer() - eleStart) + " milliseconds to switch");
 			
+			//var baseStart:int = getTimer();
+			//for (var index:uint = 0, length:uint = animationNameIndexes.length; index < length; ++index)
+			//{
+				//if (animationName == animationNameIndexes[index])
+				//{
+				//if (currentAnimationIndex != animationIndex)
+				//{
+					masterTemplate.ChangeBaseTimelinesUsed(animationIndex);
+				//}
+					//break;
+				//}
+			//}
+			//trace("Took ChangeBaseTimelinesUsed " + (getTimer() - baseStart) + " milliseconds to switch");
 			
-			for (var index:uint = 0, length:uint = animationNameIndexes.length; index < length; ++index)
-			{
-				if (animationName == animationNameIndexes[index])
-				{
-					masterTemplate.ChangeBaseTimelinesUsed(index);
-					break;
-				}
-			}
-			
-			
+			//var addStart:int = getTimer();
 			if (currentCharacter != defaultCharacter)
 			{
 				if (timelineLib.DoesCharacterSetExists(animationIndex, currentCharacter.GetID(), "Standard"))
 				{
 					masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationIndex, currentCharacter.GetID(), "Standard"));
 				}
-				
-				
 			}
+			//trace("Took AddTimelines " + (getTimer() - addStart) + " milliseconds to switch");
+			
+			//var layoutStart:int = getTimer();
 			masterTemplate.ImmediantLayoutUpdate();
+			//trace("Took ImmediantLayoutUpdate " + (getTimer() - layoutStart) + " milliseconds to switch");
 			//masterTemplate.EnsureTimelineIsUpToDate();
 			//Change the animation info
 			//masterTemplate.currentAnimationInfo = animInfoDict["Cowgirl"];
@@ -678,9 +610,10 @@ package ppppu
 				if (archive)
 				{
 					var archiveModList:Vector.<ppppuMod> = archive.GetModsList();
+					var childMod:ppppuMod;
 					for (var i:int = 0, l:int = archiveModList.length; i < l; ++i)
 					{
-						var childMod:ppppuMod = archiveModList[i];
+						childMod = archiveModList[i];
 						ProcessMod(childMod, modType);
 					}
 				}
