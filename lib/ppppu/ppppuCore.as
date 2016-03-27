@@ -44,7 +44,7 @@ package ppppu
 	 * Responsible for all the various aspects of ppppuNX. 
 	 * @author ppppuProgrammer
 	 */
-	public class ppppuCore extends MovieClip
+	public class ppppuCore extends Sprite
 	{
 		//Holds all the timelines to be used in the program.
 		private var timelineLib:TimelineLibrary = new TimelineLibrary();
@@ -69,6 +69,7 @@ package ppppu
 		private var defaultCharacterName:String;// = defaultCharacter.GetName();
 		private var currentCharacter:ppppuCharacter;// = defaultCharacter;
 		private var currentAnimationIndex:int = -1;
+		public var currentAnimationName:String = "None";
 		//private var embedTweenDataConverter:TweenDataParser = new TweenDataParser();
 		
 		private var musicPlayer:MusicPlayer = new MusicPlayer();
@@ -98,6 +99,7 @@ package ppppu
 		private var animationDuration:Number = 0;
 		
 		public var backgroundMasterTimeline:TimelineMax = new TimelineMax({paused:true, repeat: -1});
+		public var bgMasterTimelineChildren:Vector.<TimelineMax> = new Vector.<TimelineMax>();
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
@@ -203,14 +205,18 @@ package ppppu
 			
 			//Set timelines up for background elements.
 			var backlightTLDef:TimelineDefinition = new BacklightTimelineData();
-			
-			backgroundMasterTimeline.add(masterTemplate.CreateTimelineFromData(backlightTLDef.GetTimelineData(), mainStage),0);
+			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(backlightTLDef.GetTimelineData(), mainStage);
+			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			var outerDiaTLDef:TimelineDefinition = new OuterDiamondTimelineData();
-			backgroundMasterTimeline.add(masterTemplate.CreateTimelineFromData(outerDiaTLDef.GetTimelineData(), mainStage),0);
+			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(outerDiaTLDef.GetTimelineData(), mainStage);
+			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			var innerDiaTLDef:TimelineDefinition = new InnerDiamondTimelineData();
-			backgroundMasterTimeline.add(masterTemplate.CreateTimelineFromData(innerDiaTLDef.GetTimelineData(), mainStage),0);
+			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(innerDiaTLDef.GetTimelineData(), mainStage);
+			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			var transitDiaTLDef:TimelineDefinition = new TransitionDiamondTimelineData();
-			backgroundMasterTimeline.add(masterTemplate.CreateTimelineFromData(transitDiaTLDef.GetTimelineData(), mainStage),0);
+			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(transitDiaTLDef.GetTimelineData(), mainStage);
+			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
+			
 			
 			musicPlayer.SetUpdateRate(stage.frameRate);
 			
@@ -226,24 +232,12 @@ package ppppu
 			startupLoader.autoLoad = true;
 			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
 			startupLoader.append(new SWFLoader("PistonAnimation.swf"));
-			//startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
+			startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
 			startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
 			startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
-			//startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
+			startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
 			startupLoader.append(new SWFLoader("bbskywayMusic.swf"));
 			//startupLoader.load();
-			//Initialize test animation for Cowgirl animation
-			/*var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedLoadingSWF);
-			var cowgirlURL:URLRequest = new URLRequest();
-			loader.load(cowgirlURL);
-			addChild(loader);
-			
-			var loader2:Loader = new Loader();
-			loader2.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedLoadingSWF);
-			var rosaCowgirlURL:URLRequest = new URLRequest();
-			loader2.load(rosaCowgirlURL);
-			addChild(loader2);*/
 		}
 		
 		//The "heart beat" of the flash. Ran every frame to monitor and react to certain, often frame sensitive, events
@@ -259,8 +253,8 @@ package ppppu
 				SwitchCharacter(0);
 				SwitchTemplateAnimation(0);
 				backgroundMasterTimeline.play(0);
-				var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
-				for each (var tl:TimelineMax in bgTimelines)
+				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
+				for each (var tl:TimelineMax in bgMasterTimelineChildren)
 				{
 					tl.play(0);
 				}
@@ -301,11 +295,8 @@ package ppppu
 				{
 					randomAnimSelect = Math.floor((Math.random() * animationNameIndexes.length));
 				}
-				//var animSwitchStart:int = getTimer();
 				SwitchTemplateAnimation(randomAnimSelect);
-				//trace("Took SwitchTemplateAnimation" + (getTimer() - animSwitchStart) + " milliseconds to switch\n");
 				ppppuRunTimeCounter -= animationDuration;
-				//trace("mstTL: " + masterTemplate.m)
 			}
 			//if (animationFrame && animationFrame != lastPlayedFrame)
 			//{
@@ -363,6 +354,8 @@ package ppppu
 			//runTimer = new Timer(1000.0 / stage.frameRate);
 			//runTimer.addEventListener(TimerEvent.TIMER, this.RunLoop);
 			//runTimer.start();
+			e.currentTarget.unload();
+			e.currentTarget.dispose();
 		}
 		
 		//Activated if a key is detected to be released. Sets the keys "down" status to false
@@ -422,7 +415,7 @@ package ppppu
 						currentCharacter = characterList[0];
 						//masterTemplate.ClearTimelines();
 						masterTemplate.AddTimelines(timelineLib.GetBaseTimelinesFromLibrary(this.currentAnimationIndex));
-						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
+						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][currentAnimationName]);
 						masterTemplate.ImmediantLayoutUpdate();
 						//masterTemplate.ResumePlayingAnimation();
 					}
@@ -435,7 +428,7 @@ package ppppu
 						//Can crash if character isn't found, range error.
 						currentCharacter = characterList[1];
 						masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(this.currentAnimationIndex, currentCharacter.GetID(), "Standard"));
-						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
+						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][currentAnimationName]);
 						masterTemplate.ImmediantLayoutUpdate();
 						//masterTemplate.ResumePlayingAnimation();
 					}
@@ -452,8 +445,8 @@ package ppppu
 				else if (keyPressed == Keyboard.R)
 				{
 					backgroundMasterTimeline.play();
-					var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
-					for each (var tl:TimelineMax in bgTimelines)
+					//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
+					for each (var tl:TimelineMax in bgMasterTimelineChildren)
 					{
 						tl.play(0);
 					}
@@ -469,7 +462,7 @@ package ppppu
 			if (animationIndex >= animationNameIndexes.length) { return;}
 			var animationName:String = animationNameIndexes[animationIndex];
 			var currentCharacterName:String = currentCharacter.GetName();
-			masterTemplate.currentAnimationName = animationName;
+			currentAnimationName = animationName;
 
 			
 			//if(!timelineLib.DoesBaseTimelinesForAnimationExist(animationIndex))
@@ -483,27 +476,12 @@ package ppppu
 			{
 				currentCharLayerInfo = layerInfoDict[defaultCharacterName][animationName];
 			}
-			//masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][masterTemplate.currentAnimationName]);
-			//trace("character: " + currentCharacterName + ", animation: " + animationName);
-			//var eleStart:int = getTimer();
-			masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
-			//trace("Took SetElementDepthLayout " + (getTimer() - eleStart) + " milliseconds to switch");
+			masterTemplate.ChangeAnimation(currentCharLayerInfo, animationIndex, currentCharacter.GetID(), "Standard");
+
+			/*masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
 			
-			//var baseStart:int = getTimer();
-			//for (var index:uint = 0, length:uint = animationNameIndexes.length; index < length; ++index)
-			//{
-				//if (animationName == animationNameIndexes[index])
-				//{
-				//if (currentAnimationIndex != animationIndex)
-				//{
-					masterTemplate.ChangeBaseTimelinesUsed(animationIndex);
-				//}
-					//break;
-				//}
-			//}
-			//trace("Took ChangeBaseTimelinesUsed " + (getTimer() - baseStart) + " milliseconds to switch");
+			masterTemplate.ChangeBaseTimelinesUsed(animationIndex);
 			
-			//var addStart:int = getTimer();
 			if (currentCharacter != defaultCharacter)
 			{
 				if (timelineLib.DoesCharacterSetExists(animationIndex, currentCharacter.GetID(), "Standard"))
@@ -511,24 +489,15 @@ package ppppu
 					masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationIndex, currentCharacter.GetID(), "Standard"));
 				}
 			}
-			//trace("Took AddTimelines " + (getTimer() - addStart) + " milliseconds to switch");
 			
-			//var layoutStart:int = getTimer();
-			masterTemplate.ImmediantLayoutUpdate();
-			//trace("Took ImmediantLayoutUpdate " + (getTimer() - layoutStart) + " milliseconds to switch");
-			//masterTemplate.EnsureTimelineIsUpToDate();
-			//Change the animation info
-			//masterTemplate.currentAnimationInfo = animInfoDict["Cowgirl"];
+			masterTemplate.ImmediantLayoutUpdate();*/
 			
 			animationDuration = masterTemplate.GetDurationOfCurrentAnimation();
-			
-			//Sync the animation to the main stage's timeline (main stage's current frame - animation start frame % 120 + 1 to avoid setting it to frame 0)
-			//masterTemplate.PlayAnimation((mainStage.currentFrame -2) % 120 + 1);
 			currentAnimationIndex = animationIndex;
-			
 		}
 		
-		public function SwitchCharacter(charId:int):void
+		[Inline]
+		final public function SwitchCharacter(charId:int):void
 		{
 			if (charId >= 0 && charId < characterList.length)
 			{
@@ -617,6 +586,7 @@ package ppppu
 						ProcessMod(childMod, modType);
 					}
 				}
+				archive = null;
 			}
 			else
 			{
@@ -625,6 +595,9 @@ package ppppu
 			}
 			//remove the mod file.
 			removeChild(mod);
+			mod = null;
+			//e.target.unload();
+			//e.target.dispose();
 		}
 		
 		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter

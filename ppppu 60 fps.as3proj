@@ -35,7 +35,7 @@
     <option showInvalidCSS="True" />
     <option showDeprecationWarnings="True" />
     <option showUnusedTypeSelectorWarnings="True" />
-    <option strict="False" />
+    <option strict="True" />
     <option useNetwork="False" />
     <option useResourceBundleMetadata="True" />
     <option warnings="True" />
