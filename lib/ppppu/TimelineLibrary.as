@@ -1,6 +1,6 @@
 package ppppu 
 {
-	import com.greensock.TimelineMax;
+	import com.greensock.TimelineLite;
 	import flash.utils.Dictionary;
 	/**
 	 * Holds all the various timelines that can be used in the program. 
@@ -13,20 +13,20 @@ package ppppu
 		public const TYPE_EYE:int = 1; //Used to fine tune the eye graphics displayed and their placement.
 		
 		/*Contains the default timelines for an animation. Is a vector (animation ids are used for indices) 
-		containing a vector<TimelineMax>.
+		containing a vector<TimelineLite>.
 		Concise version: vector[animID] > vector[timelines]*/
-		private var baseTimelinesCollection:Vector.<Vector.<TimelineMax>> = new Vector.<Vector.<TimelineMax>>();
+		private var baseTimelinesCollection:Vector.<Vector.<TimelineLite>> = new Vector.<Vector.<TimelineLite>>();
 		
 		/*Contains additional timelines that will replace base timelines in an animation. Primarily used for body part rearraignment.
 		 * Is a vector (animation id) of vectors (character) of dictionaries (animation set which is a group of timelines meant for a 
-		 * certain purpose) which will use a string as a key(set name) and a vector<TimelineMax> as the value. 
+		 * certain purpose) which will use a string as a key(set name) and a vector<TimelineLite> as the value. 
 		 * Concise version: vector[anim] > vector[char] > dict[set] > vector[timelines]*/
 		private var replacementTimelinesCollection:Vector.<Vector.<Dictionary>> = new Vector.<Vector.<Dictionary>>();
 		
 		/*Contains supplementary timelines to add onto the base timelines in an animation.
-		 *Is a vector (animation ids) of vectors (character ids) of vectors (timeline type) of vector<timelineMax>.
+		 *Is a vector (animation ids) of vectors (character ids) of vectors (timeline type) of vector<TimelineLite>.
 		 *Concise version: vector[anim] > vector[char] > vector[type] > vector[timelines]*/
-		private var supplementTimelinesCollection:Vector.<Vector.<Vector.<Vector.<TimelineMax>>>> = new Vector.<Vector.<Vector.<Vector.<TimelineMax>>>>();
+		private var supplementTimelinesCollection:Vector.<Vector.<Vector.<Vector.<TimelineLite>>>> = new Vector.<Vector.<Vector.<Vector.<TimelineLite>>>>();
 		
 		//Flag variable that tells if there is atleast 1 usable base timeline loaded.
 		private var HasValidBaseTimeline:Boolean = false;
@@ -39,7 +39,7 @@ package ppppu
 		/*Adding timeline(s) to library functions*/
 		
 		
-		public function AddBaseTimelinesToLibrary(animationID:int, timelines:Vector.<TimelineMax> ):void
+		public function AddBaseTimelinesToLibrary(animationID:int, timelines:Vector.<TimelineLite> ):void
 		{
 			while (animationID > baseTimelinesCollection.length)
 			{
@@ -50,7 +50,7 @@ package ppppu
 			if (baseTimelinesCollection.length > 0) { HasValidBaseTimeline = true;}
 		}
 		
-		public function AddReplacementTimelinesToLibrary(animationID:int, characterID:int, setName:String, timelines:Vector.<TimelineMax> ):void
+		public function AddReplacementTimelinesToLibrary(animationID:int, characterID:int, setName:String, timelines:Vector.<TimelineLite> ):void
 		{
 			if (characterID == -1 || animationID == -1) { return;}
 			DoesCharacterSetExists(animationID, characterID, setName);
@@ -63,9 +63,9 @@ package ppppu
 			timelineSetDictionary[setName] = timelines;
 		}
 		
-		public function AddSupplementTimelineToLibrary(animationID:int, characterID:int, type:int, timelineName:String, timeline:TimelineMax):void
+		public function AddSupplementTimelineToLibrary(animationID:int, characterID:int, type:int, timelineName:String, timeline:TimelineLite):void
 		{
-			var typeVector:Vector.<TimelineMax> = supplementTimelinesCollection[animationID][characterID][type];
+			var typeVector:Vector.<TimelineLite> = supplementTimelinesCollection[animationID][characterID][type];
 			
 			var timelineWithSameNameFound:Boolean = false;
 			//Check that a timeline of the given name isn't already in the vector. If it is, then write over it.
@@ -90,9 +90,9 @@ package ppppu
 		/*Get timeline(s) from library functions*/
 		
 		
-		public function GetBaseTimelinesFromLibrary(animationID:int):Vector.<TimelineMax>
+		public function GetBaseTimelinesFromLibrary(animationID:int):Vector.<TimelineLite>
 		{
-			var baseTimelines:Vector.<TimelineMax> = null;
+			var baseTimelines:Vector.<TimelineLite> = null;
 			if (animationID < baseTimelinesCollection.length)
 			{
 				baseTimelines = baseTimelinesCollection[animationID];
@@ -100,27 +100,27 @@ package ppppu
 			return baseTimelines;
 		}
 		
-		public function GetReplacementTimelinesToLibrary(animationID:int, characterID:int, setName:String ):Vector.<TimelineMax>
+		public function GetReplacementTimelinesToLibrary(animationID:int, characterID:int, setName:String ):Vector.<TimelineLite>
 		{
 			var dictionary:Dictionary = replacementTimelinesCollection[animationID][characterID] as Dictionary;
-			var timelines:Vector.<TimelineMax> = dictionary[setName] as Vector.<TimelineMax>;
+			var timelines:Vector.<TimelineLite> = dictionary[setName] as Vector.<TimelineLite>;
 			return timelines;
 		}
 		
-		public function GetAllSupplementTimelinesOfTypeFromLibrary(animationID:int, characterID:int, type:int):Vector.<TimelineMax>
+		public function GetAllSupplementTimelinesOfTypeFromLibrary(animationID:int, characterID:int, type:int):Vector.<TimelineLite>
 		{
 			CheckSupplementTimelinesVectorRange(animationID, characterID);
-			var typeVector:Vector.<TimelineMax> = supplementTimelinesCollection[animationID][characterID][type];
+			var typeVector:Vector.<TimelineLite> = supplementTimelinesCollection[animationID][characterID][type];
 			
 			return typeVector;
 		}
 		
-		public function GetSupplementTimelineFromLibrary(animationID:int, characterID:int, type:int, timelineName:String):TimelineMax
+		public function GetSupplementTimelineFromLibrary(animationID:int, characterID:int, type:int, timelineName:String):TimelineLite
 		{
 			CheckSupplementTimelinesVectorRange(animationID, characterID);
-			var typeVector:Vector.<TimelineMax> = supplementTimelinesCollection[animationID][characterID][type];
+			var typeVector:Vector.<TimelineLite> = supplementTimelinesCollection[animationID][characterID][type];
 			
-			var timeline:TimelineMax = null;
+			var timeline:TimelineLite = null;
 			for (var i:int = 0, l:int = typeVector.length; i < l; ++i )
 			{
 				if (typeVector[i].data == timelineName)
@@ -198,7 +198,7 @@ package ppppu
 				
 				if (supplementTimelinesCollection.length <= animIndex /*|| supplementTimelinesCollection[animIndex] == undefined*/)
 				{
-					supplementTimelinesCollection[animIndex] = new Vector.<Vector.<Vector.<TimelineMax>>>();
+					supplementTimelinesCollection[animIndex] = new Vector.<Vector.<Vector.<TimelineLite>>>();
 				}
 				
 				//Fill character vector
@@ -206,10 +206,10 @@ package ppppu
 				{
 					if (supplementTimelinesCollection[animIndex].length <= charIndex /*|| supplementTimelinesCollection[animIndex][charIndex] == undefined*/)
 					{
-						supplementTimelinesCollection[animIndex][charIndex]  = new Vector.<Vector.<TimelineMax>>();
+						supplementTimelinesCollection[animIndex][charIndex]  = new Vector.<Vector.<TimelineLite>>();
 						//Fill in the type vectors
-						supplementTimelinesCollection[animIndex][charIndex][TYPE_EXPRESSION] = new Vector.<TimelineMax>();
-						supplementTimelinesCollection[animIndex][charIndex][TYPE_EYE] = new Vector.<TimelineMax>();
+						supplementTimelinesCollection[animIndex][charIndex][TYPE_EXPRESSION] = new Vector.<TimelineLite>();
+						supplementTimelinesCollection[animIndex][charIndex][TYPE_EYE] = new Vector.<TimelineLite>();
 					}
 				}
 			}
@@ -217,15 +217,15 @@ package ppppu
 			
 			/*while (supplementTimelinesCollection.length <= animationID)
 			{
-				supplementTimelinesCollection[supplementTimelinesCollection.length] = new Vector.<Vector.<Vector.<TimelineMax>>>();
+				supplementTimelinesCollection[supplementTimelinesCollection.length] = new Vector.<Vector.<Vector.<TimelineLite>>>();
 			}
 			
 			while (supplementTimelinesCollection[animationID].length <= characterID)
 			{
 				var something:int = supplementTimelinesCollection[animationID].length;
 				
-				supplementTimelinesCollection[animationID][something][TYPE_EXPRESSION] = new Vector.<TimelineMax>();
-				supplementTimelinesCollection[animationID][something][TYPE_EYE] = new Vector.<TimelineMax>();
+				supplementTimelinesCollection[animationID][something][TYPE_EXPRESSION] = new Vector.<TimelineLite>();
+				supplementTimelinesCollection[animationID][something][TYPE_EYE] = new Vector.<TimelineLite>();
 				
 			}*/
 		}

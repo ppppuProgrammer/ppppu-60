@@ -4,14 +4,15 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\ppppu60fps.swf" />
-    <movie fps="30" />
-    <movie width="480" />
+    <movie path="bin\ppppu60fps_SneakPeek.swf" />
+    <movie fps="60" />
+    <movie width="580" />
     <movie height="720" />
-    <movie version="19" />
+    <movie version="13" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#0C0046" />
+    <movie preferredSDK="AIR 21.0.0;21.0.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -21,7 +22,7 @@
   <!-- Build options -->
   <build>
     <option accessible="False" />
-    <option advancedTelemetry="True" />
+    <option advancedTelemetry="False" />
     <option allowSourcePathOverlap="False" />
     <option benchmark="False" />
     <option es="False" />

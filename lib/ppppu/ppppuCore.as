@@ -99,7 +99,7 @@ package ppppu
 		private var animationDuration:Number = 0;
 		
 		public var backgroundMasterTimeline:TimelineMax = new TimelineMax({paused:true, repeat: -1});
-		public var bgMasterTimelineChildren:Vector.<TimelineMax> = new Vector.<TimelineMax>();
+		public var bgMasterTimelineChildren:Vector.<TimelineLite> = new Vector.<TimelineLite>();
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
@@ -254,7 +254,7 @@ package ppppu
 				SwitchTemplateAnimation(0);
 				backgroundMasterTimeline.play(0);
 				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
-				for each (var tl:TimelineMax in bgMasterTimelineChildren)
+				for each (var tl:TimelineLite in bgMasterTimelineChildren)
 				{
 					tl.play(0);
 				}
@@ -295,46 +295,11 @@ package ppppu
 				{
 					randomAnimSelect = Math.floor((Math.random() * animationNameIndexes.length));
 				}
+				var startFuncTime:int = getTimer();
 				SwitchTemplateAnimation(randomAnimSelect);
+				trace("SwitchTemplateAnimation complete time(ms): " + (getTimer() - startFuncTime));
 				ppppuRunTimeCounter -= animationDuration;
 			}
-			//if (animationFrame && animationFrame != lastPlayedFrame)
-			//{
-				//if (frameNum == flashStartFrame)
-				//{
-					/*if (userSettings.firstTimeRun == true)
-					{
-						UpdateKeyBindsForHelpScreen();
-						ToggleHelpScreen(); //Show the help screen
-						characterManager.ToggleMenu();
-						userSettings.firstTimeRun = false;
-						settingsSaveFile.data.ppppuSettings = userSettings;
-						settingsSaveFile.flush();
-					}
-					else
-					{
-						if (userSettings.showMenu)
-						{
-							characterManager.ToggleMenu();
-						}
-					}*/
-					/*if (userSettings.showBackground == true)
-					{
-						//mainStage.TransitionDiamond.visible = //mainStage.OuterDiamond.visible = //mainStage.InnerDiamond.visible = true;
-					}*/
-					/*mainStage.OuterDiamond.gotoAndPlay(animationFrame);
-					mainStage.InnerDiamond.gotoAndPlay(animationFrame);
-					mainStage.TransitionDiamond.gotoAndPlay(animationFrame);
-					mainStage.Backlight.gotoAndPlay(animationFrame);*/
-					//masterTemplate.visible = true;
-					//Go to the 
-					//SwitchTemplateAnimation(currentAnimationIndex);
-					//masterTemplate.PlayAnimation(animationFrame);
-					
-					////mainStage.setChildIndex(masterTemplate, //mainStage.numChildren - 1);
-				//}
-				//masterTemplate.Update(/*animationFrame*/);
-				//masterTemplate.UpdateAnchoredElements(); //Called by master template's update functions
 				//if (playSounds)
 				//{
 					//charVoiceSystem.Tick(animationFrame);
@@ -446,7 +411,7 @@ package ppppu
 				{
 					backgroundMasterTimeline.play();
 					//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
-					for each (var tl:TimelineMax in bgMasterTimelineChildren)
+					for each (var tl:TimelineLite in bgMasterTimelineChildren)
 					{
 						tl.play(0);
 					}
@@ -610,7 +575,7 @@ package ppppu
 				if (animation)
 				{
 					var data:Vector.<Object> = animation.GetDataForTimelinesCreation();
-					var timelines:Vector.<TimelineMax> = new Vector.<TimelineMax>();
+					var timelines:Vector.<TimelineLite> = new Vector.<TimelineLite>();
 					var displayLayout:Object = JSON.parse(animation.GetDisplayOrderList());
 					
 					var charName:String = animation.GetCharacterName();
