@@ -4,9 +4,9 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\ppppu60fps_SneakPeek.swf" />
+    <movie path="bin\ppppu60fps.swf" />
     <movie fps="60" />
-    <movie width="580" />
+    <movie width="480" />
     <movie height="720" />
     <movie version="13" />
     <movie minorVersion="0" />
@@ -22,7 +22,7 @@
   <!-- Build options -->
   <build>
     <option accessible="False" />
-    <option advancedTelemetry="False" />
+    <option advancedTelemetry="True" />
     <option allowSourcePathOverlap="False" />
     <option benchmark="False" />
     <option es="False" />
@@ -44,7 +44,7 @@
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
-    <option additional="" />
+    <option additional="-use-gpu=true&#xA;-use-direct-blit=true" />
     <option compilerConstants="" />
     <option minorVersion="" />
   </build>
