@@ -55,6 +55,7 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="ppppu60.swc" />
+    <element path="lib\TurboSignals.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

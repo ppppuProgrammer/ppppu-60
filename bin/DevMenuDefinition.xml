@@ -1,0 +1,38 @@
+<comps>
+	<!-- Window 1 -->
+	<Window id="mainWindow" title="NX developer menu" width="480" height="140" hasMinimizeButton="true">
+		<!-- Section 1 -->
+		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
+		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>
+		<Label id="bodyLabel" x="170" y="10" text="Body group:"/>
+		<ComboBox id="bodyTypeSelector" x="230" y="10" width="90"/>
+		<Label id="charLabel" x="330" y="10" text="Character:"/>
+		<ComboBox id="characterSelector" x="380" y="10" width="90"/>
+		
+		<!-- Section 2 Animation play progress -->
+		<PushButton id="animPlayButton" x="10" y="35" label="Play" width="50" toggle="false"/>
+		<PushButton id="animPauseButton" x="70" y="35" label="Pause" width="50" toggle="false"/>
+		<Label id="frameLabel" x="130" y="35" text="Frame:"/>
+		<Label id="frameText" x="160" y="35" text=""/>
+		<HUISlider id="animProgressSlider" x="220" y="35" label="Progress" labelPrecision="0"/>
+		
+		<!-- Section 3 Changing frame for animation-->
+		<Label id="frameSettingLabel" x="10" y="60" text="Frame Settings"/>
+		<PushButton id="-1F" x="10" y="80" label="-1F" width="30"/>
+		<PushButton id="-5F" x="40" y="80" label="-5F" width="30"/>
+		<PushButton id="-10F" x="70" y="80" label="-10F" width="30"/>
+		<PushButton id="+1F" x="110" y="80" label="+1F" width="30"/>
+		<PushButton id="+5F" x="140" y="80" label="+5F" width="30"/>
+		<PushButton id="+10F" x="170" y="80" label="+10F" width="30"/>
+		<PushButton id="setFrameButton" x="210" y="80" label="Set to frame" width="80"/>
+		<HUISlider id="frameSlider" x="300" y="80" label="" minimum="1" value="1" labelPrecision="0"/>
+	</Window>
+	
+	<!-- Section 4 Debug output -->
+	<Window id="consoleWindow" title="NX developer debug output" x="0" y="560" width="480" height="160" hasMinimizeButton="true">
+		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
+	</Window>
+	<!--  -
+	< id="" x="" y="" label="">
+	<!- -->
+</comps>

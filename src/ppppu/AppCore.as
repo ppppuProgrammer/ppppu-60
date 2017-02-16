@@ -2,6 +2,7 @@ package ppppu
 {
 	//import AnimationSettings.CowgirlInfo;
 	import animations.TimelineLibrary;
+	import com.jacksondunstan.signals.*;
 	import flash.system.System;
 	import modifications.AnimationMod;
 	import animations.background.*;
@@ -55,7 +56,7 @@ package ppppu
 	 * Responsible for all the various aspects of ppppuNX. 
 	 * @author ppppuProgrammer
 	 */
-	public class AppCore extends Sprite
+	public class AppCore extends Sprite implements Slot1, Slot2
 	{
 		//Holds all the timelines to be used in the program.
 		private var timelineLib:TimelineLibrary = new TimelineLibrary();
@@ -114,7 +115,14 @@ package ppppu
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
-		private var startupLoader:LoaderMax = new LoaderMax({name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF});
+		private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
+		
+		CONFIG::debug
+		private var devMenu:DeveloperMenu = new DeveloperMenu();
+
+		private var devMenuSignaller1:Signal1 = new Signal1();
+		private var devMenuSignaller2:Signal2 = new Signal2();
+		
 		//Constructor
 		public function AppCore() 
 		{
@@ -243,13 +251,21 @@ package ppppu
 			//masterTemplate.PlayAnimation(0);
 			//mainStage.play();
 			
+			CONFIG::debug
+			{
+				addChild(devMenu);
+				devMenu.SetupHooksToApp(this);
+				SetupDevMenuHooks();
+				
+			}
+			
 			startupLoader.autoLoad = true;
 			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
 			startupLoader.append(new SWFLoader("PistonAnimation.swf"));
 			startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
-			startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
-			startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
-			startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
+			//startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
+			//startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
+			//startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
 			//startupLoader.append(new SWFLoader("bbskywayMusic.swf"));
 			
 			//LoaderMax.parse(["./bbskywayMusic.swf", "RosaLeanTowardsAnimation.swf"], { name:"parsedLoader"} );
@@ -260,6 +276,10 @@ package ppppu
 		private function RunLoop(e:Event):void
 		{
 			//Checks if the timeline lib has a valid base animation set. If it doesn't, return until there is one loaded in.
+			if (devMenu.ReadyCheck() == false)
+			{
+				return;
+			}
 			if (!timelineLib.HasValidBaseAnimation())
 			{
 				return;
@@ -271,20 +291,28 @@ package ppppu
 				System.pauseForGCIfCollectionImminent(1);
 				SwitchCharacter(0);
 				SwitchTemplateAnimation(0);
-				backgroundMasterTimeline.play(0);
+				//backgroundMasterTimeline.play(0);
 				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
 				/*for each (var tl:TimelineLite in bgMasterTimelineChildren)
 				{
 					tl.play(0);
 				}*/
-				masterTemplate.PlayAnimation(0);
+				//masterTemplate.PlayAnimation(0);
 				masterTemplate.visible = true;
 				firstTimeInLoop = false;
 				previousUpdateTime = backgroundMasterTimeline.totalTime();//(getTimer() / 1000.0);
 				ppppuRunTimeCounter = 0;
 				musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
+
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
+
+				var animationPosition:Number = masterTemplate.Update();
+				CONFIG::debug
+				{
+					devMenuSignaller2.dispatch("frameText",animationPosition);
+				}
+
 			/*else
 			{
 				var latestUpdateTime:Number = backgroundMasterTimeline.totalTime();// (getTimer() / 1000.0);
@@ -367,7 +395,7 @@ package ppppu
 					SwitchTemplateAnimation(randomAnimIndex);
 					masterTemplate.PlayAnimation(-1);
 				}
-				else if((!(49 > keyPressed) && !(keyPressed > 57)) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
+				else if((!(Keyboard.NUMBER_0 > keyPressed) && !(keyPressed > Keyboard.NUMBER_9 )) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
 				{
 					//keypress of 1 has a keycode of 49
 					if(keyPressed > 96)
@@ -483,6 +511,10 @@ package ppppu
 			masterTemplate.ImmediantLayoutUpdate();*/
 			
 			animationDuration = masterTemplate.GetDurationOfCurrentAnimation();
+			CONFIG::debug
+			{
+				devMenuSignaller2.dispatch("animationDuration", animationDuration);
+			}
 			currentAnimationIndex = animationIndex;
 		}
 		
@@ -614,6 +646,8 @@ package ppppu
 						animationIndex = animationNameIndexes.length;
 						animationNameIndexes[animationIndex] = animName;
 						
+						CONFIG::debug
+						devMenu.AddNewAnimation(animName);
 					}
 					
 					//If the layer info dictionary for the animation doesn't exist, create it.
@@ -680,6 +714,73 @@ package ppppu
 				animLayout.AddNewFrameVector(parseFloat(frameKey), entireLayoutObj[frameKey], masterTemplate);
 			}
 			return animLayout;
+		}
+		
+		private function SetupDevMenuHooks():void
+		{
+			devMenuSignaller1.addSlot(devMenu);
+			devMenuSignaller2.addSlot(devMenu);
+		}
+		
+		private function AddNewLineToDevOutputWindow(message:String):void
+		{
+			devMenuSignaller1.dispatch(message);
+		}
+		
+		public function onSignal1(targetName:*):void
+		{
+			var target:String = targetName as String;
+			if (target == "animPlayButton")
+			{
+				masterTemplate.ResumePlayingAnimation();
+			}
+			else if (target == "animPauseButton")
+			{
+				masterTemplate.StopAnimation();
+			}
+			else if (target.search(RegExp("[+-]\d*.F") > -1))
+			{
+				var sign:int = target.charAt(0) == "-"? -1:1;
+				target = target.substring(1, target.length -1);
+				var frameAmount:int = int(target);
+				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
+				position = roundToNearest(1.0 / 60, position);
+				position +=  (sign * frameAmount)*(1.0 / 60.0);
+				masterTemplate.JumpToPosition(position);
+				devMenuSignaller2.dispatch("frameText",masterTemplate.GetTimeInCurrentAnimation());
+			}
+			/*else if (targetName.contains() == "-1F")
+			{
+				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
+				position = roundToNearest(1.0 / 60, position);
+				position -= 1.0 / 60.0;
+				masterTemplate.JumpToPosition(position);
+				devMenuSignaller2.dispatch("frameText",masterTemplate.GetTimeInCurrentAnimation());
+				
+			}
+			else if (targetName == "+1F")
+			{
+				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
+				position = roundToNearest(1.0 / 60, position);
+				position += 1.0 / 60.0;
+				masterTemplate.JumpToPosition(position);
+				devMenuSignaller2.dispatch("frameText",masterTemplate.GetTimeInCurrentAnimation());
+			}*/
+		}
+		
+		public function onSignal2(targetName:*, value:*):void
+		{
+			if (targetName == "animationSelector")
+			{
+				SwitchTemplateAnimation(value);
+			}
+			else if (targetName == "setFrameButton")
+			{
+				masterTemplate.JumpToPosition(value* (1.0/60.0));
+			}
+		}
+		function roundToNearest(roundTo:Number, value:Number):Number{
+			return Math.round(value/roundTo)*roundTo;
 		}
 	}
 

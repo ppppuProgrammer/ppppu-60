@@ -7,6 +7,7 @@ package ppppu
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.easing.Linear;
 	import org.libspark.betweenas3.tweens.IObjectTween;
+	import org.libspark.betweenas3.tweens.ITween;
 	//import com.greensock.TimelineLite;
 	//import com.greensock.TimelineMax;
 	//import com.greensock.TweenLite;
@@ -157,6 +158,9 @@ package ppppu
 					{
 						//timeline.to(target, duration * TIME_PER_FRAME, currentTweenData);
 						tweens[tweens.length] = BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear);
+						
+						// time scaled
+						//tweens[tweens.length] = BetweenAS3.scale(BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear), 10);
 					}
 					else //duration is 0, so tween is to be set instantly.
 					{
@@ -174,6 +178,7 @@ package ppppu
 				}
 				timeline = BetweenAS3.serialTweens(tweens) as SerialTween;
 			}
+			//trace("Created timeline for " + target.name + ".\tDuration:" + timeline.duration);
 			//var tlDur:Number = timeline.duration();
 			//if (tlDur > 4.0)
 			//{
@@ -186,11 +191,12 @@ package ppppu
 			
 		}
 		
-		public function Update():void
+		public function Update():Number
 		{
 			if (animationPaused == false) //If animation isn't paused, update
 			{
-				var currentTime:Number = masterTimeline.position();
+				var currentTime:Number = masterTimeline.position;
+				trace("Frame " + int(120*(currentTime/masterTimeline.duration)));
 				var displayLayout:AnimationLayout = currentAnimationElementDepthLayout;
 				//Start at the end and work backwards
 				for (var i:int = displayLayout.frameVector.length -1; i >= 0; --i)
@@ -204,7 +210,7 @@ package ppppu
 					}
 				}
 			}
-			
+			return masterTimeline.position;
 		}
 		
 		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
@@ -313,7 +319,10 @@ package ppppu
 						
 					}
 					//Remove the container from the template base, allowing it to be garbage collected (optimization: Allow them to be reused, avoiding costly GC)
-					this.removeChild(container);
+					if (container.parent == this)
+					{
+						this.removeChild(container);
+					}
 				}
 			}
 			else
@@ -511,9 +520,9 @@ package ppppu
 			}*/
 		}
 		
-		public function JumpToFrameAnimation(frame:uint):void
+		public function JumpToPosition(time:Number):void
 		{
-				masterTimeline.gotoAndStop(frame*(1.0/this.stage.frameRate));
+				masterTimeline.gotoAndStop(time);
 				/*var childTimelines:Array = masterTimeline.//getChildren(true, false);
 				
 				for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
