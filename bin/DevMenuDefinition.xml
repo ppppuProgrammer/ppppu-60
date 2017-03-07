@@ -12,9 +12,11 @@
 		<!-- Section 2 Animation play progress -->
 		<PushButton id="animPlayButton" x="10" y="35" label="Play" width="50" toggle="false"/>
 		<PushButton id="animPauseButton" x="70" y="35" label="Pause" width="50" toggle="false"/>
-		<Label id="frameLabel" x="130" y="35" text="Frame:"/>
-		<Label id="frameText" x="160" y="35" text=""/>
-		<HUISlider id="animProgressSlider" x="220" y="35" label="Progress" labelPrecision="0"/>
+		<Label id="timeLabel" x="130" y="35" text="Time:"/>
+		<Label id="timeText" x="160" y="35" text=""/>
+		<Label id="frameLabel" x="220" y="35" text="Frame:"/>
+		<Label id="frameText" x="250" y="35" text=""/>
+		<!--  -<HUISlider id="animProgressSlider" x="220" y="35" label="Progress" labelPrecision="0"/><!- -->
 		
 		<!-- Section 3 Changing frame for animation-->
 		<Label id="frameSettingLabel" x="10" y="60" text="Frame Settings"/>
@@ -29,8 +31,16 @@
 	</Window>
 	
 	<!-- Section 4 Debug output -->
-	<Window id="consoleWindow" title="NX developer debug output" x="0" y="560" width="480" height="160" hasMinimizeButton="true">
+	<Window id="consoleWindow" title="NX developer debug output" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
 		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
+	</Window>
+	
+	<!-- Section 5 Tween testing -->
+	<Window id="tweenWindow" title="Tween debug window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="false">
+		<ComboBox id="elementSelector" x="0" y="00" width="140" height="20"/>
+		<HUISlider id="tweenSelectSlider" x="200" y="00" width="300" height="20" minimum ="0" value="0" maximum="0" labelPrecision="0"/>
+		<Label id="tweenDataLabel" x="200" y="15" text="Element Data"/>
+		<TextArea id="tweenEditor" x="200" y="35" width="260" height="100" editable="true"/>
 	</Window>
 	<!--  -
 	< id="" x="" y="" label="">

@@ -113,6 +113,12 @@ package ppppu
 				timelineControlElementDict[timeline] = target;
 				
 				var duration:int;
+				
+				if (target.name == "ClosedLashL")
+				{
+					var track:Boolean = true;
+					var totalDuration:Number = 0;
+				}
 				for (var i:int = 0, l:int = tweenData.length; i < l; ++i)
 				{
 					currentTweenData = { };
@@ -132,11 +138,21 @@ package ppppu
 					//Visibility fallback check for first tween. Assume that it is to be visible if there was no visible property specified.
 					if (i == 0)
 					{
-						if (!("visible" in currentTweenData))
+						if (!("visible" in tweenData[i]))
 						{
-							tweens[tweens.length] = BetweenAS3.func(ChangeSpriteVisibility, [target, true]);
+							currentTweenData.visible = 1.0;
+							//tweens[tweens.length] = BetweenAS3.func(ChangeSpriteVisibility, [target, true]);
+							var tween:IObjectTween = BetweenAS3.to(target, { visible: 1.0 }, 0, Linear.linear);
+							tweens[tweens.length] = tween;
+							previousTweenData = currentTweenData;
+							//currentTweenData["visible"]
 							//currentTweenData.visible = true;
 						}
+					}
+					
+					if ("visible" in tweenData[i])
+					{
+						currentTweenData.visible = Number(tweenData[i].visible);
 					}
 					
 					if ("duration" in tweenData[i])
@@ -149,6 +165,8 @@ package ppppu
 						duration = 0;
 					}
 					
+					
+					
 					if (!("transformMatrix" in tweenData[i]))
 					{
 						currentTweenData["$x"] = 0;
@@ -157,25 +175,46 @@ package ppppu
 					if (duration)
 					{
 						//timeline.to(target, duration * TIME_PER_FRAME, currentTweenData);
-						tweens[tweens.length] = BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear);
-						
+						var tween:IObjectTween = BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear);
+						if ("visible" in currentTweenData || "visible" in previousTweenData)
+						{
+							var bp:int = 5;
+						}
+						tweens[tweens.length] = tween;
 						// time scaled
 						//tweens[tweens.length] = BetweenAS3.scale(BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear), 10);
 					}
 					else //duration is 0, so tween is to be set instantly.
 					{
 						//timeline.set(target, currentTweenData);
-						tweens[tweens.length] = BetweenAS3.to(target, currentTweenData, 0.0, Linear.linear);
+						var tween:IObjectTween = BetweenAS3.to(target, currentTweenData, 0, Linear.linear);
+						tweens[tweens.length] = tween;
 					}
-					if ("visible" in tweenData[i])
+					
+					/*if ("visible" in tweenData[i])
 					{
-						tweens[tweens.length] = BetweenAS3.func(ChangeSpriteVisibility, [target, tweenData[i].visible]);
-						//currentTweenData.visible = tweenData[i].visible;
-						//currentTweenData.duration = null; //Remove duration from tween data so it can be passed used for the tween's var property
-					}
+						var visValue:Number = tweenData[i].visible;
+						var visObj:Object = new Object;
+						visObj["visible"] = visValue;
+						var tween:IObjectTween = BetweenAS3.to(target, visObj, 0, Linear.linear);
+						tweens[tweens.length] = tween;
+						//previousTweenData = currentTweenData;
+						//currentTweenData["visible"] = Number(tweenData[i].visible);
+						//tweens[tweens.length] = BetweenAS3.func(ChangeSpriteVisibility, [target, tweenData[i].visible]);
+						/*if (target.name == "EyelidL")
+					{
+						trace("tween #" + i +", type: " + getQualifiedClassName(tweens[tweens.length-1]) + ", position: " + tweens[tweens.length-1].position + ", duration: " + tweens[tweens.length-1].duration);
+					}*/
+					//}
+					/*if (track)
+					{
+						totalDuration += duration;
+						trace("Finished reading tween data " + i + ", duration is at " + totalDuration);
+					}*/
 					
 					previousTweenData = currentTweenData;
 				}
+				
 				timeline = BetweenAS3.serialTweens(tweens) as SerialTween;
 			}
 			//trace("Created timeline for " + target.name + ".\tDuration:" + timeline.duration);
@@ -196,7 +235,7 @@ package ppppu
 			if (animationPaused == false) //If animation isn't paused, update
 			{
 				var currentTime:Number = masterTimeline.position;
-				trace("Frame " + int(120*(currentTime/masterTimeline.duration)));
+				//trace("Frame " + int(120*(currentTime/masterTimeline.duration)));
 				var displayLayout:AnimationLayout = currentAnimationElementDepthLayout;
 				//Start at the end and work backwards
 				for (var i:int = displayLayout.frameVector.length -1; i >= 0; --i)

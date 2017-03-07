@@ -261,8 +261,8 @@ package ppppu
 			
 			startupLoader.autoLoad = true;
 			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
-			startupLoader.append(new SWFLoader("PistonAnimation.swf"));
-			startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
+			//startupLoader.append(new SWFLoader("PistonAnimation.swf"));
+			//startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
 			//startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
 			//startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
 			//startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
@@ -310,7 +310,8 @@ package ppppu
 				var animationPosition:Number = masterTemplate.Update();
 				CONFIG::debug
 				{
-					devMenuSignaller2.dispatch("frameText",animationPosition);
+					devMenuSignaller2.dispatch("timeText", animationPosition);
+					devMenuSignaller2.dispatch("updatedAnimation", masterTemplate);
 				}
 
 			/*else
@@ -744,28 +745,11 @@ package ppppu
 				target = target.substring(1, target.length -1);
 				var frameAmount:int = int(target);
 				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
-				position = roundToNearest(1.0 / 60, position);
-				position +=  (sign * frameAmount)*(1.0 / 60.0);
+				position = roundToNearest(1.0 / stage.frameRate, position);
+				position +=  (sign * frameAmount)*(1.0 / stage.frameRate);
 				masterTemplate.JumpToPosition(position);
-				devMenuSignaller2.dispatch("frameText",masterTemplate.GetTimeInCurrentAnimation());
+				devMenuSignaller2.dispatch("timeText",masterTemplate.GetTimeInCurrentAnimation());
 			}
-			/*else if (targetName.contains() == "-1F")
-			{
-				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
-				position = roundToNearest(1.0 / 60, position);
-				position -= 1.0 / 60.0;
-				masterTemplate.JumpToPosition(position);
-				devMenuSignaller2.dispatch("frameText",masterTemplate.GetTimeInCurrentAnimation());
-				
-			}
-			else if (targetName == "+1F")
-			{
-				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
-				position = roundToNearest(1.0 / 60, position);
-				position += 1.0 / 60.0;
-				masterTemplate.JumpToPosition(position);
-				devMenuSignaller2.dispatch("frameText",masterTemplate.GetTimeInCurrentAnimation());
-			}*/
 		}
 		
 		public function onSignal2(targetName:*, value:*):void
@@ -773,10 +757,15 @@ package ppppu
 			if (targetName == "animationSelector")
 			{
 				SwitchTemplateAnimation(value);
+				devMenuSignaller2.dispatch("elementSelector", timelineLib.GetBaseTimelinesFromLibrary(value));
 			}
 			else if (targetName == "setFrameButton")
 			{
-				masterTemplate.JumpToPosition(value* (1.0/60.0));
+				masterTemplate.JumpToPosition(value* (1.0/stage.frameRate));
+			}
+			else if (targetName == "setAnimationTime")
+			{
+				masterTemplate.JumpToPosition(value);
 			}
 		}
 		function roundToNearest(roundTo:Number, value:Number):Number{
