@@ -39,6 +39,7 @@ package org.libspark.betweenas3.core.updaters.display
 	import flash.filters.GradientBevelFilter;
 	import flash.filters.GradientGlowFilter;
 	import flash.filters.ShaderFilter;
+	import flash.geom.Matrix;
 	import org.libspark.betweenas3.core.updaters.AbstractUpdater;
 	import org.libspark.betweenas3.core.utils.ClassRegistry;
 	
@@ -64,6 +65,7 @@ package org.libspark.betweenas3.core.updaters.display
 			'width',
 			'height',
 			'visible', //allow updater to directly affect visibility
+			//'_matrix', //allow updater to directly modify the transform matrix instead of doing sub object tranversals to do so.
 			'_bevelFilter',
 			'_blurFilter',
 			'_colorMatrixFilter',
@@ -259,6 +261,9 @@ package org.libspark.betweenas3.core.updaters.display
 		 */
 		override public function getObject(propertyName:String):Object
 		{
+			/*if (propertyName == '_matrix') {
+				return _target.transform.matrix;
+			}*/
 			if (propertyName == '_blurFilter') {
 				return getFilterByClass(BlurFilter);
 			}
@@ -313,6 +318,10 @@ package org.libspark.betweenas3.core.updaters.display
 		 */
 		override public function setObject(propertyName:String, value:Object):void
 		{
+			/*if (propertyName == '_matrix') {
+				_target.transform.matrix = value as Matrix;
+				return;
+			}*/
 			if (propertyName == '_blurFilter') {
 				setFilterByClass(value as BitmapFilter, BlurFilter);
 				return;

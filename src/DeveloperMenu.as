@@ -120,7 +120,7 @@ frameBackButton.width = 70;
 		
 		private function ClickEventHandler(e:MouseEvent)
 		{
-			if (e.target.name != "setFrameButton")
+			if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
 				signal1.dispatch(e.target.name);
 			}

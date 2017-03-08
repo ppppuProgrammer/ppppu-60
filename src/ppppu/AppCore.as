@@ -276,9 +276,12 @@ package ppppu
 		private function RunLoop(e:Event):void
 		{
 			//Checks if the timeline lib has a valid base animation set. If it doesn't, return until there is one loaded in.
+			CONFIG::debug
+			{
 			if (devMenu.ReadyCheck() == false)
 			{
 				return;
+			}
 			}
 			if (!timelineLib.HasValidBaseAnimation())
 			{
@@ -290,7 +293,7 @@ package ppppu
 				System.pauseForGCIfCollectionImminent(1);
 				System.pauseForGCIfCollectionImminent(1);
 				SwitchCharacter(0);
-				SwitchTemplateAnimation(0);
+				//SwitchTemplateAnimation(0);
 				//backgroundMasterTimeline.play(0);
 				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
 				/*for each (var tl:TimelineLite in bgMasterTimelineChildren)
@@ -648,7 +651,9 @@ package ppppu
 						animationNameIndexes[animationIndex] = animName;
 						
 						CONFIG::debug
+						{
 						devMenu.AddNewAnimation(animName);
+						}
 					}
 					
 					//If the layer info dictionary for the animation doesn't exist, create it.
@@ -716,7 +721,8 @@ package ppppu
 			}
 			return animLayout;
 		}
-		
+		CONFIG::debug
+		{
 		private function SetupDevMenuHooks():void
 		{
 			devMenuSignaller1.addSlot(devMenu);
@@ -726,6 +732,7 @@ package ppppu
 		private function AddNewLineToDevOutputWindow(message:String):void
 		{
 			devMenuSignaller1.dispatch(message);
+		}
 		}
 		
 		public function onSignal1(targetName:*):void
@@ -739,7 +746,7 @@ package ppppu
 			{
 				masterTemplate.StopAnimation();
 			}
-			else if (target.search(RegExp("[+-]\d*.F") > -1))
+			else if (target.search(RegExp(/[+-]\d*.F/)) > -1)
 			{
 				var sign:int = target.charAt(0) == "-"? -1:1;
 				target = target.substring(1, target.length -1);

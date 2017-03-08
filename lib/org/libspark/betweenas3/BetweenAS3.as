@@ -49,6 +49,7 @@ package org.libspark.betweenas3
 	import org.libspark.betweenas3.core.updaters.BezierUpdater;
 	import org.libspark.betweenas3.core.updaters.display.DisplayObjectUpdater;
 	import org.libspark.betweenas3.core.updaters.display.MovieClipUpdater;
+	import org.libspark.betweenas3.core.updaters.geom.MatrixUpdater;
 	import org.libspark.betweenas3.core.updaters.geom.PointUpdater;
 	import org.libspark.betweenas3.core.updaters.ObjectUpdater;
 	import org.libspark.betweenas3.core.updaters.UpdaterFactory;
@@ -94,6 +95,7 @@ package org.libspark.betweenas3
 			DisplayObjectUpdater.register(_updaterClassRegistry);
 			MovieClipUpdater.register(_updaterClassRegistry);
 			PointUpdater.register(_updaterClassRegistry);
+			MatrixUpdater.register(_updaterClassRegistry);
 		}
 		
 		/**

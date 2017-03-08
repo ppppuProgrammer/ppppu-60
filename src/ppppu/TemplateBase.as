@@ -6,6 +6,7 @@ package ppppu
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.easing.Linear;
+	import org.libspark.betweenas3.events.TweenEvent;
 	import org.libspark.betweenas3.tweens.IObjectTween;
 	import org.libspark.betweenas3.tweens.ITween;
 	//import com.greensock.TimelineLite;
@@ -125,15 +126,17 @@ package ppppu
 					//currentTweenData = tweenData[i];
 					if ("transformMatrix" in tweenData[i])
 					{
-						currentTweenData.transform = { }; currentTweenData.transform.matrix = { };
+						/*currentTweenData.transform = { };*/ currentTweenData._matrix = { };
 						//currentTweenData.x = tweenData[i].transformMatrix.tx;
 						//currentTweenData.y = tweenData[i].transformMatrix.ty;
-						currentTweenData.transform.matrix.a = tweenData[i].transformMatrix.a;
-						currentTweenData.transform.matrix.b = tweenData[i].transformMatrix.b;
-						currentTweenData.transform.matrix.c = tweenData[i].transformMatrix.c;
-						currentTweenData.transform.matrix.d = tweenData[i].transformMatrix.d;
-						currentTweenData.transform.matrix.tx = tweenData[i].transformMatrix.tx;
-						currentTweenData.transform.matrix.ty = tweenData[i].transformMatrix.ty;
+						var matrix:Matrix = new Matrix(tweenData[i].transformMatrix.a, tweenData[i].transformMatrix.b, tweenData[i].transformMatrix.c, tweenData[i].transformMatrix.d, tweenData[i].transformMatrix.tx, tweenData[i].transformMatrix.ty);
+						currentTweenData._matrix = matrix;
+						/*currentTweenData._matrix.a = tweenData[i].transformMatrix.a;
+						currentTweenData._matrix.b = tweenData[i].transformMatrix.b;
+						currentTweenData._matrix.c = tweenData[i].transformMatrix.c;
+						currentTweenData._matrix.d = tweenData[i].transformMatrix.d;
+						currentTweenData._matrix.tx = tweenData[i].transformMatrix.tx;
+						currentTweenData._matrix.ty = tweenData[i].transformMatrix.ty;*/
 					}
 					//Visibility fallback check for first tween. Assume that it is to be visible if there was no visible property specified.
 					if (i == 0)
@@ -232,7 +235,8 @@ package ppppu
 		
 		public function Update():Number
 		{
-			if (animationPaused == false) //If animation isn't paused, update
+			var position:Number = Number.NaN;
+			if (animationPaused == false && masterTimeline) //If animation isn't paused, update
 			{
 				var currentTime:Number = masterTimeline.position;
 				//trace("Frame " + int(120*(currentTime/masterTimeline.duration)));
@@ -248,8 +252,13 @@ package ppppu
 						break; //Break out the for loop
 					}
 				}
+				//position = masterTimeline.position;
 			}
-			return masterTimeline.position;
+			if (masterTimeline)
+			{
+				position = masterTimeline.position;
+			}
+			return position;
 		}
 		
 		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
@@ -534,8 +543,11 @@ package ppppu
 			{
 				startTime = masterTimeline.position;
 			}
-			if (animationPaused) { animationPaused = false;}
+			if (animationPaused) { animationPaused = false; }
+			masterTimeline.stopOnComplete = false;	
 			masterTimeline.gotoAndPlay(startTime);
+			
+			
 			//Get all timelines currently used
 			//elementTimelineDict
 			/*var childTimelines:Array = masterTimeline.getTweenAt//getChildren(!true, false);
@@ -549,6 +561,7 @@ package ppppu
 		public function ResumePlayingAnimation():void
 		{
 			animationPaused = false;
+			masterTimeline.stopOnComplete = false;
 			masterTimeline.play();
 			//Get all timelines currently used
 			/*var childTimelines:Array = masterTimeline.getChildren(!true, false);
@@ -796,6 +809,11 @@ package ppppu
 		private function ChangeSpriteVisibility(target:DisplayObject, visible:Boolean):void
 		{
 			target.visible = visible;
+		}
+		
+		private function LoopAnimation(e:TweenEvent):void
+		{
+			masterTimeline.gotoAndPlay(0);
 		}
 	}
 

@@ -123,11 +123,12 @@ package animations
 			var timeline:SerialTween = null;
 			for (var i:int = 0, l:int = typeVector.length; i < l; ++i )
 			{
-				if (typeVector[i].data == timelineName)
+				//Commented out so Flex will shut up. The code is actually wrong but Flex will still compile this function despite it never being called anywhere in the program.
+				/*if (typeVector[i].data == timelineName)
 				{
 					timeline = typeVector[i];
 					break;
-				}
+				}*/
 			}
 			return timeline;
 		}
