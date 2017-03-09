@@ -126,17 +126,26 @@ package ppppu
 					//currentTweenData = tweenData[i];
 					if ("transformMatrix" in tweenData[i])
 					{
-						/*currentTweenData.transform = { };*/ currentTweenData._matrix = { };
+						
 						//currentTweenData.x = tweenData[i].transformMatrix.tx;
 						//currentTweenData.y = tweenData[i].transformMatrix.ty;
-						var matrix:Matrix = new Matrix(tweenData[i].transformMatrix.a, tweenData[i].transformMatrix.b, tweenData[i].transformMatrix.c, tweenData[i].transformMatrix.d, tweenData[i].transformMatrix.tx, tweenData[i].transformMatrix.ty);
-						currentTweenData._matrix = matrix;
-						/*currentTweenData._matrix.a = tweenData[i].transformMatrix.a;
+						//var matrix:Matrix = new Matrix(tweenData[i].transformMatrix.a, tweenData[i].transformMatrix.b, tweenData[i].transformMatrix.c, tweenData[i].transformMatrix.d, tweenData[i].transformMatrix.tx, tweenData[i].transformMatrix.ty);
+						/*currentTweenData._matrix = matrix;
+						currentTweenData.transform = { }; currentTweenData.transform.matrix = { };
+						currentTweenData._matrix.a = tweenData[i].transformMatrix.a;
 						currentTweenData._matrix.b = tweenData[i].transformMatrix.b;
 						currentTweenData._matrix.c = tweenData[i].transformMatrix.c;
 						currentTweenData._matrix.d = tweenData[i].transformMatrix.d;
 						currentTweenData._matrix.tx = tweenData[i].transformMatrix.tx;
 						currentTweenData._matrix.ty = tweenData[i].transformMatrix.ty;*/
+						
+						currentTweenData.transform = { }; currentTweenData.transform.matrix = { };
+						currentTweenData.transform.matrix.a = tweenData[i].transformMatrix.a;
+						currentTweenData.transform.matrix.b = tweenData[i].transformMatrix.b;
+						currentTweenData.transform.matrix.c = tweenData[i].transformMatrix.c;
+						currentTweenData.transform.matrix.d = tweenData[i].transformMatrix.d;
+						currentTweenData.transform.matrix.tx = tweenData[i].transformMatrix.tx;
+						currentTweenData.transform.matrix.ty = tweenData[i].transformMatrix.ty;
 					}
 					//Visibility fallback check for first tween. Assume that it is to be visible if there was no visible property specified.
 					if (i == 0)
