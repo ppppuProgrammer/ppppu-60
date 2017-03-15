@@ -6,6 +6,8 @@ package ppppu
 	import flash.system.System;
 	import modifications.AnimationMod;
 	import animations.background.*;
+	import org.libspark.betweenas3.BetweenAS3;
+	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
 	//import animations.background.BacklightTimelineData;
 	//import animations.background.InnerDiamondTimelineData;
@@ -110,8 +112,8 @@ package ppppu
 		//Holds the duration of the master timeline contained in the master template. Used to avoid needing to call masterTemplate.GetDurationOfCurrentAnimation in the run loop.
 		private var animationDuration:Number = 0;
 		
-		public var backgroundMasterTimeline:TimelineMax = new TimelineMax({paused:true, repeat: -1});
-		public var bgMasterTimelineChildren:Vector.<TimelineLite> = new Vector.<TimelineLite>();
+		public var backgroundMasterTimeline:ParallelTween;
+		public var bgMasterTimelineChildren:Array = new Array();
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
@@ -228,18 +230,19 @@ package ppppu
 			//Set timelines up for background elements.
 			/*var backlightTLDef:TimelineDefinition = new BacklightTimelineData();
 			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(backlightTLDef.GetTimelineData(), mainStage);
-			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
+			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			var outerDiaTLDef:TimelineDefinition = new OuterDiamondTimelineData();
 			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(outerDiaTLDef.GetTimelineData(), mainStage);
-			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
+			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			var innerDiaTLDef:TimelineDefinition = new InnerDiamondTimelineData();
 			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(innerDiaTLDef.GetTimelineData(), mainStage);
-			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
+			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			var transitDiaTLDef:TimelineDefinition = new TransitionDiamondTimelineData();
 			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(transitDiaTLDef.GetTimelineData(), mainStage);
-			backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);*/
+			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
 			
-			
+			backgroundMasterTimeline = BetweenAS3.parallelTweens(bgMasterTimelineChildren) as ParallelTween;
+			backgroundMasterTimeline.stopOnComplete = false;*/
 			musicPlayer.SetUpdateRate(stage.frameRate);
 			
 			//(loader as AnimationInfo).GetDataForTimelinesCreation();
@@ -294,7 +297,7 @@ package ppppu
 				System.pauseForGCIfCollectionImminent(1);
 				SwitchCharacter(0);
 				//SwitchTemplateAnimation(0);
-				//backgroundMasterTimeline.play(0);
+				//backgroundMasterTimeline.gotoAndPlay(0);
 				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
 				/*for each (var tl:TimelineLite in bgMasterTimelineChildren)
 				{
@@ -303,7 +306,7 @@ package ppppu
 				//masterTemplate.PlayAnimation(0);
 				masterTemplate.visible = true;
 				firstTimeInLoop = false;
-				previousUpdateTime = backgroundMasterTimeline.totalTime();//(getTimer() / 1000.0);
+				//previousUpdateTime = backgroundMasterTimeline.position;// .totalTime();//(getTimer() / 1000.0);
 				ppppuRunTimeCounter = 0;
 				musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
 
@@ -768,7 +771,9 @@ package ppppu
 			}
 			else if (targetName == "setFrameButton")
 			{
-				masterTemplate.JumpToPosition(value* (1.0/stage.frameRate));
+				
+				masterTemplate.JumpToPosition(value * (1.0 / stage.frameRate));
+				//masterTemplate.ResumePlayingAnimation();
 			}
 			else if (targetName == "setAnimationTime")
 			{

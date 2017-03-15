@@ -14,8 +14,8 @@
 		<PushButton id="animPauseButton" x="70" y="35" label="Pause" width="50" toggle="false"/>
 		<Label id="timeLabel" x="130" y="35" text="Time:"/>
 		<Label id="timeText" x="160" y="35" text=""/>
-		<Label id="frameLabel" x="220" y="35" text="Frame:"/>
-		<Label id="frameText" x="250" y="35" text=""/>
+		<Label id="frameLabel" x="220" y="35" text="Keyframe:"/>
+		<Label id="frameText" x="270" y="35" text=""/>
 		<!--  -<HUISlider id="animProgressSlider" x="220" y="35" label="Progress" labelPrecision="0"/><!- -->
 		
 		<!-- Section 3 Changing frame for animation-->

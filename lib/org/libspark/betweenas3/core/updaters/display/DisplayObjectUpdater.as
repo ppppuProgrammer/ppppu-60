@@ -39,7 +39,7 @@ package org.libspark.betweenas3.core.updaters.display
 	import flash.filters.GradientBevelFilter;
 	import flash.filters.GradientGlowFilter;
 	import flash.filters.ShaderFilter;
-	import flash.geom.Matrix;
+	//import flash.geom.Matrix;
 	import org.libspark.betweenas3.core.updaters.AbstractUpdater;
 	import org.libspark.betweenas3.core.utils.ClassRegistry;
 	

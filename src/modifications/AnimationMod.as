@@ -1,42 +1,52 @@
 package modifications 
 {
-	import modifications.Mod;
+	import flash.display.MovieClip;
 	/**
-	 * Class that holds the various timelines used to animate various elements on the master template/compositor to create an animation.
-	 * This class is to be used as a base class.
+	 * ...
 	 * @author 
 	 */
-	public class AnimationMod extends Mod
+	public class AnimationMod extends Mod  implements IModdable
 	{
-		protected var timelinesData:Vector.<Object>;
-		protected var displayOrderList:String;
-		protected var characterName:String;
-		protected var animationName:String;
+		//The movie clip for an single animation or for multiple animations, each in a frame of the container.
+		protected var animationContainer:MovieClip=null;
+		//The character group this mod is intended for.
+		protected var targetCharacterName:String = null;
 		
+		//protected var 
 		public function AnimationMod() 
 		{
-			modType = Mod.MOD_ANIMATION; 
-			timelinesData = new Vector.<Object>();
+			modType = Mod.MOD_ANIMATION;
+		}
+		public function GetAnimationContainer():MovieClip
+		{
+			return animationContainer;
 		}
 		
-		public function GetDataForTimelinesCreation():Vector.<Object>
+		public function GetTargetCharacterName():String
 		{
-			return timelinesData;
+			return targetCharacterName;
 		}
 		
-		public function GetCharacterName():String
+		public function OutputModDetails():String
 		{
-			return characterName;
+			var output:String = "Target character group: " + (targetCharacterName != null && targetCharacterName.length > 0 ? targetCharacterName : "None targetted");
+			return output;
 		}
 		
-		public function GetAnimationName():String
+		override public function Dispose():void 
 		{
-			return animationName;
-		}
-		
-		public function GetDisplayOrderList():String
-		{
-			return displayOrderList;
+			super.Dispose();
+			if (animationContainer != null)
+			{
+				animationContainer.stopAllMovieClips();
+				animationContainer.removeChildren();
+				if (animationContainer.parent != null)
+				{
+					animationContainer.parent.removeChild(animationContainer);
+				}
+				animationContainer = null;
+			}
+			targetCharacterName = null;
 		}
 		
 	}

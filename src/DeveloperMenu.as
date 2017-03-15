@@ -213,7 +213,8 @@ frameBackButton.width = 70;
 				(config.getCompById(targetName) as Label).text = timeStr;
 				
 				//Update the label that indicates the frame
-				var frameStr:String = int(TimeUtil.toFrames(position, 30)) + " / " + int(TimeUtil.toFrames(animationDuration, 30.0));
+				var animationTotalKeyframes:Number = TimeUtil.toFrames(animationDuration, 30.0);
+				var frameStr:String = (((TimeUtil.toFrames(position, 30)+1.0)%animationTotalKeyframes).toFixed(1)) + " / " + int(animationTotalKeyframes);
 				(config.getCompById("frameText") as Label).text = frameStr;
 			}
 			else if (targetName == "updatedAnimation")
