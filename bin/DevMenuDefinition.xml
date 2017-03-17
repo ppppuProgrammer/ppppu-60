@@ -4,10 +4,11 @@
 		<!-- Section 1 -->
 		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
 		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>
-		<Label id="bodyLabel" x="170" y="10" text="Body group:"/>
-		<ComboBox id="bodyTypeSelector" x="230" y="10" width="90"/>
-		<Label id="charLabel" x="330" y="10" text="Character:"/>
-		<ComboBox id="characterSelector" x="380" y="10" width="90"/>
+		<Label id="bodyLabel" x="160" y="10" text="Body:"/>
+		<ComboBox id="bodyTypeSelector" x="190" y="10" width="90"/>
+		<Label id="charLabel" x="290" y="10" text="Character:"/>
+		<ComboBox id="characterSelector" x="340" y="10" width="90"/>
+		<PushButton id="setAnimationButton" x="440" y="10" width="30" label="Set" />
 		
 		<!-- Section 2 Animation play progress -->
 		<PushButton id="animPlayButton" x="10" y="35" label="Play" width="50" toggle="false"/>

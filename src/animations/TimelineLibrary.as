@@ -17,6 +17,8 @@ package animations
 		Concise version: vector[animID] > vector[timelines]*/
 		private var baseTimelinesCollection:Vector.<Vector.<SerialTween>> = new Vector.<Vector.<SerialTween>>();
 		
+		private var extraTimelinesCollection;
+		
 		/*Contains additional timelines that will replace base timelines in an animation. Primarily used for body part rearraignment.
 		 * Is a vector (animation id) of vectors (character) of dictionaries (animation set which is a group of timelines meant for a 
 		 * certain purpose) which will use a string as a key(set name) and a vector<SerialTween> as the value. 

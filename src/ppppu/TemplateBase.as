@@ -37,6 +37,8 @@ package ppppu
 		 * controlled  by series of tweens defined by a motion xml.*/
 		//private var masterTimeline:TimelineMax = new TimelineMax( { useFrames:false, smoothChildTiming:false, paused:true, repeat: -1 /*,onRepeat:DEBUG__MTLOutput, onRepeatParams:["{self}"], onStart:DEBUG__MTLOutput2, onStartParams:["{self}"]*/ } );
 		public var masterTimeline:ParallelTween;
+		public var baseAnimationTweens:ParallelTween;
+		public var additionalAnimationTweens:ParallelTween;
 		//An Object that contains a number of depth layout change Objects for specified frames of the current animation.
 		//private var currentAnimationElementDepthLayout:Object;
 		private var currentAnimationElementDepthLayout:AnimationLayout;

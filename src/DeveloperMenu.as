@@ -120,7 +120,14 @@ frameBackButton.width = 70;
 		
 		private function ClickEventHandler(e:MouseEvent)
 		{
-			if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
+			if (e.target.name == "setAnimationButton")
+			{
+				var anim_cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+				var body_cbox:ComboBox = config.getCompById("bodyTypeSelector") as ComboBox;
+				var char_cbox:ComboBox = config.getCompById("characterSelector") as ComboBox;
+				signal2.dispatch(e.target.name, [anim_cbox.selectedIndex, body_cbox.selectedIndex, char_cbox.selectedIndex]);
+			}
+			else if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
 				signal1.dispatch(e.target.name);
 			}
@@ -190,6 +197,24 @@ frameBackButton.width = 70;
 		public function AddNewAnimation(name:String):void
 		{
 			var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+			if (cbox)
+			{
+				cbox.addItem(name);
+			}
+		}
+		
+		public function AddNewBodyType(name:String):void
+		{
+			var cbox:ComboBox = config.getCompById("bodyTypeSelector") as ComboBox;
+			if (cbox)
+			{
+				cbox.addItem(name);
+			}
+		}
+		
+		public function AddNewCharacter(name:String):void
+		{
+			var cbox:ComboBox = config.getCompById("characterSelector") as ComboBox;
 			if (cbox)
 			{
 				cbox.addItem(name);

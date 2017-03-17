@@ -6,6 +6,8 @@ package ppppu
 	import flash.system.System;
 	import modifications.AnimationMod;
 	import animations.background.*;
+	import modifications.TemplateAnimationMod;
+	import modifications.TemplateCharacterMod;
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
@@ -78,6 +80,7 @@ package ppppu
 		private var keyDownStatus:Array = [];
 		//Contains the names of the various animations that the master template can switch between. The names are indexed by their position in the vector.
 		private var animationNameIndexes:Vector.<String> = new Vector.< String > ();// ["Cowgirl", "LeanBack", "LeanForward", "Grind", "ReverseCowgirl", "Paizuri", "Blowjob", "SideRide", "Swivel", "Anal"];
+		private var basisBodyTypes:Vector.<String> = new Vector.<String>();
 		private var characterList:Vector.<Character> = new Vector.<Character>();//[new PeachCharacter, new RosalinaCharacter];
 		private var defaultCharacter:Character;// = characterList[0];
 		private var defaultCharacterName:String;// = defaultCharacter.GetName();
@@ -263,7 +266,9 @@ package ppppu
 			}
 			
 			startupLoader.autoLoad = true;
+			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
 			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
+			startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
 			//startupLoader.append(new SWFLoader("PistonAnimation.swf"));
 			//startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
 			//startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
@@ -399,7 +404,7 @@ package ppppu
 				if((keyPressed == 48 || keyPressed == 96))
 				{
 					var randomAnimIndex:int = Math.floor(Math.random() * animationNameIndexes.length);
-					SwitchTemplateAnimation(randomAnimIndex);
+					//SwitchTemplateAnimation(randomAnimIndex);
 					masterTemplate.PlayAnimation(-1);
 				}
 				else if((!(Keyboard.NUMBER_0 > keyPressed) && !(keyPressed > Keyboard.NUMBER_9 )) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
@@ -411,7 +416,7 @@ package ppppu
 					}
 					if (timelineLib.DoesBaseTimelinesForAnimationExist(keyPressed - 49))
 					{
-					SwitchTemplateAnimation(keyPressed - 49);
+					//SwitchTemplateAnimation(keyPressed - 49);
 					}
 					masterTemplate.PlayAnimation(0);
 				}
@@ -477,12 +482,13 @@ package ppppu
 		}
 		
 		//Switches to a templated animation of a specified name
-		private function SwitchTemplateAnimation(animationIndex:uint):void
+		private function SwitchTemplateAnimation(animationIndex:uint, bodyType:int):void
 		{
-			if (animationIndex >= animationNameIndexes.length) { return;}
+			if (animationIndex >= animationNameIndexes.length || bodyType == -1) { return;}
 			var animationName:String = animationNameIndexes[animationIndex];
 			var currentCharacterName:String = currentCharacter.GetName();
 			currentAnimationName = animationName;
+			var bodyTypeString:String = basisBodyTypes[bodyType];
 
 			
 			//if(!timelineLib.DoesBaseTimelinesForAnimationExist(animationIndex))
@@ -496,13 +502,13 @@ package ppppu
 			{
 				currentCharLayerInfo = layerInfoDict[defaultCharacterName][animationName];
 			}*/
-			var currentCharAnimLayout:AnimationLayout = layerInfoDict[animationName][currentCharacterName];
-			if (currentCharAnimLayout == null && currentCharacterName != defaultCharacterName)
+			var currentCharAnimLayout:AnimationLayout = layerInfoDict[animationName][bodyTypeString];
+			/*if (currentCharAnimLayout == null && currentCharacterName != defaultCharacterName)
 			{
 				currentCharAnimLayout = layerInfoDict[animationName][defaultCharacterName];
-			}
+			}*/
 			//masterTemplate.ChangeAnimation(currentCharLayerInfo, animationIndex, currentCharacter.GetID(), "Standard");
-			masterTemplate.ChangeAnimation(currentCharAnimLayout, animationIndex, currentCharacter.GetID(), "Standard");
+			masterTemplate.ChangeAnimation(currentCharAnimLayout, animationIndex, currentCharacter.GetID(), bodyTypeString);
 			/*masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
 			
 			masterTemplate.ChangeBaseTimelinesUsed(animationIndex);
@@ -633,18 +639,25 @@ package ppppu
 		and the mod could not be added.*/
 		private function ProcessMod(mod:Mod, modType:int):Boolean
 		{
-			if (modType == Mod.MOD_ANIMATION)
+			if (modType == Mod.MOD_TEMPLATEANIMATION)
 			{
-				var animation:AnimationMod = mod as AnimationMod;
+				var animation:TemplateAnimationMod = mod as TemplateAnimationMod;
 				if (animation)
 				{
 					var data:Vector.<Object> = animation.GetDataForTimelinesCreation();
 
 					var timelines:Vector.<SerialTween> = new Vector.<SerialTween>();
-					var displayLayout:Object = JSON.parse(animation.GetDisplayOrderList());
+					
+					var displayOrderCommands:String = animation.GetDisplayOrderList();
+					var displayLayout:Object = null;
+					if (displayOrderCommands.length > 0)
+					{
+						displayLayout = JSON.parse(animation.GetDisplayOrderList());
+					}
 					
 					var charName:String = animation.GetCharacterName();
 					var animName:String = animation.GetAnimationName();
+					var bodyName:String = animation.GetBodyTypeName();
 					
 					var animationIndex:int = animationNameIndexes.indexOf(animName);
 					//Animations can not be added until the default character has their data for the particular animation loaded in.
@@ -663,28 +676,53 @@ package ppppu
 					if (layerInfoDict[animName] == null) 
 					{ layerInfoDict[animName] = new Dictionary(); }
 					//If the layer info dictionary for the character doesn't exist, create it.
-					if (layerInfoDict[charName] == null) 
-					{ layerInfoDict[charName] = new Dictionary(); }
+					//if (layerInfoDict[animName][charName] == null) 
+					//{ layerInfoDict[animName][charName] = new Dictionary(); }
+					//{ layerInfoDict[bodyName] = new Dictionary(); }
 					//Set the layer info for an animation of the character
 					//layerInfoDict[charName][animName] = displayLayout;
-					layerInfoDict[animName][charName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
+					
+					
+					//If animation is to be used as the basis, it might define a new body type.  
+					if (animation.GetIfBasisTemplate() == true)
+					{
+						//bodyName is used to define the name of the body type in the case of a basis animation.
+						//So check that the body type of the mod is not already in the basis body types list.
+						if (basisBodyTypes.indexOf(bodyName) == -1)
+						{
+							
+							basisBodyTypes[basisBodyTypes.length] = bodyName;
+							CONFIG::debug
+							{
+							devMenu.AddNewBodyType(bodyName);
+							}
+							
+							layerInfoDict[animName][bodyName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
+						}
+					}
+					else
+					{
+						if (layerInfoDict[animName][charName] == null && displayLayout != null)
+						{
+							layerInfoDict[animName][charName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
+						}
+					}
+					
+					
 					for (var i:int = 0, l:int = data.length; i < l; ++i)
 					{
-						if (i == 9)
-					{
-						var bp:int = 5;
-					}
 						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
 						//timelines[i].play();
 						
 					}
-					if (charName == defaultCharacterName)
+					if (animation.GetIfBasisTemplate() == true)
 					{
 						timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
 					}
 					else
 					{
-						var charID:int = -1;
+						timelineLib.
+						/*var charID:int = -1;
 						for (var x:int = 0, y:int = characterList.length; x < y; ++x)
 						{
 							if (charName == characterList[x].GetName())
@@ -692,13 +730,23 @@ package ppppu
 								charID = x; 
 							}
 						}
-						timelineLib.AddReplacementTimelinesToLibrary(animationIndex, charID, "Standard", timelines);
+						timelineLib.AddReplacementTimelinesToLibrary(animationIndex, charID, "Standard", timelines);*/
 					}
 					return true;
 				}
 			}
-			else if (modType == Mod.MOD_CHARACTER)
+			else if (modType == Mod.MOD_TEMPLATECHARACTER)
 			{
+				var tcharacter:TemplateCharacterMod = mod as TemplateCharacterMod;
+				if (tcharacter)
+				{
+					var charName:String = tcharacter.GetCharacterName();
+					CONFIG::debug
+					{
+					devMenu.AddNewCharacter(charName);
+					}
+				}
+				
 			}
 			else if (modType == Mod.MOD_MUSIC)
 			{
@@ -717,6 +765,7 @@ package ppppu
 		
 		private function ConvertLayoutObjectToAnimationLayout(entireLayoutObj:Object):AnimationLayout
 		{
+			if (entireLayoutObj == null) { return null;}
 			var animLayout:AnimationLayout = new AnimationLayout();
 			for (var frameKey:String in entireLayoutObj)
 			{
@@ -764,10 +813,20 @@ package ppppu
 		
 		public function onSignal2(targetName:*, value:*):void
 		{
-			if (targetName == "animationSelector")
+			/*if (targetName == "animationSelector")
 			{
 				SwitchTemplateAnimation(value);
 				devMenuSignaller2.dispatch("elementSelector", timelineLib.GetBaseTimelinesFromLibrary(value));
+			}*/
+			if (targetName == "setAnimationButton")
+			{
+				//value is expected to be an array with 3 values; animation index, body type index, and character index.
+				if (value[0] == value[1] == -1)
+				{
+					return;
+				}
+				
+				SwitchTemplateAnimation(value[0], value[1]);
 			}
 			else if (targetName == "setFrameButton")
 			{
@@ -778,6 +837,10 @@ package ppppu
 			else if (targetName == "setAnimationTime")
 			{
 				masterTemplate.JumpToPosition(value);
+			}
+			else if (targetName == "characterSelector")
+			{
+				SwitchCharacter(value);
 			}
 		}
 		function roundToNearest(roundTo:Number, value:Number):Number{
