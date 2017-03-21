@@ -1,5 +1,24 @@
 package ppppu 
 {
+	/*body type > animation > variation
+
+Currently:
+animation > body > timelines
+animation > character > timelines
+
+animation:
+character:
+body:
+variant:
+
+goals:
+There should be a base animation that a complete animation is built off of
+
+base + character specific body parts + character hair
+
+how to accomplish base + rosa body parts + peach hair (char is peach)
+* Can't have timelines tied to character.
+Need to set base. Need to add/replace with rosa body parts timelines. Need to then add peach hair timelines.*/
 	//import AnimationSettings.CowgirlInfo;
 	import animations.TimelineLibrary;
 	import com.jacksondunstan.signals.*;
