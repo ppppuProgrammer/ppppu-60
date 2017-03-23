@@ -28,8 +28,10 @@ package modifications
 		public static const MOD_TEMPLATECHARACTER:int = 5;
 		//The mod will add in an animation template. Prefix is "TANIM"
 		public static const MOD_TEMPLATEANIMATION:int = 6;
+		//The mod will add in an animate shard. Prefix is "ANMSHD"
+		public static const MOD_ANIMATESHARD:int = 7;
 		//Used when the mod is loaded standalone to tell the user what type of mod was loaded.
-		private static const modTypeStringDictionary:Vector.<String> = Vector.<String>(["Archive", "AnimatedCharacter", "Animation", "Music", "Assets", "TemplateCharacter", "TemplateAnimation" ]);
+		private static const modTypeStringDictionary:Vector.<String> = Vector.<String>(["Archive", "AnimatedCharacter", "Animation", "Music", "Assets", "TemplateCharacter", "TemplateAnimation", "AnimateShard" ]);
 		protected var modType:int = MOD_UNDEFINED;
 		
 		//For holding any extra mod-inspecific information.

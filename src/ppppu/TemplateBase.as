@@ -1,5 +1,6 @@
 package ppppu 
 {
+	import animations.AnimateShardLibrary;
 	import animations.TimelineLibrary;
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.tweens.ObjectTween;
@@ -25,6 +26,7 @@ package ppppu
 	import ppppu.AnimationLayout;
 	import ppppu.LayoutFrameVector;
 	import ppppu.LayoutRecord;
+	import animations.AnimateShard;
 	//import EyeContainer;
 	//import MouthContainer;
 	/**
@@ -61,7 +63,8 @@ package ppppu
 		
 		private var animationPaused:Boolean = false;
 		
-		public var timelineLib:TimelineLibrary;
+		//public var timelineLib:TimelineLibrary;
+		public var shardLib:AnimateShardLibrary;
 		
 		public var maskedContainerIndexes:Vector.<Sprite> = new Vector.<Sprite>();
 		
@@ -85,9 +88,10 @@ package ppppu
 			addEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
 		}
 		
-		public function Initialize(timelineLibrary:TimelineLibrary):void
+		public function Initialize(shardLibrary:AnimateShardLibrary/*timelineLibrary:TimelineLibrary*/):void
 		{
-			timelineLib = timelineLibrary;
+			//timelineLib = timelineLibrary;
+			shardLib = shardLibrary;
 			
 			for (var i:int = 0, l:int = this.numChildren; i < l; ++i)
 			{
@@ -290,17 +294,17 @@ package ppppu
 			//trace("Change layout completed in " + (getTimer() - timer));
 			//timer = getTimer();
 			//Get timelines that will be added
-			var timelines:Vector.<SerialTween> = timelineLib.GetBaseTimelinesFromLibrary(animationId);
+			var timelines:Vector.<SerialTween> = null;// timelineLib.GetBaseTimelinesFromLibrary(animationId);
 			if (timelines)
 			{
 				AddTimelines(timelines);
 			}
 			//trace("Add base timelines completed in " + (getTimer() - timer));
 			//timer = getTimer();
-			if (timelineLib.DoesCharacterSetExists(animationId, charId, replaceSetName))
+			/*if (timelineLib.DoesCharacterSetExists(animationId, charId, replaceSetName))
 			{
 				AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationId, charId, replaceSetName));
-			}	
+			}	*/
 			//trace("Add replacement timelines completed in " + (getTimer() - timer));
 			//trace("animation duration: " + masterTimeline.duration());
 			//timer = getTimer();
@@ -606,7 +610,7 @@ package ppppu
 		/*Removes all currently active timelines and adds the base timelines for a specified animation.*/
 		public function ChangeBaseTimelinesUsed(animationIndex:uint, clearCurrentTimelines:Boolean=false):void
 		{
-			var timelines:Vector.<SerialTween> = timelineLib.GetBaseTimelinesFromLibrary(animationIndex);
+			var timelines:Vector.<SerialTween> = null;// timelineLib.GetBaseTimelinesFromLibrary(animationIndex);
 			if (timelines)
 			{
 				/*if (clearCurrentTimelines)
@@ -615,6 +619,22 @@ package ppppu
 				}*/
 				AddTimelines(timelines);
 			}
+		}
+		
+		public function CompileAnimation(shards:Vector.<AnimateShard>):void
+		{
+			var timelines:Array = new Array;
+			var shardTimelines:Vector.<SerialTween>;
+			for (var i:int = 0, l:int = shards.length; i < l; i++) 
+			{
+				shardTimelines = shards[i].GetTimelines();
+				for (var j:int = 0, k:int = shardTimelines.length; j < k; j++) 
+				{
+					timelines[timelines.length] = shardTimelines[j];
+				}
+			}
+			var compiledAnimation:ParallelTween = BetweenAS3.parallelTweens(timelines) as ParallelTween;
+			compiledAnimation.gotoAndPlay(0.0);
 		}
 		
 		/*Removes all children timelines, which control the various body part elements of the master template, from the master timeline.

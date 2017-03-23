@@ -1,16 +1,45 @@
 <comps>
 	<!-- Window 1 -->
-	<Window id="mainWindow" title="NX developer menu" width="480" height="140" hasMinimizeButton="true">
+	<Window id="mainWindow" title="NX developer menu" width="480" height="270" hasMinimizeButton="true">
 		<!-- Section 1 -->
 		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
 		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>
-		<Label id="bodyLabel" x="160" y="10" text="Body:"/>
+		<Label id="shardTypeLabel" x="160" y="10" text="Type:"/>
+		<ComboBox id="shardTypeSelector"  x="190" y="10" width="60"/>
+		<Label id="shardLabel" x="260" y="10" text="Shard:"/>
+		<ComboBox id="shardSelector"  x="295" y="10" width="90"/>
+		<PushButton id="addShardButton" x="410" y="10" width="60" label="Add Shard" />
+		<Label id="ShardInfoLabel" x="10" y="30" text="Shard information"/>
+		<TextArea id="shardInfoText" x="0" y="50" width="480" height="35" editable="false"/>
+		<Label id="animListLabel" x="10" y="90" text="Animate Shards list"/>
+		<List id="animList" x="0" y="110" width="480" height="100"/>
+		<PushButton id="removeShardButton" x="20" y="220" width="150" label="Remove selected shard from list" />
+		<PushButton id="finalizeButton" x="180" y="220" width="150" label="Compile shards into animation" />
+		<!-- <Label id="bodyLabel" x="160" y="10" text="Body:"/>
 		<ComboBox id="bodyTypeSelector" x="190" y="10" width="90"/>
 		<Label id="charLabel" x="290" y="10" text="Character:"/>
 		<ComboBox id="characterSelector" x="340" y="10" width="90"/>
-		<PushButton id="setAnimationButton" x="440" y="10" width="30" label="Set" />
+		<PushButton id="setAnimationButton" x="440" y="10" width="30" label="Set" /> -->
 		
-		<!-- Section 2 Animation play progress -->
+		
+	</Window>
+	
+	<!-- Section 4 Debug output -->
+	<Window id="consoleWindow" title="NX developer debug output" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
+		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
+	</Window>
+	
+	<!-- Section 5 Tween testing -->
+	<Window id="tweenWindow" title="Tween debug window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
+		<ComboBox id="elementSelector" x="0" y="00" width="140" height="20"/>
+		<HUISlider id="tweenSelectSlider" x="200" y="00" width="300" height="20" minimum ="0" value="0" maximum="0" labelPrecision="0"/>
+		<Label id="tweenDataLabel" x="200" y="15" text="Element Data"/>
+		<TextArea id="tweenEditor" x="200" y="35" width="260" height="100" editable="true"/>
+	</Window>
+	
+	<!-- Section 6 Animation Playback -->
+	<Window id="animPlayWindow" title="Animation playback window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
+		<!-- Section 1 Animation play progress -->
 		<PushButton id="animPlayButton" x="10" y="35" label="Play" width="50" toggle="false"/>
 		<PushButton id="animPauseButton" x="70" y="35" label="Pause" width="50" toggle="false"/>
 		<Label id="timeLabel" x="130" y="35" text="Time:"/>
@@ -19,7 +48,7 @@
 		<Label id="frameText" x="270" y="35" text=""/>
 		<!--  -<HUISlider id="animProgressSlider" x="220" y="35" label="Progress" labelPrecision="0"/><!- -->
 		
-		<!-- Section 3 Changing frame for animation-->
+		<!-- Section 2 Changing frame for animation-->
 		<Label id="frameSettingLabel" x="10" y="60" text="Frame Settings"/>
 		<PushButton id="-1F" x="10" y="80" label="-1F" width="30"/>
 		<PushButton id="-5F" x="40" y="80" label="-5F" width="30"/>
@@ -31,18 +60,14 @@
 		<HUISlider id="frameSlider" x="300" y="80" label="" minimum="1" value="1" labelPrecision="0"/>
 	</Window>
 	
-	<!-- Section 4 Debug output -->
-	<Window id="consoleWindow" title="NX developer debug output" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
-		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
-	</Window>
-	
-	<!-- Section 5 Tween testing -->
-	<Window id="tweenWindow" title="Tween debug window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="false">
-		<ComboBox id="elementSelector" x="0" y="00" width="140" height="20"/>
-		<HUISlider id="tweenSelectSlider" x="200" y="00" width="300" height="20" minimum ="0" value="0" maximum="0" labelPrecision="0"/>
-		<Label id="tweenDataLabel" x="200" y="15" text="Element Data"/>
-		<TextArea id="tweenEditor" x="200" y="35" width="260" height="100" editable="true"/>
-	</Window>
+	<!-- Outdated Section 1
+		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
+		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>
+		<Label id="bodyLabel" x="160" y="10" text="Body:"/>
+		<ComboBox id="bodyTypeSelector" x="190" y="10" width="90"/>
+		<Label id="charLabel" x="290" y="10" text="Character:"/>
+		<ComboBox id="characterSelector" x="340" y="10" width="90"/>
+		<PushButton id="setAnimationButton" x="440" y="10" width="30" label="Set" /> -->
 	<!--  -
 	< id="" x="" y="" label="">
 	<!- -->

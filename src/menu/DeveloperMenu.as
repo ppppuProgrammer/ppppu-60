@@ -1,5 +1,7 @@
-package
+package menu
 {
+	import adobe.utils.CustomActions;
+	import animations.AnimateShard;
 	import com.bit101.components.*;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -40,6 +42,11 @@ package
 		var signal2:Signal2 = new Signal2();
 		var config:MinimalConfigurator;
 		var waitingForComponentsCreation:Boolean = true;
+		
+		var currentSelectedAnimationId:int;
+		var currentSelectedShardType:String;
+		var currentSelectedShard:AnimateShard;
+		var currentSelectedShardName:String;
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
 		var serialTweenDict:Dictionary = new Dictionary();
@@ -120,12 +127,24 @@ frameBackButton.width = 70;
 		
 		private function ClickEventHandler(e:MouseEvent)
 		{
-			if (e.target.name == "setAnimationButton")
+			if (e.target.name == "addShardButton")
+			{
+				AddSelectedShardToAnimationList();
+			}
+			/*if (e.target.name == "setAnimationButton")
 			{
 				var anim_cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
 				var body_cbox:ComboBox = config.getCompById("bodyTypeSelector") as ComboBox;
 				var char_cbox:ComboBox = config.getCompById("characterSelector") as ComboBox;
 				signal2.dispatch(e.target.name, [anim_cbox.selectedIndex, body_cbox.selectedIndex, char_cbox.selectedIndex]);
+			}*/
+			else if (e.target.name == "finalizeButton")
+			{
+				CompileShardsIntoAnimation();
+			}
+			else if (e.target.name == "removeShardButton")
+			{
+				RemoveShardFromAnimationList();
 			}
 			else if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
@@ -167,9 +186,35 @@ frameBackButton.width = 70;
 		
 		private function SelectEventHandler(e:Event)
 		{
-			if(e.target.name == "elementSelector")
+			
+			if (e.target.name == "shardTypeSelector" || e.target.name == "animationSelector")
 			{
-				/*var serialTweenForElement:SerialTween = serialTweenDict[(config.getCompById("elementSelector") as ComboBox).selectedItem];
+				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+				var cbox2:ComboBox = config.getCompById("shardTypeSelector") as ComboBox;
+				var cbox3:ComboBox = config.getCompById("shardSelector") as ComboBox;
+				if (cbox2.selectedItem == null) { return; }
+				
+				//cache the values of the combo boxes.
+				currentSelectedAnimationId = cbox.selectedIndex;
+				currentSelectedShardType = cbox2.selectedItem as String;
+				cbox3.removeAll();
+				cbox3.selectedItem = -1;
+				currentSelectedShardName = null;
+				SetSelectedShard(null, null);
+				
+				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardType]);
+				//UpdateShardComboBox();
+			}
+			else if (e.target.name == "shardSelector")
+			{
+				var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
+				currentSelectedShardName = cbox.selectedItem as String;
+				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardType, currentSelectedShardName]);
+				//UpdateShardComboBox();
+			}
+			/*else if(e.target.name == "elementSelector")
+			{
+				var serialTweenForElement:SerialTween = serialTweenDict[(config.getCompById("elementSelector") as ComboBox).selectedItem];
 				var tweenSlider:HUISlider = (config.getCompById("tweenSelectSlider") as HUISlider);
 				//Need to find out how many ITweens are in the serial tween.
 				var tweenAmount:int=0;
@@ -177,8 +222,8 @@ frameBackButton.width = 70;
 				{
 					++tweenAmount;
 				}
-				tweenSlider.maximum = tweenAmount;*/
-			}
+				tweenSlider.maximum = tweenAmount;
+			}*/
 			else
 			{
 				try
@@ -189,10 +234,71 @@ frameBackButton.width = 70;
 			}
 		}
 		
+		public function UpdateShardsCombobox(shardNames:Vector.<String>):void 
+		{
+			var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
+			cbox.removeAll();
+			for (var i:int = 0; i < shardNames.length; i++) 
+			{
+				cbox.addItem(shardNames[i]);
+			}
+			
+		}
+		
+		public function AddSelectedShardToAnimationList():void
+		{
+			//If a shard isn't selected then exit this function
+			if (currentSelectedShard == null) return;
+			
+			
+			var animList:List = config.getCompById("animList") as List
+			//Check to make sure the shard isn't already on the list.
+			var listItems:Array = animList.items;
+			for (var i:int = 0, l:int = listItems.length; i < l; i++) 
+			{
+				if (listItems[i].shard == currentSelectedShard)
+					return;
+			}
+			
+			animList.addItem({displayName: currentSelectedShardName, shard: currentSelectedShard});
+			//if(animList.items.indexOf(
+			
+		}
+		
+		public function RemoveShardFromAnimationList():void
+		{
+			var animList:List = config.getCompById("animList") as List
+			if (animList.selectedIndex > -1)
+			{
+				animList.removeItemAt(animList.selectedIndex);
+			}
+		}
+		
+		public function CompileShardsIntoAnimation():void
+		{
+			var shardsToCompile:Vector.<AnimateShard> = new Vector.<AnimateShard>();
+			var animList:List = config.getCompById("animList") as List
+			//Check to make sure the shard isn't already on the list.
+			var listItems:Array = animList.items;
+			
+			for (var i:int = 0, l:int = listItems.length; i < l; i++) 
+			{
+				shardsToCompile[shardsToCompile.length] = listItems[i].shard
+			}
+			signal2.dispatch("CompileShards", shardsToCompile);
+		}
+		
 		public function FinishedLoadingXML(e:Event):void
 		{
 			waitingForComponentsCreation = false;
 			config.removeEventListener(Event.COMPLETE, FinishedLoadingXML);
+			
+			var cbox:ComboBox = config.getCompById("shardTypeSelector") as ComboBox;
+			cbox.addItem("Base");
+			cbox.addItem("Addition");
+			
+			var animList:List = config.getCompById("animList") as List;
+			animList.listItemClass = ShardItem;
 		}
 		public function AddNewAnimation(name:String):void
 		{
@@ -203,7 +309,7 @@ frameBackButton.width = 70;
 			}
 		}
 		
-		public function AddNewBodyType(name:String):void
+		/*public function AddNewBodyType(name:String):void
 		{
 			var cbox:ComboBox = config.getCompById("bodyTypeSelector") as ComboBox;
 			if (cbox)
@@ -219,7 +325,7 @@ frameBackButton.width = 70;
 			{
 				cbox.addItem(name);
 			}
-		}
+		}*/
 		
 		//Used for entering strings into the debug output
 		public function onSignal1(string:*):void
@@ -270,6 +376,10 @@ frameBackButton.width = 70;
 				animationDuration = value;
 				(config.getCompById("frameSlider") as HUISlider).maximum = value*stage.frameRate;
 			}
+			else if (targetName == "SetShard")
+			{
+				SetSelectedShard(value[0] as AnimateShard, value[1] as String);
+			}
 			else if (targetName == "elementSelector")
 			{
 				var elementSelectBox:ComboBox = config.getCompById("elementSelector") as ComboBox;
@@ -306,6 +416,13 @@ frameBackButton.width = 70;
 				}
 				//currentTimelineSet = timelines;
 			}
+		}
+		
+		private function SetSelectedShard(shard:AnimateShard/*, shardName:String*/, description:String):void
+		{
+			currentSelectedShard = shard;
+			//currentSelectedShardName = shardName;
+			(config.getCompById("shardInfoText") as TextArea).text = description;
 		}
 		
 		function roundToNearest(roundTo:Number, value:Number):Number{

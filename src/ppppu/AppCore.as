@@ -20,13 +20,18 @@ how to accomplish base + rosa body parts + peach hair (char is peach)
 * Can't have timelines tied to character.
 Need to set base. Need to add/replace with rosa body parts timelines. Need to then add peach hair timelines.*/
 	//import AnimationSettings.CowgirlInfo;
+	import animations.AnimateShard;
+	import animations.AnimateShardLibrary;
 	import animations.TimelineLibrary;
 	import com.jacksondunstan.signals.*;
 	import flash.system.System;
+	import menu.DeveloperMenu;
+	import modifications.AnimateShardMod;
 	import modifications.AnimationMod;
 	import animations.background.*;
 	import modifications.TemplateAnimationMod;
 	import modifications.TemplateCharacterMod;
+	import mx.utils.StringUtil;
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
@@ -82,7 +87,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	public class AppCore extends Sprite implements Slot1, Slot2
 	{
 		//Holds all the timelines to be used in the program.
-		private var timelineLib:TimelineLibrary = new TimelineLibrary();
+		//private var timelineLib:TimelineLibrary = new TimelineLibrary();
+		
+		
+		private var shardLib:AnimateShardLibrary = new AnimateShardLibrary();
+		
 		
 		//A movie clip that holds all the body elements used to create an animation. The elements in this class are controlled
 		//TODO: Test the extendability of the master template. Can custom elements be easily added to it without big issues?
@@ -142,7 +151,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
 		
 		CONFIG::debug
-		private var devMenu:DeveloperMenu = new DeveloperMenu();
+		private var devMenu:menu.DeveloperMenu = new menu.DeveloperMenu();
 
 		private var devMenuSignaller1:Signal1 = new Signal1();
 		private var devMenuSignaller2:Signal2 = new Signal2();
@@ -171,7 +180,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			addChild(test);*/
 			masterTemplate = mainStage.Compositor;
 			
-			masterTemplate.Initialize(timelineLib);
+			masterTemplate.Initialize(shardLib);
 			//masterTemplate.visible = false;
 			//characterList[0].SetID(0);
 			//masterTemplate.
@@ -285,9 +294,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			
 			startupLoader.autoLoad = true;
-			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
-			startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
-			startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
+			//startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
+			startupLoader.append(new SWFLoader("ARCH_CowgirlAnimation_Shards.swf"));
+			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Peach_Shards.swf"));
+			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Rosalina_Shards.swf"));
+			//startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
+			//startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
+			
 			//startupLoader.append(new SWFLoader("PistonAnimation.swf"));
 			//startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
 			//startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
@@ -310,10 +323,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				return;
 			}
 			}
-			if (!timelineLib.HasValidBaseAnimation())
+			/*if (!timelineLib.HasValidBaseAnimation())
 			{
 				return;
-			}
+			}*/
 
 			if (firstTimeInLoop)
 			{
@@ -433,10 +446,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					{
 						keyPressed = keyPressed - 48;
 					}
-					if (timelineLib.DoesBaseTimelinesForAnimationExist(keyPressed - 49))
+					/*if (timelineLib.DoesBaseTimelinesForAnimationExist(keyPressed - 49))
 					{
 					//SwitchTemplateAnimation(keyPressed - 49);
-					}
+					}*/
 					masterTemplate.PlayAnimation(0);
 				}
 				
@@ -625,28 +638,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			var mod:Mod = (e.target.content.rawContent as Mod);
 			//Add the mod to the stage so the first frame function can get started, allowing the content to be ready to be used.
 			addChild(mod);
-			var modType:int = mod.GetModType();
-			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
-			if (modType == Mod.MOD_ARCHIVE)
-			{
-				var archive:ModArchive = mod as ModArchive;
-				if (archive)
-				{
-					var archiveModList:Vector.<Mod> = archive.GetModsList();
-					var childMod:Mod;
-					for (var i:int = 0, l:int = archiveModList.length; i < l; ++i)
-					{
-						childMod = archiveModList[i];
-						ProcessMod(childMod, modType);
-					}
-				}
-				archive = null;
-			}
-			else
-			{
-				//A singular mod. Just need to process it.
-				ProcessMod(mod, modType);
-			}
+			ProcessMod(mod);
 			//remove the mod file.
 			removeChild(mod);
 			mod = null;
@@ -656,8 +648,18 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter
 		and the mod could not be added.*/
-		private function ProcessMod(mod:Mod, modType:int):Boolean
+		private function ProcessMod(mod:Mod):Boolean
 		{
+			//var modClassName:String = getQualifiedClassName(mod);
+			var addedMod:Boolean = false;
+			if (mod == null)
+			{
+				//logger.warn(modClassName + " is not a ppppuXi mod!");
+				return addedMod;
+			}
+			
+			var modType:int = mod.GetModType();
+			
 			if (modType == Mod.MOD_TEMPLATEANIMATION)
 			{
 				var animation:TemplateAnimationMod = mod as TemplateAnimationMod;
@@ -711,10 +713,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						{
 							
 							basisBodyTypes[basisBodyTypes.length] = bodyName;
-							CONFIG::debug
+							/*CONFIG::debug
 							{
 							devMenu.AddNewBodyType(bodyName);
-							}
+							}*/
 							
 							layerInfoDict[animName][bodyName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
 						}
@@ -736,11 +738,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					}
 					if (animation.GetIfBasisTemplate() == true)
 					{
-						timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
+						//timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
 					}
 					else
 					{
-						timelineLib.
+						//timelineLib.
 						/*var charID:int = -1;
 						for (var x:int = 0, y:int = characterList.length; x < y; ++x)
 						{
@@ -760,12 +762,55 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (tcharacter)
 				{
 					var charName:String = tcharacter.GetCharacterName();
-					CONFIG::debug
+					/*CONFIG::debug
 					{
 					devMenu.AddNewCharacter(charName);
-					}
+					}*/
 				}
 				
+			}
+			else if (modType == Mod.MOD_ANIMATESHARD)
+			{
+				var shardMod:AnimateShardMod = mod as AnimateShardMod;
+				if (shardMod)
+				{
+					var animationName:String = shardMod.GetTargetAnimationName();
+					var animationIndex:int = animationNameIndexes.indexOf(animationName);
+					if (animationIndex == -1)
+					{
+						animationIndex = animationNameIndexes.length;
+						animationNameIndexes[animationIndex] = animationName;
+						
+						CONFIG::debug
+						{
+						devMenu.AddNewAnimation(animationName);
+						}
+					}
+					
+					var timelines:Vector.<SerialTween> = new Vector.<SerialTween>();
+					var data:Vector.<Object> = shardMod.GetTimelineConstructionData();
+					for (var i:int = 0, l:int = data.length; i < l; ++i)
+					{
+						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
+					}
+					var shard:AnimateShard = new AnimateShard(timelines, null);
+					shardLib.AddShardToLibrary(animationIndex, shard, shardMod.GetShardName(), shardMod.GetIfBaseShard());
+					
+					
+					
+					var categories:Vector.<String> = shardMod.GetCategories();
+					var categoriesStr:String = "";
+					for (var i:int = 0, l:int = categories.length; i < l; i++) 
+					{
+						categoriesStr += categories[i];
+						if(i+1 < l){categoriesStr += ", "}
+					} 
+					
+					
+					//construct the info text for the shard.
+					var shardInfo:String = StringUtil.substitute("Categories:  {0}\nDescription: {1}", categoriesStr, shardMod.GetDescription());
+					shardLib.SetInformationForShard(shard, shardInfo);
+				}
 			}
 			else if (modType == Mod.MOD_MUSIC)
 			{
@@ -779,7 +824,33 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				
 			}
-			return false;
+			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
+			else if (modType == Mod.MOD_ARCHIVE)
+			{
+				var archive:ModArchive = mod as ModArchive;
+				if (archive)
+				{
+					
+					//logger.info("\t* Processing archive mod: " + modClassName + "*");
+					var archiveModList:Vector.<Mod> = archive.GetModsList();
+					var childMod:Mod;
+					var	numArchMods:int = archiveModList.length;	//SMLSE OPTIMIZE ATTEMPT
+					for (var i:int = 0; i < numArchMods; ++i)
+					{
+						childMod = archiveModList[i];
+						ProcessMod(childMod);
+					}
+					addedMod = true;
+					//logger.info("\t* Finished processing archive mod " + modClassName + "*");
+				}
+				else 
+				{
+					//logger.error(modClassName + " was not a valid archive mod.");
+				}
+			}
+			mod.Dispose();
+			mod = null;
+			return addedMod;
 		}
 		
 		private function ConvertLayoutObjectToAnimationLayout(entireLayoutObj:Object):AnimationLayout
@@ -860,6 +931,22 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (targetName == "characterSelector")
 			{
 				SwitchCharacter(value);
+			}
+			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
+			{
+				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0], (value[1] == "Base")));
+			}
+			else if (targetName == "shardSelector")
+			{
+				var shard:AnimateShard = shardLib.GetShard(value[0], (value[1] == "Base"), value[2]);
+				devMenuSignaller2.dispatch("SetShard", [shard, shardLib.GetInformationOnShard(shard)]);
+				//devMenu.SetSelectedShard(shard);
+				//devMenu.set
+			}
+			else if (targetName == "CompileShards")
+			{
+				var shardsToCompile:Vector.<AnimateShard> = value as Vector.<AnimateShard>;
+				masterTemplate.CompileAnimation(shardsToCompile);
 			}
 		}
 		function roundToNearest(roundTo:Number, value:Number):Number{
