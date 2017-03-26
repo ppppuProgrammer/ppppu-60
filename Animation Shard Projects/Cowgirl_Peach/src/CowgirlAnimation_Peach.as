@@ -22,7 +22,7 @@ package
 			modsList.push(CreateShardModForCrown());
 			modsList.push(CreateShardModForEarringL());
 			modsList.push(CreateShardModForEarringR());
-			modsList.push(CreateShardModForBodyChanges());
+			//modsList.push(CreateShardModForBodyChanges());
 		}
 		
 		//Hair
@@ -44,6 +44,19 @@ package
 		private function CreateDisplayInfoForHair():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHairFront", 500, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHair2L", 400, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHair2R", 300, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHair1L", 200, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHair1R", 100, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			
+			
+			
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHair3L", 300, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHair3R", 200, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
+			
+			
+			dispInfo[dispInfo.length] = new DispObjInfo("PchHairBack", 100, 0.0, "HairBackLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -75,6 +88,7 @@ package
 		private function CreateDisplayInfoForCrown():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("PchCrown", 100, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -107,6 +121,8 @@ package
 		private function CreateDisplayInfoForEarringL():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			
+			dispInfo[dispInfo.length] = new DispObjInfo("PchEarringL", 100, 0.0, "HairBehindFaceLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -139,6 +155,7 @@ package
 		private function CreateDisplayInfoForEarringR():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("PchEarringR", 200, 0.0, "HairBehindFaceLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);

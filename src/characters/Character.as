@@ -16,6 +16,8 @@
 		//private var m_defInDiaMC:Boolean = true;
 		//private var m_defTransDiaMC:Boolean = true;
 		
+		public var data:Object;
+		
 		//Flag that determines if the id number of the character can be set.
 		protected var idSet:Boolean = false;
 		
@@ -30,7 +32,14 @@
 		//The music to play for this specific character
 		protected var selectedMusicId:int = -1;
 		//private var m_numOfLockedAnimations:int = 0;
-
+		
+		public function Character(name:String, charData:Object)
+		{
+			m_name = name;
+			data = charData;
+			
+		}
+		
 		public function SetID(idNumber:int):void
 		{
 			if (!idSet)

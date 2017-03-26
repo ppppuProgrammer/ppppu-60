@@ -1,6 +1,7 @@
 package ppppu 
 {
 	import flash.display.Sprite;
+	import animations.DispObjInfo;
 	/**
 	 * Used to keep track of what elements are used in an animation, where they are positioned depth wise, and any frame in which
 	 * either an element's visibility or depth changes.
@@ -15,9 +16,9 @@ package ppppu
 		{
 			
 		}
-		public function AddNewFrameVector(time:Number, frameLayoutObj:Object, animationCanvas:Sprite):void
+		public function AddNewFrameVector(time:Number, dispInfoVector:Vector.<DispObjInfo>/*, animationCanvas:Sprite*/):void
 		{
-			frameVector[frameVector.length] = new LayoutFrameVector(time, frameLayoutObj, animationCanvas);
+			frameVector[frameVector.length] = new LayoutFrameVector(time, dispInfoVector/*, animationCanvas*/);
 		}
 	}
 

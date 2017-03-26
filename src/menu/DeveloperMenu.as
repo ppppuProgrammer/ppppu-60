@@ -283,7 +283,7 @@ frameBackButton.width = 70;
 			
 			for (var i:int = 0, l:int = listItems.length; i < l; i++) 
 			{
-				shardsToCompile[shardsToCompile.length] = listItems[i].shard
+				shardsToCompile[shardsToCompile.length] = listItems[i].shard;
 			}
 			signal2.dispatch("CompileShards", shardsToCompile);
 		}
@@ -299,6 +299,9 @@ frameBackButton.width = 70;
 			
 			var animList:List = config.getCompById("animList") as List;
 			animList.listItemClass = ShardItem;
+			
+			var window:Window = config.getCompById("mainWindow") as Window;
+			window.title += " v" + Version.VERSION;//window.title + 
 		}
 		public function AddNewAnimation(name:String):void
 		{
@@ -316,7 +319,7 @@ frameBackButton.width = 70;
 			{
 				cbox.addItem(name);
 			}
-		}
+		}*/
 		
 		public function AddNewCharacter(name:String):void
 		{
@@ -325,7 +328,7 @@ frameBackButton.width = 70;
 			{
 				cbox.addItem(name);
 			}
-		}*/
+		}
 		
 		//Used for entering strings into the debug output
 		public function onSignal1(string:*):void

@@ -7,7 +7,7 @@ package
 		{
 			timelineData = new Object();
 			timelineData.TIME_PER_FRAME = 0.03333333333333333;
-			timelineData.targetName = "PchPupilR";
+			timelineData.targetName = "EyeballR";
 			var tweenPropVector:Vector.<Object> = new Vector.<Object>();
 			tweenPropVector[tweenPropVector.length]= {visible:true,transformMatrix:{a:-1.595001220703125,b:0.020965576171875,c:0.0000152587890625,d:1.456634521484375,tx:274.95,ty:184.9}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.510284423828125,b:0.026947021484375,c:0.0000152587890625,d:1.40228271484375,tx:273.7,ty:175.25}};

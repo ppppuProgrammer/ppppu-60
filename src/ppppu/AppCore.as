@@ -41,9 +41,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	//import animations.background.TransitionDiamondTimelineData;
 	import animations.TimelineDefinition;
 	import characters.*;
-	import characters.PeachCharacter;
 	import characters.Character;
-	import characters.RosalinaCharacter;
 	import com.greensock.easing.Linear;
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.loading.LoaderMax;
@@ -117,11 +115,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		public var currentAnimationName:String = "None";
 		//private var embedTweenDataConverter:TweenDataParser = new TweenDataParser();
 		
-		private var musicPlayer:ppppu.MusicPlayer = new ppppu.MusicPlayer();
+		//private var musicPlayer:ppppu.MusicPlayer = new ppppu.MusicPlayer();
 		//private var charVoiceSystem:SoundEffectSystem;
 		
-		private var playSounds:Boolean = false;
+		//private var playSounds:Boolean = false;
 		
+		
+		//public var characterList:Vector.<Character> = new Vector.<Character>();
 		//For stopping animation
 		//private var lastPlayedFrame:int = -1;
 		
@@ -205,8 +205,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyReleaseCheck);
 			
 			//Add the characters
-			AddCharacter(PeachCharacter);
-			AddCharacter(RosalinaCharacter);
+			//AddCharacter(PeachCharacter);
+			//AddCharacter(RosalinaCharacter);
 			
 			CONFIG::TweenLib == "GSAP"
 			{
@@ -274,7 +274,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			backgroundMasterTimeline = BetweenAS3.parallelTweens(bgMasterTimelineChildren) as ParallelTween;
 			backgroundMasterTimeline.stopOnComplete = false;*/
-			musicPlayer.SetUpdateRate(stage.frameRate);
+			//musicPlayer.SetUpdateRate(stage.frameRate);
 			
 			//(loader as AnimationInfo).GetDataForTimelinesCreation();
 			//var animation:AnimationInfo = (loader as AnimationInfo);
@@ -294,7 +294,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			
 			startupLoader.autoLoad = true;
-			//startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
+			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
+			startupLoader.append(new SWFLoader("TCHAR_Rosalina.swf"));
 			startupLoader.append(new SWFLoader("ARCH_CowgirlAnimation_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Peach_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Rosalina_Shards.swf"));
@@ -345,7 +346,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				firstTimeInLoop = false;
 				//previousUpdateTime = backgroundMasterTimeline.position;// .totalTime();//(getTimer() / 1000.0);
 				ppppuRunTimeCounter = 0;
-				musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
+				//musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
 
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
@@ -662,7 +663,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			if (modType == Mod.MOD_TEMPLATEANIMATION)
 			{
-				var animation:TemplateAnimationMod = mod as TemplateAnimationMod;
+				/*var animation:TemplateAnimationMod = mod as TemplateAnimationMod;
 				if (animation)
 				{
 					var data:Vector.<Object> = animation.GetDataForTimelinesCreation();
@@ -713,10 +714,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						{
 							
 							basisBodyTypes[basisBodyTypes.length] = bodyName;
-							/*CONFIG::debug
-							{
-							devMenu.AddNewBodyType(bodyName);
-							}*/
 							
 							layerInfoDict[animName][bodyName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
 						}
@@ -742,19 +739,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					}
 					else
 					{
-						//timelineLib.
-						/*var charID:int = -1;
-						for (var x:int = 0, y:int = characterList.length; x < y; ++x)
-						{
-							if (charName == characterList[x].GetName())
-							{
-								charID = x; 
-							}
-						}
-						timelineLib.AddReplacementTimelinesToLibrary(animationIndex, charID, "Standard", timelines);*/
 					}
 					return true;
-				}
+				}*/
 			}
 			else if (modType == Mod.MOD_TEMPLATECHARACTER)
 			{
@@ -762,10 +749,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (tcharacter)
 				{
 					var charName:String = tcharacter.GetCharacterName();
-					/*CONFIG::debug
+					var character:Character = new Character(charName, tcharacter.GetCharacterData());
+					characterList[characterList.length] = character;
+					CONFIG::debug
 					{
 					devMenu.AddNewCharacter(charName);
-					}*/
+					}
 				}
 				
 			}
@@ -774,6 +763,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var shardMod:AnimateShardMod = mod as AnimateShardMod;
 				if (shardMod)
 				{
+					if (shardMod.GetCategories().indexOf("Rosalina") > -1)
+					{
+						var bp:int = 5;
+					}
 					var animationName:String = shardMod.GetTargetAnimationName();
 					var animationIndex:int = animationNameIndexes.indexOf(animationName);
 					if (animationIndex == -1)
@@ -793,7 +786,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					{
 						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
 					}
-					var shard:AnimateShard = new AnimateShard(timelines, null);
+					var shard:AnimateShard = new AnimateShard(timelines, shardMod.GetDisplayObjectOrders());
 					shardLib.AddShardToLibrary(animationIndex, shard, shardMod.GetShardName(), shardMod.GetIfBaseShard());
 					
 					
@@ -817,7 +810,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var music:MusicMod = mod as MusicMod;
 				if (music)
 				{
-					musicPlayer.AddMusic(music.GetMusicData(), music.GetName(), music.GetStartLoopTime(), music.GetEndLoopTime(), music.GetStartTime());
+					//musicPlayer.AddMusic(music.GetMusicData(), music.GetName(), music.GetStartLoopTime(), music.GetEndLoopTime(), music.GetStartTime());
 				}
 			}
 			else if (modType == Mod.MOD_ASSETS)
@@ -853,7 +846,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			return addedMod;
 		}
 		
-		private function ConvertLayoutObjectToAnimationLayout(entireLayoutObj:Object):AnimationLayout
+		/*private function ConvertLayoutObjectToAnimationLayout(entireLayoutObj:Object):AnimationLayout
 		{
 			if (entireLayoutObj == null) { return null;}
 			var animLayout:AnimationLayout = new AnimationLayout();
@@ -862,7 +855,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				animLayout.AddNewFrameVector(parseFloat(frameKey), entireLayoutObj[frameKey], masterTemplate);
 			}
 			return animLayout;
-		}
+		}*/
 		CONFIG::debug
 		{
 		private function SetupDevMenuHooks():void
@@ -934,7 +927,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
+				CONFIG::debug
+				{
 				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0], (value[1] == "Base")));
+				}
 			}
 			else if (targetName == "shardSelector")
 			{

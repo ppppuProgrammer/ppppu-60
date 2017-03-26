@@ -7,7 +7,7 @@ package
 		{
 			timelineData = new Object();
 			timelineData.TIME_PER_FRAME = 0.03333333333333333;
-			timelineData.targetName = "RosaClosedSmile";
+			timelineData.targetName = "ClosedSmile";
 			var tweenPropVector:Vector.<Object> = new Vector.<Object>();
 			tweenPropVector[tweenPropVector.length]= {transformMatrix:{a:1.9344482421875,b:-0.0000152587890625,c:0.0000152587890625,d:1.6497802734375,tx:237.65,ty:232.15}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:1.83172607421875,b:-0.0000152587890625,c:0.0000152587890625,d:1.56219482421875,tx:238.35,ty:220.05}};

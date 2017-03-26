@@ -1,20 +1,22 @@
 <comps>
 	<!-- Window 1 -->
-	<Window id="mainWindow" title="NX developer menu" width="480" height="270" hasMinimizeButton="true">
+	<Window id="mainWindow" title="NX developer menu" width="480" height="300" hasMinimizeButton="true">
 		<!-- Section 1 -->
 		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
 		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>
 		<Label id="shardTypeLabel" x="160" y="10" text="Type:"/>
-		<ComboBox id="shardTypeSelector"  x="190" y="10" width="60"/>
-		<Label id="shardLabel" x="260" y="10" text="Shard:"/>
-		<ComboBox id="shardSelector"  x="295" y="10" width="90"/>
-		<PushButton id="addShardButton" x="410" y="10" width="60" label="Add Shard" />
-		<Label id="ShardInfoLabel" x="10" y="30" text="Shard information"/>
-		<TextArea id="shardInfoText" x="0" y="50" width="480" height="35" editable="false"/>
-		<Label id="animListLabel" x="10" y="90" text="Animate Shards list"/>
-		<List id="animList" x="0" y="110" width="480" height="100"/>
-		<PushButton id="removeShardButton" x="20" y="220" width="150" label="Remove selected shard from list" />
-		<PushButton id="finalizeButton" x="180" y="220" width="150" label="Compile shards into animation" />
+		<ComboBox id="shardTypeSelector"  x="190" y="10" width="70"/>
+		<Label id="characterLabel" x="305" y="10" text="Character:"/>
+		<ComboBox id="characterSelector"  x="360" y="10" width="110"/>
+		<Label id="shardLabel" x="10" y="40" text="Shard:"/>
+		<ComboBox id="shardSelector"  x="45" y="40" width="300"/>
+		<PushButton id="addShardButton" x="355" y="40" width="60" label="Add Shard" />
+		<Label id="ShardInfoLabel" x="10" y="60" text="Shard information"/>
+		<TextArea id="shardInfoText" x="0" y="80" width="480" height="35" editable="false"/>
+		<Label id="animListLabel" x="10" y="120" text="Animate Shards list"/>
+		<List id="animList" x="0" y="140" width="480" height="100"/>
+		<PushButton id="removeShardButton" x="20" y="250" width="150" label="Remove selected shard from list" />
+		<PushButton id="finalizeButton" x="180" y="250" width="150" label="Compile shards into animation" />
 		<!-- <Label id="bodyLabel" x="160" y="10" text="Body:"/>
 		<ComboBox id="bodyTypeSelector" x="190" y="10" width="90"/>
 		<Label id="charLabel" x="290" y="10" text="Character:"/>

@@ -11,9 +11,12 @@ package ppppu
 		//Used in case the element was not found at the time of the layout object being created. This is used to search for the element in the compositor.
 		public var expectedElementName:String;
 		public var depth:Number;
-		public function LayoutRecord(sprite:Sprite, layerDepth:Number, searchName:String) 
+		//0 is normal, 1 is child, 2 is masked
+		public var property:int;
+		public function LayoutRecord(sprite:Sprite, layerDepth:Number, searchName:String, elementProperty:int=0) 
 		{
 			element = sprite; depth = layerDepth; expectedElementName = searchName;
+			property = elementProperty;
 		}
 		
 	}

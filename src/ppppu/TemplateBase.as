@@ -1,7 +1,9 @@
 package ppppu 
 {
 	import animations.AnimateShardLibrary;
+	import animations.DispObjInfo;
 	import animations.TimelineLibrary;
+	import flash.display.SpreadMethod;
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.tweens.ObjectTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
@@ -77,6 +79,11 @@ package ppppu
 		private var elementTimelineDict:Dictionary = new Dictionary();
 		
 		private var timelineControlElementDict:Dictionary = new Dictionary();
+		
+		private var elementDict:Dictionary = new Dictionary();
+		
+		var containers:Vector.<Sprite> = new Vector.<Sprite>();
+		
 		/*sorted depth elements arrays. Split into 2 parts to */
 		//Used by the ChangeElementDepths function to avoid allocation of an array every time it's called.
 		//Due to experimental code, this array is not needed. When custom elements can be added and are set to a relative position, then this will be needed again.
@@ -85,6 +92,15 @@ package ppppu
 		
 		public function TemplateBase()
 		{
+			var layer1:Sprite = new Sprite();
+			var layer2:Sprite = new Sprite();
+			var layer3:Sprite = new Sprite();
+			var layer4:Sprite = new Sprite();
+			layer1.name = "HairFrontLayer";
+			layer2.name = "HairBehindFaceLayer";
+			layer3.name = "HairBehindHeadwearLayer";
+			layer4.name = "HairBackLayer";
+			addChild(layer1); addChild(layer2); addChild(layer3); addChild(layer4);
 			addEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
 		}
 		
@@ -108,7 +124,8 @@ package ppppu
 		{
 			var tweenData:Vector.<Object> = timelineData.tweenProperties;
 			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
-			var target:Sprite = displayObjContainingTarget.getChildByName(timelineData.targetName as String) as Sprite;
+			var target:Sprite = elementDict[timelineData.targetName] as Sprite;
+			//var target:Sprite = displayObjContainingTarget.getChildByName(timelineData.targetName as String) as Sprite;
 			var timeline:SerialTween = null;
 			var currentTweenData:Object, previousTweenData:Object;
 			//var = null;
@@ -120,12 +137,7 @@ package ppppu
 				timelineControlElementDict[timeline] = target;
 				
 				var duration:int;
-				
-				if (target.name == "ClosedLashL")
-				{
-					var track:Boolean = true;
-					var totalDuration:Number = 0;
-				}
+
 				for (var i:int = 0, l:int = tweenData.length; i < l; ++i)
 				{
 					currentTweenData = { };
@@ -366,7 +378,7 @@ package ppppu
 		//final public function ChangeElementDepths(depthLayout:Object):void
 		final public function ChangeElementDepths(depthLayout:LayoutFrameVector, justRearranging:Boolean = false):void
 		{
-			if (justRearranging)
+			/*if (justRearranging)
 			{
 				var container:DisplayObjectContainer;
 				//If there are any maskedContainers being used, remove them.
@@ -391,17 +403,69 @@ package ppppu
 			else
 			{
 				this.removeChildren();
+			}*/
+			this.removeChildren();
+			
+			for (var i:int = 0, l:int = containers.length; i < l; i++) 
+			{
+				containers[i].removeChildren();
 			}
-
-			var layoutVector:Vector.<LayoutRecord> = depthLayout.layoutVector;
+			var layoutVector:Vector.<DispObjInfo> = depthLayout.dispInfo;// .layoutVector;
 			var latestElement:Sprite = null;
 			var latestMaskedContainer:Sprite = null;
 			//var currentElement:Sprite;
-			var depth:Number;
-			var timeline:SerialTween;
+			//var depth:Number;
+			//var timeline:SerialTween;
 			//var currentElementName:String;
 			//time = getTimer();
+			
+			//Unoptimized version
 			for (var vecIndex:int = 0, vecLength:int = layoutVector.length; vecIndex < vecLength; ++vecIndex )
+			{
+				var element:Sprite = elementDict[layoutVector[vecIndex].GetControlObjectName()];
+				if (element)
+				{
+					var flag:int = layoutVector[vecIndex].GetTargetFlag();
+					
+					if (flag == 0)
+					{
+						addChild(element);
+						latestElement = element;
+						if (latestMaskedContainer != null)
+						{
+						latestMaskedContainer = null;
+						}
+					}
+					else
+					{
+						var targetElement:Sprite = elementDict[layoutVector[vecIndex].GetTargetObjName()];
+						if (targetElement)
+						{
+							if (flag == 1)
+							{
+								targetElement.addChild(element);
+								latestMaskedContainer = null;
+								containers.push(targetElement);
+							}
+							else if (flag == 2)
+							{
+								if (latestMaskedContainer == null)
+								{
+									latestMaskedContainer = new Sprite();
+									this.addChild(latestMaskedContainer);
+									latestMaskedContainer.mask = targetElement;
+									containers.push(latestMaskedContainer);
+									//targetElement.mask = latestMaskedContainer;
+								}
+								latestMaskedContainer.addChild(element);
+								
+							}
+						}
+					}
+				}
+			}
+			
+			/*for (var vecIndex:int = 0, vecLength:int = layoutVector.length; vecIndex < vecLength; ++vecIndex )
 			{
 				var element:Sprite = layoutVector[vecIndex].element;
 				if (element == null) { element = this[layoutVector[vecIndex].expectedElementName]; }
@@ -434,115 +498,10 @@ package ppppu
 						//timeline.play(masterTimeline.time());
 					//}
 				}
-			}
+			}*/
 			//trace("\t\tFinalization complete time(ms): " + (getTimer() - time));
 			//End experimental code
 			
-			/*
-			sortedDepthElements.length = 0;
-			var element:DisplayObject;
-			var elementName:String;
-			var timeline:TimelineLite;
-			for (var childIndex:int = 0; childIndex < templateChildrenCount; ++childIndex)
-			{
-				element = this.getChildAt(childIndex);
-				elementName = element.name;
-				
-				//Get the timeline that was last used for the element
-				timeline = elementTimelineDict[element] as TimelineLite;
-				if (elementName in depthLayout)
-				{	
-					sortedDepthElements[sortedDepthElements.length] = element;
-					if (timeline && !timeline.isActive())
-					{
-						timeline.seek(0);
-						timeline.play(masterTimeline.time());
-					}
-				}
-				else
-				{
-					//Check that there are tweens. If there are, then a timeline is currently associated with the element. Stop this timeline.
-					if (timeline)
-					{
-						//Stop the timeline to reduce processing
-						timeline.stop();
-						//Remove the reference of the timeline from the elementTimelineDict
-						elementTimelineDict[element] = null;
-					}
-					element.visible = false;
-					//experimental code
-					this.removeChild(element);
-					--templateChildrenCount;
-				}
-			}*/
-			
-			//Sort the array by using the comb sort algorithm
-			/*var arraySize:int = sortedDepthElements.length;
-			var gap:int = arraySize;
-			var shrinkFactor:Number = 1.3;
-			var swapped:Boolean = false;
-			var swapElementHolder:DisplayObject;
-			var compElementDepth1:Number;
-			var compElementDepth2:Number;
-			while (gap != 1 || swapped)
-			{
-				gap = int(gap / shrinkFactor);
-				if (gap < 1) { gap = 1; }
-			
-				var i:int = 0;
-				swapped = false;
-				
-				while (i + gap < arraySize)
-				{
-					compElementDepth1 = depthLayout[sortedDepthElements[i].name];
-					compElementDepth2 = depthLayout[sortedDepthElements[i + gap].name];
-					if (compElementDepth1 > compElementDepth2)
-					{
-						swapElementHolder = sortedDepthElements[i];
-						sortedDepthElements[i] = sortedDepthElements[i + gap];
-						sortedDepthElements[i + gap] = swapElementHolder;
-						swapped = true;
-					}
-					if (compElementDepth1 == compElementDepth2)
-					{
-						swapped = true;
-					}
-					++i;
-				}
-			}*/
-			
-			/*var latestElement:Sprite = null;
-			var latestMaskedContainer:Sprite = null;
-			var currentElement:Sprite;
-			var depth:Number;
-			var currentElementName:String;
-			for (var arrayPosition:int = 0, length:int = sortedDepthElements.length; arrayPosition < length; ++arrayPosition )
-			{
-				currentElement = sortedDepthElements[arrayPosition];
-				currentElementName = currentElement.name;*/
-
-				/*If depth for the element has a decimal value (depth % 1 != 0)  then it is to be masked. Since as3 has a 1 element per mask limitation,
-				what needs to be done is creating a container for all elements to be masked then have that [the container] be masked.*/
-				/*depth = depthLayout[currentElementName];
-				if (depth % 1 == 0)
-				{
-					latestElement = currentElement;
-					setChildIndex(latestElement, numChildren - 1);
-					latestMaskedContainer = null;
-				}
-				else //Masking related logic
-				{
-					if (!latestMaskedContainer)
-					{
-						latestMaskedContainer = new Sprite();
-						latestMaskedContainer.name = latestElement.name + "MaskedContainer";
-						this.addChildAt(latestMaskedContainer, this.getChildIndex(latestElement));
-						maskedContainerIndexes.push(latestMaskedContainer);
-						latestMaskedContainer.mask = latestElement;
-					}
-					latestMaskedContainer.addChild(currentElement);
-				}
-			}*/	
 			
 		}
 		
@@ -625,16 +584,226 @@ package ppppu
 		{
 			var timelines:Array = new Array;
 			var shardTimelines:Vector.<SerialTween>;
+			var shardDispObjInfoVector:Vector.<DispObjInfo>;
+			var finalizedLayout:Object = new Object();
+			
+			//var deferredDispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
 			for (var i:int = 0, l:int = shards.length; i < l; i++) 
 			{
 				shardTimelines = shards[i].GetTimelines();
 				for (var j:int = 0, k:int = shardTimelines.length; j < k; j++) 
 				{
-					timelines[timelines.length] = shardTimelines[j];
+					if (shardTimelines[j] != null)
+					{
+						timelines[timelines.length] = shardTimelines[j];
+					}
+				}
+				
+				shardDispObjInfoVector = shards[i].GetDispObjData();
+				var shardDispInfo:DispObjInfo;
+				if (shardDispObjInfoVector != null)
+				{
+					for (var m:int = 0, n:int = shardDispObjInfoVector.length; m < n; m++) 
+					{
+						shardDispInfo = shardDispObjInfoVector[m];
+						//Get the time that this disp obj info is used for.
+						var time:String = String(shardDispInfo.GetStartTime()) 
+						if (!(time in finalizedLayout) )
+						{
+							finalizedLayout[time] = new Vector.<DispObjInfo>();
+						}
+						finalizedLayout[time].push(shardDispInfo);
+						
+						//finalizedLayout[time][shardDispInfo.GetControlObjectName()] = (shardDispInfo.GetTargetFlag() < 2) ? shardDispInfo.GetDepth() : ModifyDepthDataBasedOnTargetFlag(shardDispInfo.GetDepth(), shardDispInfo.GetTargetFlag());
+						
+					}
 				}
 			}
+			//Need to complete the display object layout for the animation
+			ProcessDisplayObjects(finalizedLayout);
+			currentAnimationElementDepthLayout = new AnimationLayout();
+			for (var timeAsStr:String in finalizedLayout) 
+			{
+				currentAnimationElementDepthLayout.AddNewFrameVector(Number(timeAsStr), finalizedLayout[timeAsStr]);
+			}
 			var compiledAnimation:ParallelTween = BetweenAS3.parallelTweens(timelines) as ParallelTween;
-			compiledAnimation.gotoAndPlay(0.0);
+			masterTimeline = compiledAnimation;
+			masterTimeline.gotoAndPlay(0.0);
+		}
+		
+		private function ProcessDisplayObjects(dispObjContainer:Object):void
+		{
+			//Received an object with vectors of dispobjinfo instances. There are possibly multiple instances that will overwrite each other. 
+			for (var time:String in dispObjContainer) 
+			{
+				//The raw vector of dispObjInfo objects for a particular time of the animation.
+				var dispObjDataForTimePoint:Vector.<DispObjInfo> = dispObjContainer[time];
+				
+				//The vector with the end result, which will be sorted by depth. Any dispobjinfo that are to have its controlDispObj be masked or added as a child will be place at the end of the 
+				var sortedDispObjInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+				var deferredDispObjInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+				var overwriteTracker:Dictionary = new Dictionary();
+				
+				for (var i:int = 0, l:int = dispObjDataForTimePoint.length; i < l; i++) 
+				{
+					if (dispObjDataForTimePoint[i].GetTargetFlag() == 0) // For normal behavior
+					{
+						var controlName:String = dispObjDataForTimePoint[i].GetControlObjectName();
+						var dispInfoIndex:int = 0;
+						if (controlName in overwriteTracker)
+						{
+							//replace the old index that had the dispobjinfo for the control object.
+							sortedDispObjInfo[overwriteTracker[controlName]] = dispObjDataForTimePoint[i];
+							
+						}
+						else
+						{
+							dispInfoIndex = sortedDispObjInfo.length;
+							sortedDispObjInfo[dispInfoIndex] = dispObjDataForTimePoint[i];
+						}
+						overwriteTracker[controlName] = dispInfoIndex;
+					}
+					else //For masked or child behavior
+					{
+						deferredDispObjInfo[deferredDispObjInfo.length] = dispObjDataForTimePoint[i];
+					}
+					
+				}
+				
+				//Handle the deferredDispObjs
+				var deferredLength:int = deferredDispObjInfo.length;
+				for (var j:int = 0; j < deferredLength; j++) 
+				{
+					var targetName:String = deferredDispObjInfo[j].GetTargetObjName();
+					if (targetName in overwriteTracker)
+					{
+						trace(targetName + sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
+						deferredDispObjInfo[j].SetTargetDepth(sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
+						sortedDispObjInfo[sortedDispObjInfo.length] = deferredDispObjInfo[j];
+					}
+					//deferredDispObjInfo[j] = null;
+				}
+				
+				//Need to sort the dispobjinfo by depth.
+				SortDispObjInfoVector(sortedDispObjInfo);
+				dispObjContainer[time] = sortedDispObjInfo;
+				//trace("Finished sort");
+				
+				//Need to find the dispObj with a depth of 0 and flag of 0.
+				/*for (var name:String in overwriteTracker) 
+				{
+					var startPointDispInfo:DispObjInfo = (overwriteTracker[name] as DispObjInfo);
+					if (startPointDispInfo.GetDepth() == 0 && startPointDispInfo.GetTargetFlag() == 0)
+					{
+						sortedDispObjInfo[sortedDispObjInfo.length] = startPointDispInfo;
+						delete overwriteTracker[name];
+						break;
+					}
+				}*/
+				//If a start point was found, then the 
+				/*if (sortedDispObjInfo.length > 0)
+				{
+					
+				}*/
+				
+			}
+			
+			
+		}
+		
+		//Sorts a vector containing DispObjInfo by depth using the bottom-up merge sorting algorithm.
+		private function SortDispObjInfoVector(vector:Vector.<DispObjInfo>):void
+		{
+			var length:int = vector.length;
+			var tmpVector:Vector.<DispObjInfo> = new Vector.<DispObjInfo>(length);
+			for (var width:int = 1; width < length; width = 2 * width) 
+			{
+				for (var i:int = 0; i < length; i = i + 2 * width)
+				{
+					Merge(vector, i, Math.min(i + width, length), Math.min(i + 2 * width, length), tmpVector);
+				}
+				
+				for (var j:int = 0; j < length; j++) 
+				{
+					vector[j] = tmpVector[j];
+				}
+			}
+		}
+		
+		private function Merge(A:Vector.<DispObjInfo>, begin:int, mid:int, end:int, B:Vector.<DispObjInfo>)
+		{
+			var i:int = begin, j:int = mid;
+			for (var k:int = begin; k < end; k++) 
+			{ 
+				if (i < mid && (j >= end || CompareDispObjInfoDepths(A[i], A[j]) == 0))
+				{
+					B[k] = A[i];
+					i = i + 1;
+				}
+				else
+				{
+					B[k] = A[j];
+					j = j + 1;
+				}
+			}
+		}
+		
+		
+		//Compares 2 dispObjInfo instances and returns an int to indicate which info object should be moved. Returns 0 when info1 should be moved and returns 1 when info 2 should be moved.
+		private function CompareDispObjInfoDepths(info1:DispObjInfo, info2:DispObjInfo):int
+		{
+			if (info1.GetTargetFlag() > 0 || info2.GetTargetFlag() > 0) //Target is to be masked or be a child
+			{
+				if (info1.GetTargetFlag() == info2.GetTargetFlag()) //Need to check both depth and target depth
+				{
+					if (info1.GetTargetDepth() == info2.GetTargetDepth()) //Check depth since the target depth is the same
+					{
+						if (info1.GetDepth() <= info2.GetDepth())
+							{return 0;}
+						else
+							{return 1;}
+					}
+					else //Target depths are different, so sort by that.
+					{
+						if (info1.GetTargetDepth() <= info2.GetTargetDepth())
+							{return 0;}
+						else
+							{return 1;}
+					}
+				}
+				else if(info1.GetTargetFlag() > 0 && info2.GetTargetFlag() == 0) //Compared info1 target depth to info2's depth
+				{
+					if (info1.GetTargetDepth() <= info2.GetDepth())
+						{return 0;}
+					else
+						{return 1;}
+				}
+				else if(info1.GetTargetFlag() == 0 && info2.GetTargetFlag() > 0) //Compared info2 target depth to info1's depth
+				{
+					if (info1.GetDepth() <= info2.GetTargetDepth())
+						{return 0;}
+					else
+						{return 1;}
+				}
+				else //Both have a flag > 0, sort by target depth since masking and setting a parent are incompatible
+				{
+					if (info1.GetTargetDepth() <= info2.GetTargetDepth())
+					{return 0;}
+				else
+					{return 1;}
+				}
+			}
+			else
+			{
+				if (info1.GetDepth() <= info2.GetDepth())
+				{
+					return 0;
+				}
+				else
+				{
+					return 1;
+				}
+			}
 		}
 		
 		/*Removes all children timelines, which control the various body part elements of the master template, from the master timeline.
@@ -796,6 +965,17 @@ package ppppu
 					m_ppppuStage = displayObjBeingChecked as PPPPU_Stage;
 				}
 			}
+			
+			//unoptimized
+			var element:Sprite;
+			for (var i:int = 0; i < this.numChildren; i++) 
+			{
+				element = this.getChildAt(i) as Sprite;
+				elementDict[element.name] = element;
+			}
+			
+			this.removeChildren();
+			
 			removeEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
 		}
 		public function GetPPPPU_Stage():PPPPU_Stage

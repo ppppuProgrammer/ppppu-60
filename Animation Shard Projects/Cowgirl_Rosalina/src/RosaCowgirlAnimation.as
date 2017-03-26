@@ -48,6 +48,19 @@ package
 		private function CreateDisplayInfoForHair():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("RosHairFront", 500, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair2L", 400, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair2R", 300, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair1L", 200, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair1R", 100, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			
+			
+			
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair3L", 300, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair3R", 200, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
+			
+			
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHairBack", 100, 0.0, "HairBackLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -79,6 +92,7 @@ package
 		private function CreateDisplayInfoForCrown():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaCrown", 100, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -111,6 +125,8 @@ package
 		private function CreateDisplayInfoForEarringL():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaEarringL", 100, 0.0, "HairBehindFaceLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -134,7 +150,7 @@ package
 		//{
 		private function GetTimelineDataForEarringR():Vector.<Object>
 		{
-			var vector:Vector.<Object> = new Vector.<Object>();;
+			var vector:Vector.<Object> = new Vector.<Object>();
 			//vector.push(new RosaEarringLTimelineData().GetTimelineData());
 			vector.push(new RosaEarringRTimelineData().GetTimelineData());
 			return vector;
@@ -143,6 +159,7 @@ package
 		private function CreateDisplayInfoForEarringR():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaEarringR", 200, 0.0, "HairBehindFaceLayer", DispObjInfo.FLAG_CHILD);
 			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
@@ -174,16 +191,26 @@ package
 			vector.push(new HandRTimelineData().GetTimelineData());
 			vector.push(new RosaClosedSmileTimelineData().GetTimelineData());
 			
-			vector.push(new RosaLowerLegLTimelineData().GetTimelineData());
-			vector.push(new RosaLowerLegRTimelineData().GetTimelineData());
-			vector.push(new RosaPupilRTimelineData().GetTimelineData());
+			//vector.push(new RosaLowerLegLTimelineData().GetTimelineData());
+			//vector.push(new RosaLowerLegRTimelineData().GetTimelineData());
+			//vector.push(new RosaPupilRTimelineData().GetTimelineData());
 			return vector;
 		}
 		
 		private function CreateDisplayInfoForBodyChanges():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
+			//dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 1, 0.0, "", 1);
+			//dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 1, 0.0, "", 1);
+			//dispInfo[dispInfo.length] = new DispObjInfo("ForearmR", 5000, 0.0);
+			//dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 1, 0.0);
+			//dispInfo[dispInfo.length] = new DispObjInfo("RosaClosedSmile", 1, 0.0);
+			
+			//dispInfo[dispInfo.length] = new DispObjInfo("RosaLowerLegL", 1800, 0.0);
+			//dispInfo[dispInfo.length] = new DispObjInfo("RosaLowerLegR", 1600, 0.0);
+			//dispInfo[dispInfo.length] = new DispObjInfo("HandR", 300, 0.0);
+			//dispInfo[dispInfo.length] = new DispObjInfo("RosaPupilR", 1, 0.0, "", 1);
+			/*
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 0, 0.0, "ShaftMask", 2);

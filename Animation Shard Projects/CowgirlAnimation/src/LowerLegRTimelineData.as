@@ -1,13 +1,13 @@
 package 
 {
 	import animations.TimelineDefinition
-	public class PchLowerLegRTimelineData extends TimelineDefinition
+	public class LowerLegRTimelineData extends TimelineDefinition
 	{
-		public function PchLowerLegRTimelineData()
+		public function LowerLegRTimelineData()
 		{
 			timelineData = new Object();
 			timelineData.TIME_PER_FRAME = 0.03333333333333333;
-			timelineData.targetName = "PchLowerLegR";
+			timelineData.targetName = "LowerLegR";
 			var tweenPropVector:Vector.<Object> = new Vector.<Object>();
 			tweenPropVector[tweenPropVector.length]= {visible:true,transformMatrix:{a:1.3347625732421875,b:-0.20855712890625,c:-0.20855712890625,d:-1.33477783203125,tx:515.85,ty:765.05}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:1.26348876953125,b:-0.195281982421875,c:-0.195281982421875,d:-1.2635498046875,tx:499.05,ty:720.95}};
