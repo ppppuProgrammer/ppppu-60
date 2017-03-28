@@ -5,7 +5,7 @@ package menu
 	import flash.display.DisplayObjectContainer;
 	
 	/**
-	 * ...
+	 * minimal component list item class to hold a reference to an AnimateShard and display the name for it.
 	 * @author 
 	 */
 	public class ShardItem extends ListItem 
@@ -19,8 +19,16 @@ package menu
 		
 		override public function set data(value:Object):void
 		{
+			if (value == "")
+			{
+				_data = value;
+				_shard = null;
+			}
+			else
+			{
 			_data = value.displayName;
 			_shard = value.shard;
+			}
 			invalidate();
 		}
 		override public function get data():Object

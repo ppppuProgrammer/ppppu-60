@@ -22,7 +22,7 @@ package animations
 			additionalShardsCollection[0] = new Dictionary();
 		}
 		
-		public function AddShardToLibrary(animationId:int, shard:AnimateShard, shardName:String, baseShard:Boolean):void
+		public function AddShardToLibrary(animationId:int, shard:AnimateShard, shardName:String, baseShard:Boolean):Boolean
 		{
 			var targetCollection:Vector.<Dictionary> = baseShard ? baseShardsCollection : additionalShardsCollection;
 			//Create enough new indexes in the targetted collection so an index for the animationId exists.
@@ -31,7 +31,12 @@ package animations
 				targetCollection[targetCollection.length] = new Dictionary();
 			}
 			//baseTimelinesCollection.insertAt(animationID, timelines);
-			targetCollection[animationId][shardName] = shard;
+			if (!(shardName in targetCollection[animationId]))
+			{
+				targetCollection[animationId][shardName] = shard;
+				return true;
+			}
+			return false;
 			
 			//var 
 			//shardInformationDict[shard] = "";

@@ -78,7 +78,7 @@ package org.libspark.betweenas3.core.tweens.groups
 		private var _b:IITween;
 		private var _c:IITween;
 		private var _d:IITween;
-		private var _targets:Vector.<IITween>;
+		public var _targets:Vector.<IITween>;
 		
 		/**
 		 * @inheritDoc

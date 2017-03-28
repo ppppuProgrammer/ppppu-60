@@ -1,7 +1,7 @@
 package
 {
 	import flash.display.Sprite;
-	import ppppu.AppCore;
+	import AppCore;
 	import flash.events.Event;
 	
 	/**
@@ -19,7 +19,7 @@ package
 		
 		private function init(e:Event = null):void 
 		{
-			var ppppuApp:ppppu.AppCore = new ppppu.AppCore();
+			var ppppuApp:AppCore = new AppCore();
 			addChild(ppppuApp);
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			ppppuApp.Initialize();

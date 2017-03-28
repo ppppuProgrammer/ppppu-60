@@ -187,13 +187,28 @@ package
 			vector.push(new ArmRTimelineData().GetTimelineData());
 			vector.push(new EyelidRTimelineData().GetTimelineData());
 			vector.push(new EyeMaskRTimelineData().GetTimelineData());
+			vector.push(new EyeballRTimelineData().GetTimelineData());
+			vector.push(new ClosedLashRTimelineData().GetTimelineData());
+			vector.push(new ScleraRTimelineData().GetTimelineData());
+			vector.push(new EyelashRTimelineData().GetTimelineData());
+			
+			vector.push(new EyeballLTimelineData().GetTimelineData());
+			vector.push(new EyelidLTimelineData().GetTimelineData());
+			vector.push(new EyeMaskLTimelineData().GetTimelineData());
+			vector.push(new EyelashLTimelineData().GetTimelineData());
+			vector.push(new ClosedLashLTimelineData().GetTimelineData());
+			vector.push(new ScleraLTimelineData().GetTimelineData());
+			
 			vector.push(new ForearmRTimelineData().GetTimelineData());
 			vector.push(new HandRTimelineData().GetTimelineData());
 			vector.push(new RosaClosedSmileTimelineData().GetTimelineData());
 			
-			//vector.push(new RosaLowerLegLTimelineData().GetTimelineData());
+			
+			
+			
+			//
 			//vector.push(new RosaLowerLegRTimelineData().GetTimelineData());
-			//vector.push(new RosaPupilRTimelineData().GetTimelineData());
+			
 			return vector;
 		}
 		

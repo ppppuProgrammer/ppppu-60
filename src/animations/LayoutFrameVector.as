@@ -1,4 +1,4 @@
-package ppppu 
+package animations 
 {
 	import flash.display.Sprite;
 	import animations.DispObjInfo;

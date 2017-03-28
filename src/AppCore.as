@@ -1,4 +1,4 @@
-package ppppu 
+package 
 {
 	/*body type > animation > variation
 
@@ -22,6 +22,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	//import AnimationSettings.CowgirlInfo;
 	import animations.AnimateShard;
 	import animations.AnimateShardLibrary;
+	import animations.AnimationLayout;
 	import animations.TimelineLibrary;
 	import com.jacksondunstan.signals.*;
 	import flash.system.System;
@@ -29,6 +30,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import modifications.AnimateShardMod;
 	import modifications.AnimationMod;
 	import animations.background.*;
+	import modifications.AssetsMod;
 	import modifications.TemplateAnimationMod;
 	import modifications.TemplateCharacterMod;
 	import mx.utils.StringUtil;
@@ -73,8 +75,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import modifications.ModArchive;
 	import modifications.MusicMod;
 	import modifications.Mod;
-	import ppppu.MusicPlayer;
-	import ppppu.TemplateBase;
+	import audio.MusicPlayer;
+	import animations.TemplateBase;
 	import flash.ui.Keyboard;
 	import flash.utils.*;
 	
@@ -150,11 +152,15 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
 		
+		private var colorizer:Colorizer = new Colorizer();
+		
 		CONFIG::debug
 		private var devMenu:menu.DeveloperMenu = new menu.DeveloperMenu();
 
 		private var devMenuSignaller1:Signal1 = new Signal1();
 		private var devMenuSignaller2:Signal2 = new Signal2();
+		
+		
 		
 		//Constructor
 		public function AppCore() 
@@ -294,6 +300,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			
 			startupLoader.autoLoad = true;
+			startupLoader.append(new SWFLoader("ARCH_BaseAssets.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Rosalina.swf"));
 			startupLoader.append(new SWFLoader("ARCH_CowgirlAnimation_Shards.swf"));
@@ -570,6 +577,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			if (charId >= 0 && charId < characterList.length)
 			{
 				currentCharacter = characterList[charId];
+				var charData:Object = currentCharacter.data;
+				if ("Color" in charData)
+				{
+					colorizer.ChangeColorsUsingCharacterData(charData.Color);
+				}
 				/*charVoiceSystem.ChangeCharacterVoiceSet(currentCharacter.GetVoiceSet());
 				charVoiceSystem.ChangeCharacterVoiceChance(currentCharacter.GetVoicePlayChance());
 				charVoiceSystem.ChangeCharacterVoiceCooldown(currentCharacter.GetVoiceCooldown());
@@ -787,8 +799,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
 					}
 					var shard:AnimateShard = new AnimateShard(timelines, shardMod.GetDisplayObjectOrders());
-					shardLib.AddShardToLibrary(animationIndex, shard, shardMod.GetShardName(), shardMod.GetIfBaseShard());
+					var shardAddResult:Boolean = shardLib.AddShardToLibrary(animationIndex, shard, shardMod.GetShardName(), shardMod.GetIfBaseShard());
 					
+					if (!shardAddResult)
+					{
+						trace("Can not add shard \"" + shardMod.GetShardName() + "\" for animation " + animationNameIndexes[animationIndex] + " (id " + animationIndex +")");
+					}
 					
 					
 					var categories:Vector.<String> = shardMod.GetCategories();
@@ -815,7 +831,26 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (modType == Mod.MOD_ASSETS)
 			{
-				
+				var assetMod:AssetsMod = mod as AssetsMod;
+				if (assetMod)
+				{
+					if (masterTemplate.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
+					{
+						addedMod = true;
+						//Asset was added, so can see if it had additional data and make use of it
+						if (assetMod.data != null)
+						{
+							if ("Colorable" in assetMod.data)
+							{
+								var colorableData:Object = assetMod.data.Colorable;
+								if (colorableData != null)
+								{
+									colorizer.AddColorizeData(assetMod.asset,colorableData);
+								}
+							}
+						}
+					}
+				}
 			}
 			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
 			else if (modType == Mod.MOD_ARCHIVE)
@@ -901,40 +936,40 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				SwitchTemplateAnimation(value);
 				devMenuSignaller2.dispatch("elementSelector", timelineLib.GetBaseTimelinesFromLibrary(value));
 			}*/
-			if (targetName == "setAnimationButton")
+			/*if (targetName == "setAnimationButton")
 			{
 				//value is expected to be an array with 3 values; animation index, body type index, and character index.
-				if (value[0] == value[1] == -1)
+				if ((value[0] as int) == (value[1] as int) == -1)
 				{
 					return;
 				}
 				
-				SwitchTemplateAnimation(value[0], value[1]);
+				SwitchTemplateAnimation(value[0] as uint, value[1] as int);
 			}
-			else if (targetName == "setFrameButton")
+			else */if (targetName == "setFrameButton")
 			{
 				
-				masterTemplate.JumpToPosition(value * (1.0 / stage.frameRate));
+				masterTemplate.JumpToPosition((value as int) * (1.0 / stage.frameRate));
 				//masterTemplate.ResumePlayingAnimation();
 			}
 			else if (targetName == "setAnimationTime")
 			{
-				masterTemplate.JumpToPosition(value);
+				masterTemplate.JumpToPosition(value as Number);
 			}
 			else if (targetName == "characterSelector")
 			{
-				SwitchCharacter(value);
+				SwitchCharacter(value as int);
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
 				CONFIG::debug
 				{
-				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0], (value[1] == "Base")));
+				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0] as int, ((value[1] as String) == "Base")));
 				}
 			}
 			else if (targetName == "shardSelector")
 			{
-				var shard:AnimateShard = shardLib.GetShard(value[0], (value[1] == "Base"), value[2]);
+				var shard:AnimateShard = shardLib.GetShard(value[0] as int, ((value[1] as String) == "Base"), value[2] as String);
 				devMenuSignaller2.dispatch("SetShard", [shard, shardLib.GetInformationOnShard(shard)]);
 				//devMenu.SetSelectedShard(shard);
 				//devMenu.set

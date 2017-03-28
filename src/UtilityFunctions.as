@@ -9,10 +9,26 @@ package
 	public class UtilityFunctions 
 	{
 		
-		public function UtilityFunctions() 
+		/*public function UtilityFunctions() 
 		{
 			
+		}*/
+		
+		private static function GetColorUintValue(red:uint=0, green:uint=0, blue:uint=0, alpha:uint = 255):uint
+		{
+			if (red > 0xFF) red = 0xFF; if (green > 0xFF) green = 0xFF; if (blue > 0xFF) blue = 0xFF; if (alpha > 0xFF) alpha = 0xFF;
+			if (red < 0x00) red = 0x00; if (green < 0x00) green = 0x00; if (blue < 0x00) blue = 0x00; if (alpha < 0x00) alpha = 0x00;
+			var colorValue:uint = 0;
+			colorValue += (red << 24) + (green << 16) + (blue << 8) + alpha;
+			return colorValue;
 		}
+		
+		/*public static function GetColorUintFromRGBA(red:uint, green:uint, blue:uint. alpha:uint):uint
+		{
+			var colorValue:uint = 0;
+			colorValue +=  (red << 24) + (green << 16) + (blue << 8) + alpha;
+			return colorValue;
+		}*/
 		
 		public static function GetColorUintFromRGB(red:uint, green:uint, blue:uint):uint
 		{

@@ -1,9 +1,9 @@
-package ppppu 
+package audio 
 {
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.utils.Dictionary;
-	import ppppu.Music;
+	import audio.Music;
 	/**
 	 * ...
 	 * @author 
@@ -14,7 +14,7 @@ package ppppu
 		private var updateRate:Number;
 		
 		//Holds various, unique ppppuMusic objects that contain a Sound object and the logic needed to play it.
-		private var musicPlaylist:Vector.<ppppu.Music> = new Vector.<ppppu.Music>(); 
+		private var musicPlaylist:Vector.<audio.Music> = new Vector.<audio.Music>(); 
 		private var musicIdLookup:Dictionary = new Dictionary();
 		
 		private var currentlyPlayingMusicId:int = -1;
@@ -66,7 +66,7 @@ package ppppu
 				//Sound did not load
 				if (music.bytesTotal == 0) { return; }
 				
-				var ppppuMusicObj:ppppu.Music = new ppppu.Music(music, musicTitle, loopStartTimeMs, loopEndTimeMs, musicStartTimeMs);
+				var ppppuMusicObj:audio.Music = new audio.Music(music, musicTitle, loopStartTimeMs, loopEndTimeMs, musicStartTimeMs);
 				
 				//Look through previously added music and see if there something already using the same source sounds and loop settings.
 				for (var index:int = 0, l:int = musicPlaylist.length; index < l; ++index)

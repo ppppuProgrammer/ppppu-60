@@ -8,7 +8,7 @@ package modifications
 	public class TemplateCharacterMod extends Mod implements IModdable
 	{
 		protected var characterName:String;
-		protected var characterData:Object = new Object();
+		protected var characterData:Object = {Color:{}};
 		public function TemplateCharacterMod() 
 		{
 			modType = Mod.MOD_TEMPLATECHARACTER;

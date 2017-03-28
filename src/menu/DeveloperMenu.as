@@ -15,7 +15,7 @@ package menu
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
 	import org.libspark.betweenas3.tweens.ITween;
 	import org.libspark.betweenas3.utils.TimeUtil;
-	import ppppu.AppCore;
+	import AppCore;
 
 	//[SWF(backgroundColor=0xeeeeee, width=480, height=720)]
 	public class DeveloperMenu extends Sprite implements Slot1,Slot2
@@ -36,20 +36,20 @@ package menu
 		private var frameBackButton:PushButton;
 		private var frameSettingLabel:Label;*/
 		
-		var animationDuration:Number;
+		private var animationDuration:Number;
 		
-		var signal1:Signal1 = new Signal1();
-		var signal2:Signal2 = new Signal2();
-		var config:MinimalConfigurator;
-		var waitingForComponentsCreation:Boolean = true;
+		private var signal1:Signal1 = new Signal1();
+		private var signal2:Signal2 = new Signal2();
+		private var config:MinimalConfigurator;
+		private var waitingForComponentsCreation:Boolean = true;
 		
-		var currentSelectedAnimationId:int;
-		var currentSelectedShardType:String;
-		var currentSelectedShard:AnimateShard;
-		var currentSelectedShardName:String;
+		private var currentSelectedAnimationId:int;
+		private var currentSelectedShardType:String;
+		private var currentSelectedShard:AnimateShard;
+		private var currentSelectedShardName:String;
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
-		var serialTweenDict:Dictionary = new Dictionary();
+		private var serialTweenDict:Dictionary = new Dictionary();
 		public function DeveloperMenu() 
 		{
 			//title = "NX developer menu";
@@ -125,7 +125,7 @@ frameBackButton.width = 70;
 			addEventListener(Event.CHANGE, ChangeEventHandler, true);
 		}
 		
-		private function ClickEventHandler(e:MouseEvent)
+		private function ClickEventHandler(e:MouseEvent):void
 		{
 			if (e.target.name == "addShardButton")
 			{
@@ -157,7 +157,7 @@ frameBackButton.width = 70;
 			}
 		}
 		
-		private function ChangeEventHandler(e:Event)
+		private function ChangeEventHandler(e:Event):void
 		{
 			/*if (e.target.name == "tweenSelectSlider")
 			{
@@ -184,7 +184,7 @@ frameBackButton.width = 70;
 			}*/
 		}
 		
-		private function SelectEventHandler(e:Event)
+		private function SelectEventHandler(e:Event):void
 		{
 			
 			if (e.target.name == "shardTypeSelector" || e.target.name == "animationSelector")

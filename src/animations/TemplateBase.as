@@ -1,4 +1,4 @@
-package ppppu 
+package animations 
 {
 	import animations.AnimateShardLibrary;
 	import animations.DispObjInfo;
@@ -25,9 +25,9 @@ package ppppu
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.utils.*;
-	import ppppu.AnimationLayout;
-	import ppppu.LayoutFrameVector;
-	import ppppu.LayoutRecord;
+	import animations.AnimationLayout;
+	import animations.LayoutFrameVector;
+	import animations.LayoutRecord;
 	import animations.AnimateShard;
 	//import EyeContainer;
 	//import MouthContainer;
@@ -82,31 +82,27 @@ package ppppu
 		
 		private var elementDict:Dictionary = new Dictionary();
 		
-		var containers:Vector.<Sprite> = new Vector.<Sprite>();
+		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
-		/*sorted depth elements arrays. Split into 2 parts to */
-		//Used by the ChangeElementDepths function to avoid allocation of an array every time it's called.
-		//Due to experimental code, this array is not needed. When custom elements can be added and are set to a relative position, then this will be needed again.
-		//private var sortedDepthElements:Array = [];
-		//private var sortedDepthElements_Depth:Array = [];
-		
+		/* Creation and Initialization */
+		//{
 		public function TemplateBase()
 		{
-			var layer1:Sprite = new Sprite();
+			//Create some layers that will be what hair and accessories are typically placed into.
+			/*var layer1:Sprite = new Sprite();
 			var layer2:Sprite = new Sprite();
 			var layer3:Sprite = new Sprite();
-			var layer4:Sprite = new Sprite();
-			layer1.name = "HairFrontLayer";
-			layer2.name = "HairBehindFaceLayer";
-			layer3.name = "HairBehindHeadwearLayer";
-			layer4.name = "HairBackLayer";
-			addChild(layer1); addChild(layer2); addChild(layer3); addChild(layer4);
+			var layer4:Sprite = new Sprite();*/
+			AddNewSpriteInstance(new Sprite, "HairFrontLayer");
+			AddNewSpriteInstance(new Sprite, "HairBehindFaceLayer");
+			AddNewSpriteInstance(new Sprite, "HairBehindHeadwearLayer");
+			AddNewSpriteInstance(new Sprite, "HairBackLayer");
+			//addChild(); addChild(); addChild(); addChild();
 			addEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
 		}
 		
 		public function Initialize(shardLibrary:AnimateShardLibrary/*timelineLibrary:TimelineLibrary*/):void
 		{
-			//timelineLib = timelineLibrary;
 			shardLib = shardLibrary;
 			
 			for (var i:int = 0, l:int = this.numChildren; i < l; ++i)
@@ -120,20 +116,43 @@ package ppppu
 			}
 		}
 		
+		public function TemplateAddedToStage(e:Event):void
+		{
+			var displayObjBeingChecked:DisplayObjectContainer = this;
+			while (displayObjBeingChecked != stage && !(displayObjBeingChecked is PPPPU_Stage))
+			{
+				displayObjBeingChecked = displayObjBeingChecked.parent;
+				if (displayObjBeingChecked is PPPPU_Stage)
+				{
+					m_ppppuStage = displayObjBeingChecked as PPPPU_Stage;
+				}
+			}
+			
+			//Adds any child display objects into the element dictionary. Unoptimized and display objects ideally would not be children of the template base in the first place.
+			var element:Sprite;
+			for (var i:int = 0; i < this.numChildren; i++) 
+			{
+				element = this.getChildAt(i) as Sprite;
+				elementDict[element.name] = element;
+			}
+			
+			this.removeChildren();
+			
+			removeEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
+		}
+		//}
+		/* End of Creation and Initialization */
+		
 		public function CreateTimelineFromData(timelineData:Object, displayObjContainingTarget:Sprite):SerialTween
 		{
 			var tweenData:Vector.<Object> = timelineData.tweenProperties;
 			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
 			var target:Sprite = elementDict[timelineData.targetName] as Sprite;
-			//var target:Sprite = displayObjContainingTarget.getChildByName(timelineData.targetName as String) as Sprite;
 			var timeline:SerialTween = null;
 			var currentTweenData:Object, previousTweenData:Object;
-			//var = null;
 			if (target)
 			{
 				var tweens:Array = new Array();
-				//timeline = new TimelineLite( { paused: true, useFrames:false });
-				//timeline.data = target;
 				timelineControlElementDict[timeline] = target;
 				
 				var duration:int;
@@ -143,20 +162,7 @@ package ppppu
 					currentTweenData = { };
 					//currentTweenData = tweenData[i];
 					if ("transformMatrix" in tweenData[i])
-					{
-						
-						//currentTweenData.x = tweenData[i].transformMatrix.tx;
-						//currentTweenData.y = tweenData[i].transformMatrix.ty;
-						//var matrix:Matrix = new Matrix(tweenData[i].transformMatrix.a, tweenData[i].transformMatrix.b, tweenData[i].transformMatrix.c, tweenData[i].transformMatrix.d, tweenData[i].transformMatrix.tx, tweenData[i].transformMatrix.ty);
-						/*currentTweenData._matrix = matrix;
-						currentTweenData.transform = { }; currentTweenData.transform.matrix = { };
-						currentTweenData._matrix.a = tweenData[i].transformMatrix.a;
-						currentTweenData._matrix.b = tweenData[i].transformMatrix.b;
-						currentTweenData._matrix.c = tweenData[i].transformMatrix.c;
-						currentTweenData._matrix.d = tweenData[i].transformMatrix.d;
-						currentTweenData._matrix.tx = tweenData[i].transformMatrix.tx;
-						currentTweenData._matrix.ty = tweenData[i].transformMatrix.ty;*/
-						
+					{						
 						currentTweenData.transform = { }; currentTweenData.transform.matrix = { };
 						currentTweenData.transform.matrix.a = tweenData[i].transformMatrix.a;
 						currentTweenData.transform.matrix.b = tweenData[i].transformMatrix.b;
@@ -171,12 +177,9 @@ package ppppu
 						if (!("visible" in tweenData[i]))
 						{
 							currentTweenData.visible = 1.0;
-							//tweens[tweens.length] = BetweenAS3.func(ChangeSpriteVisibility, [target, true]);
 							var tween:IObjectTween = BetweenAS3.to(target, { visible: 1.0 }, 0, Linear.linear);
 							tweens[tweens.length] = tween;
 							previousTweenData = currentTweenData;
-							//currentTweenData["visible"]
-							//currentTweenData.visible = true;
 						}
 					}
 					
@@ -188,13 +191,11 @@ package ppppu
 					if ("duration" in tweenData[i])
 					{
 						duration = tweenData[i].duration;
-						//currentTweenData.duration = null; //Remove duration from tween data so it can be passed used for the tween's var property
 					}
 					else
 					{
 						duration = 0;
 					}
-					
 					
 					
 					if (!("transformMatrix" in tweenData[i]))
@@ -211,51 +212,18 @@ package ppppu
 							var bp:int = 5;
 						}
 						tweens[tweens.length] = tween;
-						// time scaled
-						//tweens[tweens.length] = BetweenAS3.scale(BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear), 10);
 					}
 					else //duration is 0, so tween is to be set instantly.
 					{
-						//timeline.set(target, currentTweenData);
 						var tween:IObjectTween = BetweenAS3.to(target, currentTweenData, 0, Linear.linear);
 						tweens[tweens.length] = tween;
 					}
-					
-					/*if ("visible" in tweenData[i])
-					{
-						var visValue:Number = tweenData[i].visible;
-						var visObj:Object = new Object;
-						visObj["visible"] = visValue;
-						var tween:IObjectTween = BetweenAS3.to(target, visObj, 0, Linear.linear);
-						tweens[tweens.length] = tween;
-						//previousTweenData = currentTweenData;
-						//currentTweenData["visible"] = Number(tweenData[i].visible);
-						//tweens[tweens.length] = BetweenAS3.func(ChangeSpriteVisibility, [target, tweenData[i].visible]);
-						/*if (target.name == "EyelidL")
-					{
-						trace("tween #" + i +", type: " + getQualifiedClassName(tweens[tweens.length-1]) + ", position: " + tweens[tweens.length-1].position + ", duration: " + tweens[tweens.length-1].duration);
-					}*/
-					//}
-					/*if (track)
-					{
-						totalDuration += duration;
-						trace("Finished reading tween data " + i + ", duration is at " + totalDuration);
-					}*/
 					
 					previousTweenData = currentTweenData;
 				}
 				
 				timeline = BetweenAS3.serialTweens(tweens) as SerialTween;
 			}
-			//trace("Created timeline for " + target.name + ".\tDuration:" + timeline.duration);
-			//var tlDur:Number = timeline.duration();
-			//if (tlDur > 4.0)
-			//{
-				//varn:Number = Math.round(timeline.duration()/TIME_PER_FRAME)*TIME_PER_FRAME;
-				//timeline.duration(RoundToNearest( TIME_PER_FRAME,timeline.duration()) - 0.1);
-				//var bp:int = 5;
-			//}
-			//trace("Duration: " + timeline.duration());
 			return timeline;
 			
 		}
@@ -288,38 +256,39 @@ package ppppu
 			return position;
 		}
 		
+		public function AddNewSpriteInstance(sprite:DisplayObject, spriteName:String):Boolean
+		{
+			var result:Boolean;
+			if (spriteName in elementDict)
+			{
+				//Sprite with same name was already added.
+				result = false;
+			}
+			else
+			{
+				sprite.name = spriteName;
+				elementDict[spriteName] = sprite;
+				result = true;
+			}
+			return result;
+		}
+		
 		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
-		public function ChangeAnimation(displayLayout:AnimationLayout, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
+		/*public function ChangeAnimation(displayLayout:AnimationLayout, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
 		{
 			//var timer:int = getTimer();
 			//set the element depth layout for the animation
 			elementLayoutChangeTimes.length = 0;
-			/*for(var index:String in displayLayout)
-			{
-				elementLayoutChangeTimes[elementLayoutChangeTimes.length] = Number(index);
-			}*/
+
 			for (var index:int = 0, l:int = displayLayout.frameVector.length; i < l; ++i)
 			{
 				elementLayoutChangeTimes[elementLayoutChangeTimes.length] = displayLayout.frameVector[index].changeTime;
 			}
 			currentAnimationElementDepthLayout = displayLayout;
-			//trace("Change layout completed in " + (getTimer() - timer));
-			//timer = getTimer();
-			//Get timelines that will be added
-			var timelines:Vector.<SerialTween> = null;// timelineLib.GetBaseTimelinesFromLibrary(animationId);
 			if (timelines)
 			{
 				AddTimelines(timelines);
 			}
-			//trace("Add base timelines completed in " + (getTimer() - timer));
-			//timer = getTimer();
-			/*if (timelineLib.DoesCharacterSetExists(animationId, charId, replaceSetName))
-			{
-				AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationId, charId, replaceSetName));
-			}	*/
-			//trace("Add replacement timelines completed in " + (getTimer() - timer));
-			//trace("animation duration: " + masterTimeline.duration());
-			//timer = getTimer();
 			//Cause a change to the depth of the elements
 			var currentTime:Number = masterTimeline.position;
 			//var layoutChangeTime:Number;
@@ -335,43 +304,6 @@ package ppppu
 					break; //Break out the for loop
 				}
 			}
-			/*for (var i:int = elementLayoutChangeTimes.length - 1; i >= 0; --i)
-			{
-				layoutChangeTime = elementLayoutChangeTimes[i];
-
-				if (currentTime >= layoutChangeTime)
-				{
-					latestFrameDepthLayout = currentAnimationElementDepthLayout[elementLayoutChangeTimes[i]];
-					ChangeElementDepths(latestFrameDepthLayout);
-					break; //Break out the for loop
-				}
-			}*/
-			//trace("Depth sort and change completed in "+(getTimer() - timer));
-		}
-		
-		/*Modifies the elements depth layout to match the latest layout that should be used. For example, if an animation has 3 layout changes
-		 * at frame 1, 34 and 90 and there is a switch to this animation on the 89th frame, the layout for the 34th frame will be used. 
-		 * This function should be called when the animation is switched*/
-		
-		//Time based version
-		/*public function ImmediantLayoutUpdate():void
-		{
-			//Get current time 
-			var currentTime:Number = masterTimeline.time();
-			var layoutChangeTime:Number;
-			//Start at the end and work backwards
-			for (var i:int = elementLayoutChangeTimes.length - 1; i >= 0; --i)
-			{
-				layoutChangeTime = elementLayoutChangeTimes[i];
-
-				if (currentTime >= layoutChangeTime)
-				{
-					latestFrameDepthLayout = currentAnimationElementDepthLayout[elementLayoutChangeTimes[i]];
-					ChangeElementDepths(latestFrameDepthLayout);
-					break; //Break out the for loop
-				}
-			}
-			//UpdateAnchoredElements();
 		}*/
 		
 		[Inline]
@@ -413,11 +345,6 @@ package ppppu
 			var layoutVector:Vector.<DispObjInfo> = depthLayout.dispInfo;// .layoutVector;
 			var latestElement:Sprite = null;
 			var latestMaskedContainer:Sprite = null;
-			//var currentElement:Sprite;
-			//var depth:Number;
-			//var timeline:SerialTween;
-			//var currentElementName:String;
-			//time = getTimer();
 			
 			//Unoptimized version
 			for (var vecIndex:int = 0, vecLength:int = layoutVector.length; vecIndex < vecLength; ++vecIndex )
@@ -455,7 +382,6 @@ package ppppu
 									this.addChild(latestMaskedContainer);
 									latestMaskedContainer.mask = targetElement;
 									containers.push(latestMaskedContainer);
-									//targetElement.mask = latestMaskedContainer;
 								}
 								latestMaskedContainer.addChild(element);
 								
@@ -463,46 +389,7 @@ package ppppu
 						}
 					}
 				}
-			}
-			
-			/*for (var vecIndex:int = 0, vecLength:int = layoutVector.length; vecIndex < vecLength; ++vecIndex )
-			{
-				var element:Sprite = layoutVector[vecIndex].element;
-				if (element == null) { element = this[layoutVector[vecIndex].expectedElementName]; }
-				if (element != null)
-				{
-					depth = layoutVector[vecIndex].depth;
-					if (depth % 1 == 0)
-					{
-						latestElement = element;
-						this.addChild(element);
-						//setChildIndex(latestElement, numChildren - 1);
-						latestMaskedContainer = null;
-					}
-					else //Masking related logic
-					{
-						if (!latestMaskedContainer)
-						{
-							latestMaskedContainer = new Sprite();
-							latestMaskedContainer.name = latestElement.name + "MaskedContainer";
-							this.addChildAt(latestMaskedContainer, this.getChildIndex(latestElement));
-							maskedContainerIndexes.push(latestMaskedContainer);
-							latestMaskedContainer.mask = latestElement;
-						}
-						latestMaskedContainer.addChild(element);
-					}
-					//timeline = elementTimelineDict[element] as TimelineLite;
-					//if (timeline && !timeline.isActive())
-					//{
-						//timeline.seek(0);
-						//timeline.play(masterTimeline.time());
-					//}
-				}
-			}*/
-			//trace("\t\tFinalization complete time(ms): " + (getTimer() - time));
-			//End experimental code
-			
-			
+			}			
 		}
 		
 		public function ChangePlaySpeed(speed:Number):void
@@ -520,16 +407,6 @@ package ppppu
 			if (animationPaused) { animationPaused = false; }
 			masterTimeline.stopOnComplete = false;	
 			masterTimeline.gotoAndPlay(startTime);
-			
-			
-			//Get all timelines currently used
-			//elementTimelineDict
-			/*var childTimelines:Array = masterTimeline.getTweenAt//getChildren(!true, false);
-			for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
-			{
-				//Tell the child timeline to play at the specified time
-				(childTimelines[i] as SerialTween).gotoAndPlay(startTime);
-			}*/
 		}
 		
 		public function ResumePlayingAnimation():void
@@ -537,25 +414,11 @@ package ppppu
 			animationPaused = false;
 			masterTimeline.stopOnComplete = false;
 			masterTimeline.play();
-			//Get all timelines currently used
-			/*var childTimelines:Array = masterTimeline.getChildren(!true, false);
-			for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
-			{
-				//Tell the child timeline to play at the specified time
-				(childTimelines[i] as TimelineMax).play(frameCounter);
-			}*/
 		}
 		
 		public function JumpToPosition(time:Number):void
 		{
 				masterTimeline.gotoAndStop(time);
-				/*var childTimelines:Array = masterTimeline.//getChildren(true, false);
-				
-				for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
-				{
-					//(childTimelines[i] as SerialTween).seek(frame);
-					(childTimelines[i] as SerialTween).gotoAndPlay(frame*(1.0/this.stage.frameRate));
-				}*/
 		}
 		
 		/*Pauses the animation. Currently used, it's just here in case there is a time where the animation needs to be paused. 
@@ -566,20 +429,8 @@ package ppppu
 			masterTimeline.stop();
 		}
 		
-		/*Removes all currently active timelines and adds the base timelines for a specified animation.*/
-		public function ChangeBaseTimelinesUsed(animationIndex:uint, clearCurrentTimelines:Boolean=false):void
-		{
-			var timelines:Vector.<SerialTween> = null;// timelineLib.GetBaseTimelinesFromLibrary(animationIndex);
-			if (timelines)
-			{
-				/*if (clearCurrentTimelines)
-				{
-					masterTimeline.//clear();
-				}*/
-				AddTimelines(timelines);
-			}
-		}
-		
+		/* Animation Creation Functions */
+		//{
 		public function CompileAnimation(shards:Vector.<AnimateShard>):void
 		{
 			var timelines:Array = new Array;
@@ -626,8 +477,13 @@ package ppppu
 			{
 				currentAnimationElementDepthLayout.AddNewFrameVector(Number(timeAsStr), finalizedLayout[timeAsStr]);
 			}
+			
 			var compiledAnimation:ParallelTween = BetweenAS3.parallelTweens(timelines) as ParallelTween;
-			masterTimeline = compiledAnimation;
+			if (masterTimeline && masterTimeline.isPlaying)
+			{
+				masterTimeline.stop();
+			}
+			masterTimeline = compiledAnimation;	
 			masterTimeline.gotoAndPlay(0.0);
 		}
 		
@@ -677,7 +533,7 @@ package ppppu
 					var targetName:String = deferredDispObjInfo[j].GetTargetObjName();
 					if (targetName in overwriteTracker)
 					{
-						trace(targetName + sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
+						//trace(targetName + sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
 						deferredDispObjInfo[j].SetTargetDepth(sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
 						sortedDispObjInfo[sortedDispObjInfo.length] = deferredDispObjInfo[j];
 					}
@@ -686,26 +542,7 @@ package ppppu
 				
 				//Need to sort the dispobjinfo by depth.
 				SortDispObjInfoVector(sortedDispObjInfo);
-				dispObjContainer[time] = sortedDispObjInfo;
-				//trace("Finished sort");
-				
-				//Need to find the dispObj with a depth of 0 and flag of 0.
-				/*for (var name:String in overwriteTracker) 
-				{
-					var startPointDispInfo:DispObjInfo = (overwriteTracker[name] as DispObjInfo);
-					if (startPointDispInfo.GetDepth() == 0 && startPointDispInfo.GetTargetFlag() == 0)
-					{
-						sortedDispObjInfo[sortedDispObjInfo.length] = startPointDispInfo;
-						delete overwriteTracker[name];
-						break;
-					}
-				}*/
-				//If a start point was found, then the 
-				/*if (sortedDispObjInfo.length > 0)
-				{
-					
-				}*/
-				
+				dispObjContainer[time] = sortedDispObjInfo;				
 			}
 			
 			
@@ -730,7 +567,7 @@ package ppppu
 			}
 		}
 		
-		private function Merge(A:Vector.<DispObjInfo>, begin:int, mid:int, end:int, B:Vector.<DispObjInfo>)
+		private function Merge(A:Vector.<DispObjInfo>, begin:int, mid:int, end:int, B:Vector.<DispObjInfo>):void
 		{
 			var i:int = begin, j:int = mid;
 			for (var k:int = begin; k < end; k++) 
@@ -805,179 +642,10 @@ package ppppu
 				}
 			}
 		}
-		
-		/*Removes all children timelines, which control the various body part elements of the master template, from the master timeline.
-		 Additionally, these body part elements are set to be invisible. */
-		public function ClearTimelines():void
-		{
-			//Get the timelines used currently
-			/*var childTimelines:Array = masterTimeline.//getChildren(true, false);
-			var currentChildTimeline:SerialTween;
-			//Iterate through all the timelines 
-			for (var i:int = 0, l:int = childTimelines.length; i < l; ++i)
-			{
-				currentChildTimeline = childTimelines[i] as SerialTween;
-				//The element that the timeline controls is to become invisible.
-				//TODO: Test if it is more efficient, performance wise, to remove the element from the master template.
-				//(currentChildTimeline.data as DisplayObject).visible = false;
-				(timelineControlElementDict[currentChildTimeline] as DisplayObject).visible = false;
-			}
-			//Remove the array of timelines from the master timeline, leaving it clear for another animation.
-			masterTimeline.;*/
-		}
-		
-		//Adds the timelines contained in a vector to the master timeline.
-		[Inline]
-		final public function AddTimelines(timelinesToAdd:Vector.<SerialTween>):void
-		{
-			//Current way of handling when a replacement timeline doesn't exist. Works poorly by keeping the default.
-			if (timelinesToAdd == null || timelinesToAdd.length == 0)
-			{
-				return;
-			}
-			var tlToAdd:SerialTween;
-			var timelineDisplayObject:DisplayObject;
-			var childTimeline:SerialTween;
-			
-			//reset the arrays involved used by this function in a way that it won't invoke an allocation or allow for garbage collection
-			timelinesPendingRemoval.length = 0;
-			timelinesOkForAdding.length = 0;
-			
-			masterTimeline = BetweenAS3.parallelTweens(ConvertVectorToArray(timelinesToAdd)) as ParallelTween;
-			//masterTimeline.stopOnComplete = false;
-			masterTimeline.play();
-			//var addTimer:int = getTimer();
-			var mtlTime:Number = masterTimeline.position;
-			var eleTlDict:Dictionary = elementTimelineDict;
-			for (var i:uint = 0, l:uint = timelinesToAdd.length; i < l; ++i)
-			{
-				tlToAdd = timelinesToAdd[i];
-				//If the timeline to add is null, return out the function.
-				if (tlToAdd != null) 
-				{
-					//The display object that the timeline controls
-					//timelineDisplayObject = tlToAdd.data as DisplayObject;
-					timelineDisplayObject = timelineControlElementDict[tlToAdd];
-					//Check to see if the master timeline already has a nested timeline for the specified display object.
-					//If it does, then replace it. Otherwise, add it.
-					
-					//Optimized version
-					//Get timeline from the elementTimelineDict.
-					childTimeline = eleTlDict[timelineDisplayObject] as SerialTween;
-					//Remove old timeline for element if needed
-					if (childTimeline && childTimeline != tlToAdd)
-					{
-						timelinesPendingRemoval[timelinesPendingRemoval.length] = childTimeline;
-					}
-					/*TODO:While necessary for visual correctness, the below line of code can take around 45 ms to execute. Find a way
-					 * to indicate which timeline is used for an element without resorting to the dictionary or object class.*/
-					eleTlDict[timelineDisplayObject] = tlToAdd;
-
-				}
-				
-			}
-
-			
-		}
+		//}
+		/* End of Animation Creation Functions */
 		
 		
-		//Adds the timelines contained in a vector to the master timeline.
-		/*[Inline]
-		final public function AddTimelines(timelinesToAdd:Vector.<TimelineMax>):void
-		{
-			//CUrrent way of handling when a replacement timeline doesn't exist. Works poorly by keeping the default.
-			if (timelinesToAdd == null || timelinesToAdd.length == 0)
-			{
-				return;
-			}
-			
-			for (var i:uint = 0, l:uint = timelinesToAdd.length; i < l; ++i)
-			{
-				AddTimeline(timelinesToAdd[i] as TimelineMax);
-				//trace(timelinesToAdd[i].data.name + ": " + timelinesToAdd[i].duration());
-			}
-		}
-		
-		//Adds a specified Timeline to the master timeline.
-		[Inline]
-		final public function AddTimeline(tlToAdd:TimelineMax):void
-		{
-			//If the timeline to add is null, return out the function.
-			if (tlToAdd == null) { return; }
-			
-			//The display object that the timeline controls
-			var timelineDisplayObject:DisplayObject = tlToAdd.data as DisplayObject;
-			//Check to see if the master timeline already has a nested timeline for the specified display object.
-			//If it does, then replace it. Otherwise, add it.
-			
-			//Optimized version
-			var elementTweens:Array = masterTimeline.getTweensOf(timelineDisplayObject, true);
-			if (elementTweens.length > 0)
-			{
-				var childTimeline:TimelineMax = (elementTweens[0] as TweenLite).timeline as TimelineMax;
-				ReplaceTimeline(childTimeline, tlToAdd);
-				return;
-			}
-			
-			//Looked through all the timelines nested in the master timeline and there were no matches for tlToAdd to override.
-			masterTimeline.add(tlToAdd, 0);
-			tlToAdd.seek(0);
-			tlToAdd.play(masterTimeline.time());
-		}
-		
-		//Replaces a specified timeline with another and then sets the newly added timeline to the frame that the removed one was on.
-		[Inline]
-		final public function ReplaceTimeline(tlToRemove:TimelineMax, tlToAdd:TimelineMax):void
-		{
-			if (tlToRemove != tlToAdd)
-			{
-				tlToRemove.pause();
-				masterTimeline.remove(tlToRemove);
-				masterTimeline.add(tlToAdd, 0);
-				//Start from the first tween so visibility is set correct during mid-animation switches.
-				tlToAdd.seek(0);
-				//Now start playing from the master timeline's current time
-				tlToAdd.play(masterTimeline.time());
-				//tlToAdd.seek(((((this.parent as MovieClip).currentFrame-2) % 120) * millisecPerFrame) / 1000.0);
-			}
-		}*/
-		
-		/*public function SetElementDepthLayout(layout:Object):void
-		{
-			//reset array
-			elementLayoutChangeTimes.length = 0;
-			for(var index:String in layout)
-			{
-				elementLayoutChangeTimes[elementLayoutChangeTimes.length] = index;
-			}
-			//currentAnimationElementDepthLayout = layout;
-		}*/
-		
-		
-		public function TemplateAddedToStage(e:Event):void
-		{
-			var displayObjBeingChecked:DisplayObjectContainer = this;
-			while (displayObjBeingChecked != stage && !(displayObjBeingChecked is PPPPU_Stage))
-			{
-				displayObjBeingChecked = displayObjBeingChecked.parent;
-				if (displayObjBeingChecked is PPPPU_Stage)
-				{
-					m_ppppuStage = displayObjBeingChecked as PPPPU_Stage;
-				}
-			}
-			
-			//unoptimized
-			var element:Sprite;
-			for (var i:int = 0; i < this.numChildren; i++) 
-			{
-				element = this.getChildAt(i) as Sprite;
-				elementDict[element.name] = element;
-			}
-			
-			this.removeChildren();
-			
-			removeEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
-		}
 		public function GetPPPPU_Stage():PPPPU_Stage
 		{
 			return m_ppppuStage;
@@ -986,16 +654,6 @@ package ppppu
 		final public function RoundToNearest(roundTo:Number, value:Number):Number{
 		return Math.round(value/roundTo)*roundTo;
 		}
-		
-		/*public function DEBUG__MTLOutput(masterTimeline:TimelineMax):void
-		{ 
-			//trace("Animation finished");
-		}
-		
-		public function DEBUG__MTLOutput2(masterTimeline:TimelineMax):void
-		{
-			//trace("Animation Started at " + getTimer());
-		}*/
 		
 		public function GetDurationOfCurrentAnimation():Number
 		{
@@ -1007,7 +665,7 @@ package ppppu
 			return masterTimeline.position;
 		}
 		
-		function ConvertVectorToArray(vector:Vector.<SerialTween>):Array
+		/*private function ConvertVectorToArray(vector:Vector.<SerialTween>):Array
 		{
 			var array:Array =[];
 			for (var i:int = 0; i < vector.length; ++i)
@@ -1015,12 +673,12 @@ package ppppu
 				array[i] = vector[i];
 			}
 			return array;
-		}
+		}*/
 		
-		private function ChangeSpriteVisibility(target:DisplayObject, visible:Boolean):void
+		/*private function ChangeSpriteVisibility(target:DisplayObject, visible:Boolean):void
 		{
 			target.visible = visible;
-		}
+		}*/
 		
 		private function LoopAnimation(e:TweenEvent):void
 		{
