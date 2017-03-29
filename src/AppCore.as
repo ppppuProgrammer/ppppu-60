@@ -303,6 +303,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			startupLoader.append(new SWFLoader("ARCH_BaseAssets.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Rosalina.swf"));
+			CONFIG::debug
+			{
+				startupLoader.append(new SWFLoader("TCHAR_Shantae.swf"));
+			}
 			startupLoader.append(new SWFLoader("ARCH_CowgirlAnimation_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Peach_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Rosalina_Shards.swf"));
@@ -775,10 +779,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var shardMod:AnimateShardMod = mod as AnimateShardMod;
 				if (shardMod)
 				{
-					if (shardMod.GetCategories().indexOf("Rosalina") > -1)
-					{
-						var bp:int = 5;
-					}
 					var animationName:String = shardMod.GetTargetAnimationName();
 					var animationIndex:int = animationNameIndexes.indexOf(animationName);
 					if (animationIndex == -1)

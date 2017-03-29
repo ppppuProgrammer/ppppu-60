@@ -1,6 +1,7 @@
 package modifications 
 {
 	import animations.DispObjInfo;
+	import mx.utils.StringUtil;
 	
 	/**
 	 * Mod base class that will be used to define an AnimateShard, which is a group of tweens used to build an animation.
@@ -55,7 +56,43 @@ package modifications
 		
 		public function OutputModDetails():String 
 		{
-			return "AnimateShardMod::OutputModDetails() not yet implemented";
+			var listOfSpritesWithModifiedDepths:String = "";
+			if (displayObjectOrders != null)
+			{
+				var dispObjInfo:DispObjInfo;
+				for (var i:int = 0, l:int = displayObjectOrders.length; i < l; i++) 
+				{
+					if (listOfSpritesWithModifiedDepths.length > 0)
+					{
+						listOfSpritesWithModifiedDepths += "\n";
+					}
+					dispObjInfo = displayObjectOrders[i];
+					if (dispObjInfo.GetTargetFlag() == 0)
+					{
+						listOfSpritesWithModifiedDepths += "Modifies: " + dispObjInfo.GetControlObjectName();
+					}
+					else
+					{
+						listOfSpritesWithModifiedDepths += StringUtil.substitute("Modifies: {0}, Relies on: {1}",dispObjInfo.GetControlObjectName(), dispObjInfo.GetTargetObjName());
+					}
+								
+				}
+			}
+			
+			var spritesWithAnimationData:String = "";
+			if (timelinesData != null)
+			{
+				for (var j:int = 0, k:int = timelinesData.length; j < k; j++) 
+				{
+					if (spritesWithAnimationData.length > 0)
+					{
+						spritesWithAnimationData += ", ";
+					}
+					spritesWithAnimationData += timelinesData[j].targetName;
+				}
+			}
+			
+			return StringUtil.substitute("For Animation: {0}, Shard Name: {1}, Type: {2}\nCategories: {3}\nAnimates: {4}\nChanges Depth of: {5}\nDescription: {6}", targetAnimationName, shardName, (isBaseShard) ? "Base" : "Addition", categories.join(), spritesWithAnimationData, listOfSpritesWithModifiedDepths, shardDescription);
 		}
 		
 	}

@@ -1,5 +1,6 @@
 package modifications 
 {
+	import mx.utils.StringUtil;
 	/**
 	 * Character mod intended for NX/customizable versions of ppppu. No movie clip that holds all the animations is expected as this 
 	 * type of character mod modifies a template animation (which are loaded in by an Animation mod) to give the desired appearance.
@@ -30,7 +31,7 @@ package modifications
 		
 		public function OutputModDetails():String
 		{
-			return "";
+			return StringUtil.substitute("Character: {0}\tData:{1}", name, UtilityFunctions.ConvertObjectToString(characterData));
 		}
 	}
 

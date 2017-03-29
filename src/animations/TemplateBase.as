@@ -256,7 +256,7 @@ package animations
 			return position;
 		}
 		
-		public function AddNewSpriteInstance(sprite:DisplayObject, spriteName:String):Boolean
+		public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
 		{
 			var result:Boolean;
 			if (spriteName in elementDict)
@@ -267,6 +267,7 @@ package animations
 			else
 			{
 				sprite.name = spriteName;
+				sprite.mouseChildren = sprite.mouseEnabled = false;
 				elementDict[spriteName] = sprite;
 				result = true;
 			}

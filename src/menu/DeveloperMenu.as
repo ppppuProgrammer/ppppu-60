@@ -51,57 +51,7 @@ package menu
 		//var currentTimelineSet:Vector.<SerialTween>;
 		private var serialTweenDict:Dictionary = new Dictionary();
 		public function DeveloperMenu() 
-		{
-			//title = "NX developer menu";
-			//this.setSize(480, 720);
-			//
-			/*animProgressSlider = new HUISlider(this, 160, 30, "Progress");
-animProgressSlider.labelPrecision = 0;
-
-			animationLabel = new Label(this, 10, 10, "Animation:");
-
-			animDropListPH = new ComboBox(this, 60, 10);
-			animDropListPH.width = 60;
-			
-
-			frameLabel = new Label(this, 70, 30, "Frame:");
-
-			frameText = new Label(this, 110, 30, "#");
-
-			animPlayButton = new PushButton(this, 10, 30, "Play", PlayAnimationHandler);
-animPlayButton.width = 50;
-animPlayButton.toggle = true;
-
-			setFrameButton = new PushButton(this, 180, 80, "Set to frame", SetFrameHandler);
-setFrameButton.width = 80;
-
-			frameSlider = new HUISlider(this, 270, 80, "");
-frameSlider.minimum = 1;
-frameSlider.value = 1;
-frameSlider.labelPrecision = 0;
-
-			bodyLabel = new Label(this, 170, 10, "Body group:");
-
-			bodyDropListPH = new ComboBox(this, 230, 10);
-			bodyDropListPH.width = 60;
-			bodyDropListPH.addItem("Test1");
-			bodyDropListPH.addItem("Test2");
-
-			charLabel = new Label(this, 340, 10, "Character:");
-
-			charDropListPH = new ComboBox(this, 390, 10);
-			charDropListPH.width = 60;
-
-			frameForwardButton = new PushButton(this, 90, 80, "Frame forward", FrameForwardHandler);
-frameForwardButton.width = 80;
-
-			frameBackButton = new PushButton(this, 10, 80, "Frame back", FrameBackHandler);
-frameBackButton.width = 70;
-
-			frameSettingLabel = new Label(this, 10, 60, "Frame Settings");*/
-			
-			
-			
+		{			
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.loadXML("DevMenuDefinition.xml");
@@ -196,6 +146,7 @@ frameBackButton.width = 70;
 				
 				//cache the values of the combo boxes.
 				currentSelectedAnimationId = cbox.selectedIndex;
+				if (currentSelectedAnimationId == -1) { return;}
 				currentSelectedShardType = cbox2.selectedItem as String;
 				cbox3.removeAll();
 				cbox3.selectedItem = -1;
@@ -208,6 +159,7 @@ frameBackButton.width = 70;
 			else if (e.target.name == "shardSelector")
 			{
 				var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
+				if (cbox.selectedIndex == -1) { return;}
 				currentSelectedShardName = cbox.selectedItem as String;
 				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardType, currentSelectedShardName]);
 				//UpdateShardComboBox();

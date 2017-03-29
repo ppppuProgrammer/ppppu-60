@@ -1,6 +1,7 @@
 package modifications 
 {
 	import flash.display.Sprite;
+	import mx.utils.StringUtil;
 	/**
 	 * Mod that allows new graphics to be added.
 	 * @author 
@@ -24,7 +25,7 @@ package modifications
 		
 		public function OutputModDetails():String 
 		{
-			return "Not yet implemented";
+			return StringUtil.substitute("Adds Sprite: {0}, Data: {1}", assetName, UtilityFunctions.ConvertObjectToString(data));
 		}
 		
 	}

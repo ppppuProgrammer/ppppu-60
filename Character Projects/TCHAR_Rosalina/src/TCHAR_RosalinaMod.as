@@ -1,5 +1,6 @@
 package
 {
+	import characters.ColorValueMaster;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import modifications.TemplateCharacterMod
@@ -15,15 +16,20 @@ package
 		{
 			characterName = "Rosalina";
 			
-			characterData.Color.Iris = 0x36BDC1;
-			characterData.Color.Skin = 0xFFDCC6;
+			characterData.Color.Iris = 0x36BDC1FF;
+			characterData.Color.Skin = 0xFFDCC6FF;
 			characterData.Color.Lip =  UtilityFunctions.CreateColorTransformFromHex(0xFF99CC, 51);
-			characterData.Color.Leggings = [0xFFFFFFFF, 0xC5F7EBFF];
+			characterData.Color.Legging = [0xFFFFFFFF, 0xC5F7EBFF];			
+			var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243,182,154, 255));
 			//var standardGradientEndPoint:uint = UtilityFunctions.GetColorUintFromRGB(243,182,154);
-			//characterData.skinGradient_Face = [0xFFDCC6, standardGradientEndPoint];//2
-			//characterData.sSkinGradient_Breasts = [0xFFDCC6,0xFFDCC6, standardGradientEndPoint];//3
-			//characterData.skinGradient_Vulva = [standardGradientEndPoint,0xFFDCC6];//2
-			//characterData.skinGradient_Anus = [UtilityFunctions.GetColorUintFromRGB(255, 166, 159), 0xFFDCC6];//2
+			characterData.Color.Eyelid = 0xF0A586FF;
+			characterData.Color.Nipple = 0xFFAFFFFF;
+			characterData.Color.Areola = [0xFFAFFFFF, 0xFFAFFF00];
+			characterData.Color.Face = [0xFFDCC6FF, skinGradientEndPoint.CreateLinkedColorHolder()];//2
+			characterData.Color.Ear = [skinGradientEndPoint.CreateLinkedColorHolder(), 0xFFDCC6FF];//2
+			characterData.Color.Breast = [0xFFDCC6FF,0xFFDCC6FF, skinGradientEndPoint.CreateLinkedColorHolder()];//3
+			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
+			characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159, 255), 0xFFDCC6FF];//2
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;
 			//characterData.DiamondCenterColor = 0x000000;

@@ -1,5 +1,6 @@
 package 
 {
+	import characters.ColorValueHolder;
 	import flash.display.IGraphicsData;
 	import flash.display.GraphicsGradientFill;
 	import flash.display.Sprite;
@@ -129,6 +130,7 @@ package
 		//Changes the color of a given sprite. colorValue
 		private function ModifyColorOfSprite(sprite:Sprite, colorValue:*):void
 		{
+			var color:uint;
 			if (colorValue is Array)
 			{
 				GradientChange(sprite, colorValue as Array);
@@ -139,11 +141,17 @@ package
 			}
 			else if (colorValue is uint)
 			{
-				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(colorValue as uint);
+				color = colorValue as uint;
+				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
+			}
+			else if (colorValue is ColorValueHolder)
+			{
+				color = (colorValue as ColorValueHolder).GetColor();
+				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
 			}
 			else if (colorValue is ColorMatrixFilter)
 			{
-				sprite.filters = [colorValue];
+				sprite.filters = [colorValue as ColorMatrixFilter];
 			}
 		}
 		
@@ -171,20 +179,36 @@ package
 					{
 						return;
 					}
+					var color:uint;
 					for (var x:int = 0, fillLength:int = gradientFill.colors.length; x < fillLength; ++x)
 					{
+						
 						if (x < colorUIntValues.length)
 						{
-							gradientFill.colors[x] = colorUIntValues[x] >>> 8; //Converts from RRGGBBAA to RRGGBB
-							//Extracts the alpha value via bitwise AND operation then multiplies the result so the value ranges from 0 to 1
-							gradientFill.alphas[x] = (colorUIntValues[x] & 0xFF) * 0.3921568627450980392156862745098;
+							if (colorUIntValues[x] is ColorValueHolder)
+							{
+								color = (colorUIntValues[x] as ColorValueHolder).GetColor();
+							}
+							else
+							{
+								color = colorUIntValues[x];
+							}
+							
 						}
-						else
+						else //Ran out of value in colorUIntValues, keep feeding the gradientFill with the last value in colorUIntValues.
 						{
-							gradientFill.colors[x] = colorUIntValues[colorUIntValues.length] >>> 8; //Converts from RRGGBBAA to RRGGBB
-							gradientFill.alphas[x] = (colorUIntValues[colorUIntValues.length] & 0xFF) * 0.3921568627450980392156862745098;
+							if (colorUIntValues[colorUIntValues.length] is ColorValueHolder)
+							{
+								color = (colorUIntValues[colorUIntValues.length] as ColorValueHolder).GetColor();
+							}
+							else
+							{
+								color = colorUIntValues[colorUIntValues.length];
+							}
 						}
-						
+						gradientFill.colors[x] = color >>> 8; //Converts from RRGGBBAA to RRGGBB
+						//Extracts the alpha value via bitwise AND operation then multiplies the result so the value ranges from 0 to 1
+						gradientFill.alphas[x] = (color & 0xFF) * 0.3921568627450980392156862745098;
 					}
 					graphicsData[i] = gradientFill;
 				}
