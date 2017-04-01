@@ -41,8 +41,8 @@ package animations
 		 * controlled  by series of tweens defined by a motion xml.*/
 		//private var masterTimeline:TimelineMax = new TimelineMax( { useFrames:false, smoothChildTiming:false, paused:true, repeat: -1 /*,onRepeat:DEBUG__MTLOutput, onRepeatParams:["{self}"], onStart:DEBUG__MTLOutput2, onStartParams:["{self}"]*/ } );
 		public var masterTimeline:ParallelTween;
-		public var baseAnimationTweens:ParallelTween;
-		public var additionalAnimationTweens:ParallelTween;
+		//public var baseAnimationTweens:ParallelTween;
+		//public var additionalAnimationTweens:ParallelTween;
 		//An Object that contains a number of depth layout change Objects for specified frames of the current animation.
 		//private var currentAnimationElementDepthLayout:Object;
 		private var currentAnimationElementDepthLayout:AnimationLayout;
@@ -57,6 +57,9 @@ package animations
 		//The total number of frames in the current animation.
 		//TODO: allow this to be set, which is needed for animations with non-standard frames(not 120)
 		//private var currentAnimationTotalFrames:int = 120;
+		
+		private var latestFrameDepthChangeTime:Number =-1;
+		private var nextFrameDepthChangeTime:Number=-1;
 		
 		private var latestAnimationDuration:Number;
 		
@@ -207,10 +210,6 @@ package animations
 					{
 						//timeline.to(target, duration * TIME_PER_FRAME, currentTweenData);
 						var tween:IObjectTween = BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear);
-						if ("visible" in currentTweenData || "visible" in previousTweenData)
-						{
-							var bp:int = 5;
-						}
 						tweens[tweens.length] = tween;
 					}
 					else //duration is 0, so tween is to be set instantly.
@@ -236,16 +235,41 @@ package animations
 				var currentTime:Number = masterTimeline.position;
 				//trace("Frame " + int(120*(currentTime/masterTimeline.duration)));
 				var displayLayout:AnimationLayout = currentAnimationElementDepthLayout;
-				//Start at the end and work backwards
-				for (var i:int = displayLayout.frameVector.length -1; i >= 0; --i)
+
+				if (displayLayout.frameVector.length > 0 && (latestFrameDepthChangeTime == -1 || (currentTime >= nextFrameDepthChangeTime && nextFrameDepthChangeTime >= 0) ) )
 				{
-					var frameLayout:LayoutFrameVector = displayLayout.frameVector[i];
-					if (currentTime >= frameLayout.changeTime)
+					var frameLayout:LayoutFrameVector;
+					//Start at the end and work backwards
+					for (var i:int = 0, l:int = displayLayout.frameVector.length; i < l; ++i)
 					{
-						latestFrameDepthLayout = frameLayout;
-						ChangeElementDepths(frameLayout, true);
-						break; //Break out the for loop
+						frameLayout = displayLayout.frameVector[i];
+						latestFrameDepthChangeTime = frameLayout.changeTime;
+						//There's more frame vectors to examine. Check if the next frame vector has a change time greater than the current time of the animation.
+						if (i + 1 < l && currentTime < displayLayout.frameVector[i + 1].changeTime)
+						{
+							nextFrameDepthChangeTime = displayLayout.frameVector[i+1].changeTime;
+							break;
+						}
+						else if(i + 1 == l) //Reached the end of the layout vector.
+						{
+							if (l == 1)//There is only 1 change for the animation, so don't worry about it anymore.
+							{
+								nextFrameDepthChangeTime = -1; 
+							}
+							else
+							{
+								//Loop back to beginning if there were multiple times where element depths were changed but we reached the last point in the animation where a change will happen.
+								nextFrameDepthChangeTime = displayLayout.frameVector[0].changeTime;
+							}
+							break;
+						}
 					}
+					ChangeElementDepths(frameLayout, true);
+				}
+				else if (displayLayout.frameVector.length == 0 && masterTimeline != null)
+				{
+					this.removeChildren();
+					masterTimeline = null;
 				}
 				//position = masterTimeline.position;
 			}
@@ -477,14 +501,21 @@ package animations
 			for (var timeAsStr:String in finalizedLayout) 
 			{
 				currentAnimationElementDepthLayout.AddNewFrameVector(Number(timeAsStr), finalizedLayout[timeAsStr]);
+				elementLayoutChangeTimes[elementLayoutChangeTimes.length] = Number(timeAsStr);
 			}
-			
+
+			if (masterTimeline)
+			{
+				masterTimeline.stop();
+				masterTimeline = null;
+			}
 			var compiledAnimation:ParallelTween = BetweenAS3.parallelTweens(timelines) as ParallelTween;
 			if (masterTimeline && masterTimeline.isPlaying)
 			{
 				masterTimeline.stop();
 			}
 			masterTimeline = compiledAnimation;	
+			latestFrameDepthChangeTime = nextFrameDepthChangeTime = -1;
 			masterTimeline.gotoAndPlay(0.0);
 		}
 		
@@ -523,8 +554,7 @@ package animations
 					else //For masked or child behavior
 					{
 						deferredDispObjInfo[deferredDispObjInfo.length] = dispObjDataForTimePoint[i];
-					}
-					
+					}					
 				}
 				
 				//Handle the deferredDispObjs
@@ -545,8 +575,6 @@ package animations
 				SortDispObjInfoVector(sortedDispObjInfo);
 				dispObjContainer[time] = sortedDispObjInfo;				
 			}
-			
-			
 		}
 		
 		//Sorts a vector containing DispObjInfo by depth using the bottom-up merge sorting algorithm.
@@ -587,7 +615,7 @@ package animations
 		}
 		
 		
-		//Compares 2 dispObjInfo instances and returns an int to indicate which info object should be moved. Returns 0 when info1 should be moved and returns 1 when info 2 should be moved.
+		//Compares 2 dispObjInfo instances and returns an int to indicate which info object should be moved for the merge sort. Returns 0 when info1 should be moved and returns 1 when info 2 should be moved.
 		private function CompareDispObjInfoDepths(info1:DispObjInfo, info2:DispObjInfo):int
 		{
 			if (info1.GetTargetFlag() > 0 || info2.GetTargetFlag() > 0) //Target is to be masked or be a child
@@ -658,6 +686,7 @@ package animations
 		
 		public function GetDurationOfCurrentAnimation():Number
 		{
+			if (!masterTimeline) { return Number.NaN; }
 			return masterTimeline.duration;
 		}
 		

@@ -22,11 +22,6 @@ package
 			
 		}
 		
-		public function AddSpriteToGroup(sprite:Sprite, groupName:String/*, childToColorName:String=""*/):void
-		{
-			
-		}
-		
 		public function AddColorizeData(baseSprite:Sprite, colorizeData:Object):void
 		{
 			var targets:Array=[];

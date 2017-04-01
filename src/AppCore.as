@@ -23,7 +23,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.AnimateShard;
 	import animations.AnimateShardLibrary;
 	import animations.AnimationLayout;
+	import animations.AnimationList;
 	import animations.TimelineLibrary;
+	import com.greensock.loading.BinaryDataLoader;
 	import com.jacksondunstan.signals.*;
 	import flash.system.System;
 	import menu.DeveloperMenu;
@@ -151,7 +153,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		public var DEBUG_playSpeed:Number = 1.0;
 		
 		private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
-		
+		private var binaryLoader:LoaderMax = new LoaderMax({name:"BinaryLoader", onChildComplete:BinarySubLoadComplete} );
 		private var colorizer:Colorizer = new Colorizer();
 		
 		CONFIG::debug
@@ -246,12 +248,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//AddCharacter(PeachCharacter);
 			
 			//masterTemplate.currentCharacter = defaultCharacter;
-			for (var childIndex:uint = 0, templateChildrenCount:uint = masterTemplate.numChildren; childIndex < templateChildrenCount; ++childIndex)
-			{
-				//masterTemplate.getChildAt(childIndex).visible = false;
-			}
-			mainStage.x = (stage.stageWidth - mainStage.DisplayArea.width) / 2;	
 			
+			mainStage.x = (stage.stageWidth - mainStage.DisplayArea.width) / 2;	
+			CONFIG::debug
+			{
+				mainStage.x = 0;	
+			}
 			//animInfoDict["Cowgirl"] = new CowgirlInfo();
 			
 			//Switch the first animation.
@@ -291,8 +293,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//masterTemplate.PlayAnimation(0);
 			//mainStage.play();
 			
+			registerClassAlias("AnimationList", animations.AnimationList);
+			
 			CONFIG::debug
 			{
+				devMenu.x = 480;
 				addChild(devMenu);
 				devMenu.SetupHooksToApp(this);
 				SetupDevMenuHooks();
@@ -310,6 +315,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			startupLoader.append(new SWFLoader("ARCH_CowgirlAnimation_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Peach_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Rosalina_Shards.swf"));
+			
+			binaryLoader.autoLoad = true;
 			//startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
 			//startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
 			
@@ -663,6 +670,19 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//e.target.dispose();
 		}
 		
+		private function BinarySubLoadComplete(e:LoaderEvent):void
+		{
+			if (e.target is BinaryDataLoader)
+			{
+				var byteArray:ByteArray = e.target.content as ByteArray;
+				var deserializedObj:Object = byteArray.readObject();
+				if (deserializedObj is AnimationList)
+				{
+					var animList:AnimationList = deserializedObj as AnimationList;
+				}
+			}
+		}
+		
 		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter
 		and the mod could not be added.*/
 		private function ProcessMod(mod:Mod):Boolean
@@ -964,12 +984,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				CONFIG::debug
 				{
-				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0] as int, ((value[1] as String) == "Base")));
+				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0] as int, value[1] as Boolean));
 				}
 			}
 			else if (targetName == "shardSelector")
 			{
-				var shard:AnimateShard = shardLib.GetShard(value[0] as int, ((value[1] as String) == "Base"), value[2] as String);
+				var shard:AnimateShard = shardLib.GetShard(value[0] as int, value[1] as Boolean, value[2] as String);
 				devMenuSignaller2.dispatch("SetShard", [shard, shardLib.GetInformationOnShard(shard)]);
 				//devMenu.SetSelectedShard(shard);
 				//devMenu.set
@@ -978,6 +998,45 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				var shardsToCompile:Vector.<AnimateShard> = value as Vector.<AnimateShard>;
 				masterTemplate.CompileAnimation(shardsToCompile);
+				var animationDuration:Number = masterTemplate.GetDurationOfCurrentAnimation();
+				CONFIG::debug
+				{
+					devMenuSignaller2.dispatch("animationDuration", animationDuration);
+				}
+			}
+			else if (targetName == "ProcessAnimationList")
+			{
+				var list:AnimationList = value as AnimationList;
+				if (list)
+				{
+					//Check if the animation list is a version compatible with the latest project build. Refuse to process it if it isn't.
+					if (list.version != AnimationList.ANIMATION_LIST_VERSION) { return; }
+					
+					var names:Vector.<String> = list.ShardNameList;
+					var types:Vector.<Boolean> = list.ShardTypeList;
+					var animationId:int = animationNameIndexes.indexOf(list.TargetAnimationName);
+					if (animationId == -1) { return; }
+					
+					//Arrays hold the following in order: shard name, shard type, shard
+					var shardsData:Vector.<Array> = new Vector.<Array>();
+					var shard:AnimateShard;
+					for (var i:int = 0, l:int = Math.min(names.length, types.length); i < l; i++) 
+					{
+						shard = shardLib.GetShard(animationId, (types[i] as Boolean/* == "Base"*/)/* ? true : false*/, names[i]);
+						if (shard)
+						{
+							shardsData[shardsData.length] = [names[i], types[i], shard];
+						}
+					}
+					devMenuSignaller2.dispatch("SetShardsFromList", shardsData);
+				}
+			}
+			else if (targetName == "FileLoaded")
+			{
+				//Things should happen here but for quick test purposes they don't.
+				//var 
+				//binaryLoader.append(new BinaryDataLoader(value as String));
+				//signal2.dispatch(targetName, value);
 			}
 		}
 		function roundToNearest(roundTo:Number, value:Number):Number{

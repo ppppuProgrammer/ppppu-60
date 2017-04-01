@@ -2,13 +2,18 @@ package menu
 {
 	import adobe.utils.CustomActions;
 	import animations.AnimateShard;
+	import animations.AnimationList;
 	import com.bit101.components.*;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import com.bit101.utils.MinimalConfigurator;
 	import com.jacksondunstan.signals.*;
 	import flash.events.MouseEvent;
+	import flash.net.FileReference;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
+	import io.FileReferenceLoadHelper;
+	import io.FileReferenceSaveHelper;
 	import mx.utils.StringUtil;
 	import org.libspark.betweenas3.core.tweens.AbstractTween;
 	import org.libspark.betweenas3.core.tweens.ObjectTween;
@@ -44,7 +49,7 @@ package menu
 		private var waitingForComponentsCreation:Boolean = true;
 		
 		private var currentSelectedAnimationId:int;
-		private var currentSelectedShardType:String;
+		private var currentSelectedShardTypeIsBase:Boolean;
 		private var currentSelectedShard:AnimateShard;
 		private var currentSelectedShardName:String;
 		
@@ -96,6 +101,14 @@ package menu
 			{
 				RemoveShardFromAnimationList();
 			}
+			else if (e.target.name == "loadAnimationListButton")
+			{
+				LoadAnimationListFile();
+			}
+			else if (e.target.name == "saveAnimationListButton")
+			{
+				SaveAnimationListToFile();
+			}
 			else if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
 				signal1.dispatch(e.target.name);
@@ -144,16 +157,25 @@ package menu
 				var cbox3:ComboBox = config.getCompById("shardSelector") as ComboBox;
 				if (cbox2.selectedItem == null) { return; }
 				
+				//If the animation selected changes, clear the animation list so shards from different animations can't be used together.
+				if (currentSelectedAnimationId != cbox.selectedIndex)
+				{
+					var shardList:List = config.getCompById("animList") as List;
+					if (shardList)
+					{
+						shardList.removeAll();
+					}
+				}
 				//cache the values of the combo boxes.
 				currentSelectedAnimationId = cbox.selectedIndex;
 				if (currentSelectedAnimationId == -1) { return;}
-				currentSelectedShardType = cbox2.selectedItem as String;
+				currentSelectedShardTypeIsBase = (cbox2.selectedItem as String) == "Base" ? true : false;
 				cbox3.removeAll();
 				cbox3.selectedItem = -1;
 				currentSelectedShardName = null;
 				SetSelectedShard(null, null);
 				
-				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardType]);
+				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase]);
 				//UpdateShardComboBox();
 			}
 			else if (e.target.name == "shardSelector")
@@ -161,7 +183,7 @@ package menu
 				var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
 				if (cbox.selectedIndex == -1) { return;}
 				currentSelectedShardName = cbox.selectedItem as String;
-				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardType, currentSelectedShardName]);
+				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase, currentSelectedShardName]);
 				//UpdateShardComboBox();
 			}
 			/*else if(e.target.name == "elementSelector")
@@ -212,7 +234,7 @@ package menu
 					return;
 			}
 			
-			animList.addItem({displayName: currentSelectedShardName, shard: currentSelectedShard});
+			animList.addItem({name: currentSelectedShardName, shard: currentSelectedShard, type: currentSelectedShardTypeIsBase});
 			//if(animList.items.indexOf(
 			
 		}
@@ -280,6 +302,40 @@ package menu
 			{
 				cbox.addItem(name);
 			}
+		}
+		
+		private function SaveAnimationListToFile():void
+		{
+			//Need to prepare data to create the animation list.
+			var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+			if (cbox.selectedIndex == -1) { return; }
+		
+			var animList:List = config.getCompById("animList") as List;
+			var shardsList:Array = animList.items;
+			var listLength:int = shardsList.length;
+			if (listLength == 0) { return;}
+			var shardNames:Vector.<String> = new Vector.<String>();
+			var shardTypes:Vector.<Boolean> = new Vector.<Boolean>();
+			for (var i:int = 0; i < listLength; i++) 
+			{
+				shardNames[shardNames.length] = (shardsList[i].name) as String;
+				shardTypes[shardTypes.length] = (shardsList[i].type) as Boolean;
+			}
+			//Create the animation List.
+			var list:AnimationList = new AnimationList(/*cbox.selectedItem as String, shardNames*/);
+			list.TargetAnimationName = cbox.selectedItem as String;
+			list.ShardNameList = shardNames;
+			list.ShardTypeList = shardTypes;
+			
+			//Need to ask the user where they want to save the list.
+			var file:FileReferenceSaveHelper = new FileReferenceSaveHelper(null, list, "file.pasl");
+			
+		}
+		
+		private function LoadAnimationListFile():void
+		{
+			var file:FileReferenceLoadHelper = new FileReferenceLoadHelper(this, "ppppu animation shard list (*.pasl)", "*.pasl");
+			
 		}
 		
 		//Used for entering strings into the debug output
@@ -370,6 +426,60 @@ package menu
 					
 				}
 				//currentTimelineSet = timelines;
+			}
+			else if (targetName == "SetShardsFromList") //Add shards that were referred in an animation list
+			{
+				var shardsData:Vector.<Array> = value as Vector.<Array>;
+				if (shardsData)
+				{
+					var animateList:List = config.getCompById("animList") as List;	
+					
+					if (animateList)
+					{
+						animateList.removeAll();
+						//value is vector of arrays hold the following in order: shard name, shard type, shard
+						//var shardsData:Vector.<Array> = value as Vector.<Array>;
+						for (var j:int = 0, k:int = shardsData.length; j < k; j++) 
+						{
+							animateList.addItem({name: shardsData[j][0] as String, type: shardsData[j][1] as Boolean, shard: shardsData[j][2] as AnimateShard});
+							//animateList.addItem(list.ShardNameList[j]);
+						}
+					}
+				}
+			}
+			else if (targetName == "FileLoaded")
+			{
+				//signal2.dispatch(targetName, value);
+				var bytes:ByteArray = value as ByteArray;
+				//bytes.position = 0;
+				var list:AnimationList = bytes.readObject() as AnimationList;
+				if (list)
+				{
+					var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+					if (cbox)
+					{
+						cbox.selectedIndex = cbox.items.indexOf(list.TargetAnimationName);
+					}
+					//Don't have direct access to the shards, send a command to AppCore to do stuff with the list. The dev menu will receive a command with the shards that the list wants.
+					signal2.dispatch("ProcessAnimationList", list);
+					/*var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+					var animateList:List = config.getCompById("animList") as List;
+					intentionallyBreaking;
+					//The way "shards" are added to the animate list is completely wrong. It needs to be added similiar to the standard way, not brute forcing shard names into it.
+					if (cbox && animateList)
+					{
+						animateList.removeAll();
+						cbox.selectedIndex = cbox.items.indexOf(list.TargetAnimationName);
+						var shardsAmount:int = list.ShardNameList.length;
+						var shard:AnimateShard;
+						for (var j:int = 0; j < shardsAmount; j++) 
+						{
+							shard = 
+							animList.addItem({name: currentSelectedShardName, shard: currentSelectedShard, type: list.ShardTypeList[j]});
+							//animateList.addItem(list.ShardNameList[j]);
+						}
+					}*/
+				}
 			}
 		}
 		

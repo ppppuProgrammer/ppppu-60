@@ -10,13 +10,15 @@
 		<ComboBox id="characterSelector"  x="360" y="10" width="110"/>
 		<Label id="shardLabel" x="10" y="40" text="Shard:"/>
 		<ComboBox id="shardSelector"  x="45" y="40" width="300"/>
-		<PushButton id="addShardButton" x="355" y="40" width="60" label="Add Shard" />
+		<PushButton id="addShardButton" x="355" y="40" width="80" label="Add Shard to list" />
 		<Label id="ShardInfoLabel" x="10" y="60" text="Shard information"/>
 		<TextArea id="shardInfoText" x="0" y="80" width="480" height="35" editable="false"/>
-		<Label id="animListLabel" x="10" y="120" text="Animate Shards list"/>
+		<Label id="animListLabel" x="10" y="120" text="Animation list"/>
 		<List id="animList" x="0" y="140" width="480" height="100"/>
-		<PushButton id="removeShardButton" x="20" y="250" width="150" label="Remove selected shard from list" />
-		<PushButton id="finalizeButton" x="180" y="250" width="150" label="Compile shards into animation" />
+		<PushButton id="removeShardButton" x="5" y="250" width="150" label="Remove selected shard from list" />
+		<PushButton id="finalizeButton" x="165" y="250" width="90" label="Compile animation" />
+		<PushButton id="loadAnimationListButton" x="265" y="250" width="100" label="Load Animation List" />
+		<PushButton id="saveAnimationListButton" x="375" y="250" width="100" label="Save Animation List" />
 		<!-- <Label id="bodyLabel" x="160" y="10" text="Body:"/>
 		<ComboBox id="bodyTypeSelector" x="190" y="10" width="90"/>
 		<Label id="charLabel" x="290" y="10" text="Character:"/>
@@ -27,39 +29,39 @@
 	</Window>
 	
 	<!-- Section 4 Debug output -->
-	<Window id="consoleWindow" title="NX developer debug output" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
+	<Window id="consoleWindow" title="NX developer debug output" x="0" y="420" width="480" height="160" hasMinimizeButton="true" minimized="true">
 		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
 	</Window>
 	
 	<!-- Section 5 Tween testing -->
-	<Window id="tweenWindow" title="Tween debug window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
+	<!-- <Window id="tweenWindow" title="Tween debug window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
 		<ComboBox id="elementSelector" x="0" y="00" width="140" height="20"/>
 		<HUISlider id="tweenSelectSlider" x="200" y="00" width="300" height="20" minimum ="0" value="0" maximum="0" labelPrecision="0"/>
 		<Label id="tweenDataLabel" x="200" y="15" text="Element Data"/>
 		<TextArea id="tweenEditor" x="200" y="35" width="260" height="100" editable="true"/>
-	</Window>
+	</Window> -->
 	
 	<!-- Section 6 Animation Playback -->
-	<Window id="animPlayWindow" title="Animation playback window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
+	<Window id="animPlayWindow" title="Animation playback window" x="0" y="310" width="480" height="100" hasMinimizeButton="true" minimized="false">
 		<!-- Section 1 Animation play progress -->
-		<PushButton id="animPlayButton" x="10" y="35" label="Play" width="50" toggle="false"/>
-		<PushButton id="animPauseButton" x="70" y="35" label="Pause" width="50" toggle="false"/>
-		<Label id="timeLabel" x="130" y="35" text="Time:"/>
-		<Label id="timeText" x="160" y="35" text=""/>
-		<Label id="frameLabel" x="220" y="35" text="Keyframe:"/>
-		<Label id="frameText" x="270" y="35" text=""/>
+		<PushButton id="animPlayButton" x="10" y="10" label="Play" width="50" toggle="false"/>
+		<PushButton id="animPauseButton" x="70" y="10" label="Pause" width="50" toggle="false"/>
+		<Label id="timeLabel" x="130" y="10" text="Time:"/>
+		<Label id="timeText" x="160" y="10" text=""/>
+		<Label id="frameLabel" x="220" y="10" text="Keyframe:"/>
+		<Label id="frameText" x="270" y="10" text=""/>
 		<!--  -<HUISlider id="animProgressSlider" x="220" y="35" label="Progress" labelPrecision="0"/><!- -->
 		
 		<!-- Section 2 Changing frame for animation-->
-		<Label id="frameSettingLabel" x="10" y="60" text="Frame Settings"/>
-		<PushButton id="-1F" x="10" y="80" label="-1F" width="30"/>
-		<PushButton id="-5F" x="40" y="80" label="-5F" width="30"/>
-		<PushButton id="-10F" x="70" y="80" label="-10F" width="30"/>
-		<PushButton id="+1F" x="110" y="80" label="+1F" width="30"/>
-		<PushButton id="+5F" x="140" y="80" label="+5F" width="30"/>
-		<PushButton id="+10F" x="170" y="80" label="+10F" width="30"/>
-		<PushButton id="setFrameButton" x="210" y="80" label="Set to frame" width="80"/>
-		<HUISlider id="frameSlider" x="300" y="80" label="" minimum="1" value="1" labelPrecision="0"/>
+		<Label id="frameSettingLabel" x="10" y="30" text="Frame Settings"/>
+		<PushButton id="-1F" x="10" y="50" label="-1F" width="30"/>
+		<PushButton id="-5F" x="40" y="50" label="-5F" width="30"/>
+		<PushButton id="-10F" x="70" y="50" label="-10F" width="30"/>
+		<PushButton id="+1F" x="110" y="50" label="+1F" width="30"/>
+		<PushButton id="+5F" x="140" y="50" label="+5F" width="30"/>
+		<PushButton id="+10F" x="170" y="50" label="+10F" width="30"/>
+		<PushButton id="setFrameButton" x="210" y="50" label="Set to frame" width="80"/>
+		<HUISlider id="frameSlider" x="300" y="50" label="" minimum="1" value="1" labelPrecision="0"/>
 	</Window>
 	
 	<!-- Outdated Section 1
