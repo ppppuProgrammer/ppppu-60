@@ -338,11 +338,16 @@ package menu
 			
 		}
 		
-		//Used for entering strings into the debug output
-		public function onSignal1(string:*):void
+		private function WriteToDebugOutput(textToAdd:String):void
 		{
 			var output:TextArea = config.getCompById("debugOutput") as TextArea;
-			output.text += "\n" + string as String;
+			output.text += (output.text.length > 0 ? "\n" : "") + textToAdd as String;
+		}
+		
+		//Used exclusively for debug messages.
+		public function onSignal1(string:*):void
+		{
+			WriteToDebugOutput(string as String);
 		}
 		
 		public function onSignal2(targetName:*, value:*):void
@@ -449,12 +454,14 @@ package menu
 			}
 			else if (targetName == "FileLoaded")
 			{
+				//value is an array, index 0 is the data from the file, index 1 is the name of the file
 				//signal2.dispatch(targetName, value);
-				var bytes:ByteArray = value as ByteArray;
+				var bytes:ByteArray = value[0] as ByteArray;
 				//bytes.position = 0;
 				var list:AnimationList = bytes.readObject() as AnimationList;
 				if (list)
 				{
+					WriteToDebugOutput(StringUtil.substitute("Successfully loaded Animation List \"{0}\"", value[1] as String));
 					var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
 					if (cbox)
 					{
@@ -479,6 +486,10 @@ package menu
 							//animateList.addItem(list.ShardNameList[j]);
 						}
 					}*/
+				}
+				else
+				{
+					WriteToDebugOutput(StringUtil.substitute("Failed to load Animation List \"{0}\"", value[1] as String));
 				}
 			}
 		}

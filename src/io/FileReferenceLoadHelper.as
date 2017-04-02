@@ -33,8 +33,6 @@ package io
 		private function fileSelected(e:Event):void 
 		{
 			fr.removeEventListener(Event.SELECT, fileSelected);
-			//File Reference is not used to actually load the file, a library will handle that. Instead, it is used to get the path to the file.
-			//And the above isn't possible.
 			fr.addEventListener(Event.COMPLETE, fileLoaded);
 			fr.load();
 		}
@@ -43,7 +41,7 @@ package io
 		{
 			fr.removeEventListener(Event.COMPLETE, fileLoaded);
 			
-			signal2.dispatch("FileLoaded", fr.data);
+			signal2.dispatch("FileLoaded", [fr.data,fr.name]);
 			fr = null;
 			signal2.removeAllSlots();
 			signal2 = null;

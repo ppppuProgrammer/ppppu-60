@@ -3,7 +3,6 @@ package animations
 	import animations.AnimateShardLibrary;
 	import animations.DispObjInfo;
 	import animations.TimelineLibrary;
-	import flash.display.SpreadMethod;
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.tweens.ObjectTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
@@ -32,10 +31,11 @@ package animations
 	//import EyeContainer;
 	//import MouthContainer;
 	/**
-	 * ...
+	 * Sprite subclass that handles manipulating sprites to compose an animation using tween data.
+	 * TODO: Need to remove the master template Sprite from the ppppu stage in ppppu60.fla as this class being so coupled to the fla is no longer necessary.
 	 * @author 
 	 */
-	public dynamic class TemplateBase extends Sprite
+	public dynamic class Canvas extends Sprite
 	{
 		/*Master timeline for the template animation. Contains all the timelines for parts of the animation that are 
 		 * controlled  by series of tweens defined by a motion xml.*/
@@ -50,7 +50,7 @@ package animations
 		//private var latestFrameDepthLayout:Object;
 		private var latestFrameDepthLayout:LayoutFrameVector;
 		//Indicates the various times in the animation that the elements will be rearranged in terms of render order.
-		private var elementLayoutChangeTimes:Array = [];
+		//private var elementLayoutChangeTimes:Array = [];
 		//private var latestIndexOfLayoutChangeUsed:int = -1;
 		//How far into the current animation we're in
 		//private var frameCounter:int = 0;
@@ -58,13 +58,13 @@ package animations
 		//TODO: allow this to be set, which is needed for animations with non-standard frames(not 120)
 		//private var currentAnimationTotalFrames:int = 120;
 		
-		private var latestFrameDepthChangeTime:Number =-1;
-		private var nextFrameDepthChangeTime:Number=-1;
+		private var latestDepthChangeTime:Number =-1;
+		private var nextDepthChangeTime:Number=-1;
 		
 		private var latestAnimationDuration:Number;
 		
 		//The primary movie clip for the flash in terms as asset displaying.
-		private var m_ppppuStage:PPPPU_Stage;
+		//private var m_ppppuStage:PPPPU_Stage;
 		
 		private var animationPaused:Boolean = false;
 		
@@ -75,21 +75,22 @@ package animations
 		
 		//Class level arrays used during the AddTimelines function to prevent constant allocation/GC when the function is called.
 		//private var timelinesPendingRemoval:Array = [];
-		private var timelinesPendingRemoval:Vector.<SerialTween> = new Vector.<SerialTween>();
-		private var timelinesOkForAdding:Array = [];
+		//private var timelinesPendingRemoval:Vector.<SerialTween> = new Vector.<SerialTween>();
+		//private var timelinesOkForAdding:Array = [];
 		/*Keeps track of what timeline is controlling what element. Used to avoid the getTweensOf call, which will allocate an array. 
 		The element is the key and the timelinemax instance is the value.*/
-		private var elementTimelineDict:Dictionary = new Dictionary();
+		//private var elementTimelineDict:Dictionary = new Dictionary();
 		
-		private var timelineControlElementDict:Dictionary = new Dictionary();
+		//private var timelineControlElementDict:Dictionary = new Dictionary();
 		
+		//Holds the various Sprites that can be placed onto the canvas.
 		private var elementDict:Dictionary = new Dictionary();
 		
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
 		/* Creation and Initialization */
 		//{
-		public function TemplateBase()
+		public function Canvas()
 		{
 			//Create some layers that will be what hair and accessories are typically placed into.
 			/*var layer1:Sprite = new Sprite();
@@ -122,14 +123,14 @@ package animations
 		public function TemplateAddedToStage(e:Event):void
 		{
 			var displayObjBeingChecked:DisplayObjectContainer = this;
-			while (displayObjBeingChecked != stage && !(displayObjBeingChecked is PPPPU_Stage))
+			/*while (displayObjBeingChecked != stage && !(displayObjBeingChecked is PPPPU_Stage))
 			{
 				displayObjBeingChecked = displayObjBeingChecked.parent;
 				if (displayObjBeingChecked is PPPPU_Stage)
 				{
 					m_ppppuStage = displayObjBeingChecked as PPPPU_Stage;
 				}
-			}
+			}*/
 			
 			//Adds any child display objects into the element dictionary. Unoptimized and display objects ideally would not be children of the template base in the first place.
 			var element:Sprite;
@@ -156,7 +157,7 @@ package animations
 			if (target)
 			{
 				var tweens:Array = new Array();
-				timelineControlElementDict[timeline] = target;
+				//timelineControlElementDict[timeline] = target;
 				
 				var duration:int;
 
@@ -227,47 +228,52 @@ package animations
 			
 		}
 		
+		//Ran every frame to see if there are Sprites/Actors that need to be added/removed from the canvas and/or have their depths rearraigned 
 		public function Update():Number
 		{
 			var position:Number = Number.NaN;
 			if (animationPaused == false && masterTimeline) //If animation isn't paused, update
 			{
 				var currentTime:Number = masterTimeline.position;
-				//trace("Frame " + int(120*(currentTime/masterTimeline.duration)));
+				//Caching the depth orders for the compiled animation.
 				var displayLayout:AnimationLayout = currentAnimationElementDepthLayout;
 
-				if (displayLayout.frameVector.length > 0 && (latestFrameDepthChangeTime == -1 || (currentTime >= nextFrameDepthChangeTime && nextFrameDepthChangeTime >= 0) ) )
+				//Checks to see if there are depth orders and then checks if the times for depth changes aren't set or that it's time to set the next depth orders.
+				if (displayLayout.frameVector.length > 0 && (latestDepthChangeTime == -1 || (currentTime >= nextDepthChangeTime && nextDepthChangeTime >= 0) ) )
 				{
 					var frameLayout:LayoutFrameVector;
-					//Start at the end and work backwards
+					//Iterate through the list of depth orders.
 					for (var i:int = 0, l:int = displayLayout.frameVector.length; i < l; ++i)
 					{
 						frameLayout = displayLayout.frameVector[i];
-						latestFrameDepthChangeTime = frameLayout.changeTime;
-						//There's more frame vectors to examine. Check if the next frame vector has a change time greater than the current time of the animation.
+						//Update the latest time a depth change happens.
+						latestDepthChangeTime = frameLayout.changeTime;
+						//There's more depth orders to examine. Check if the next depth order has a change time greater than the current time of the animation.
 						if (i + 1 < l && currentTime < displayLayout.frameVector[i + 1].changeTime)
 						{
-							nextFrameDepthChangeTime = displayLayout.frameVector[i+1].changeTime;
+							nextDepthChangeTime = displayLayout.frameVector[i+1].changeTime;
 							break;
 						}
 						else if(i + 1 == l) //Reached the end of the layout vector.
 						{
-							if (l == 1)//There is only 1 change for the animation, so don't worry about it anymore.
+							if (l == 1)//There is only 1 change for the animation, so don't worry about the next depth change from here on out.
 							{
-								nextFrameDepthChangeTime = -1; 
+								nextDepthChangeTime = -1; 
 							}
 							else
 							{
 								//Loop back to beginning if there were multiple times where element depths were changed but we reached the last point in the animation where a change will happen.
-								nextFrameDepthChangeTime = displayLayout.frameVector[0].changeTime;
+								nextDepthChangeTime = displayLayout.frameVector[0].changeTime;
 							}
 							break;
 						}
 					}
+					//Finally change the depths
 					ChangeElementDepths(frameLayout, true);
 				}
 				else if (displayLayout.frameVector.length == 0 && masterTimeline != null)
 				{
+					//If there is no display order data then there is no reason for anything to be on the canvas, remove all children. Check that the masterTimeline isn't null as this is an indicator that there are Sprites on the canvas.
 					this.removeChildren();
 					masterTimeline = null;
 				}
@@ -463,22 +469,28 @@ package animations
 			var shardDispObjInfoVector:Vector.<DispObjInfo>;
 			var finalizedLayout:Object = new Object();
 			
-			//var deferredDispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			//Iterate through the shards
 			for (var i:int = 0, l:int = shards.length; i < l; i++) 
 			{
+				//Cache the timelines vector of the shard
 				shardTimelines = shards[i].GetTimelines();
+				//Iterate through the timelines
 				for (var j:int = 0, k:int = shardTimelines.length; j < k; j++) 
 				{
+					//Make sure the timeline exists
 					if (shardTimelines[j] != null)
 					{
+						//add the timeline from the shard to the array of timelines to compile.
 						timelines[timelines.length] = shardTimelines[j];
 					}
 				}
 				
+				//Cache the disp obj info vector
 				shardDispObjInfoVector = shards[i].GetDispObjData();
 				var shardDispInfo:DispObjInfo;
 				if (shardDispObjInfoVector != null)
 				{
+					//Iterate through the disp obj info vector
 					for (var m:int = 0, n:int = shardDispObjInfoVector.length; m < n; m++) 
 					{
 						shardDispInfo = shardDispObjInfoVector[m];
@@ -497,11 +509,12 @@ package animations
 			}
 			//Need to complete the display object layout for the animation
 			ProcessDisplayObjects(finalizedLayout);
+			//Create the animation layout from the finalized layout
 			currentAnimationElementDepthLayout = new AnimationLayout();
 			for (var timeAsStr:String in finalizedLayout) 
 			{
 				currentAnimationElementDepthLayout.AddNewFrameVector(Number(timeAsStr), finalizedLayout[timeAsStr]);
-				elementLayoutChangeTimes[elementLayoutChangeTimes.length] = Number(timeAsStr);
+				//elementLayoutChangeTimes[elementLayoutChangeTimes.length] = Number(timeAsStr);
 			}
 
 			if (masterTimeline)
@@ -509,13 +522,15 @@ package animations
 				masterTimeline.stop();
 				masterTimeline = null;
 			}
+			//Create a parallel tween out of the timelines.
 			var compiledAnimation:ParallelTween = BetweenAS3.parallelTweens(timelines) as ParallelTween;
 			if (masterTimeline && masterTimeline.isPlaying)
 			{
 				masterTimeline.stop();
 			}
 			masterTimeline = compiledAnimation;	
-			latestFrameDepthChangeTime = nextFrameDepthChangeTime = -1;
+			//Reset the latest and next times for depth changes. -1 is used to indicate that the animation is being ran for the first time and should be checked.
+			latestDepthChangeTime = nextDepthChangeTime = -1;
 			masterTimeline.gotoAndPlay(0.0);
 		}
 		
@@ -595,7 +610,7 @@ package animations
 				}
 			}
 		}
-		
+		//Helper function that handles the merging for SortDispObjInfoVector().
 		private function Merge(A:Vector.<DispObjInfo>, begin:int, mid:int, end:int, B:Vector.<DispObjInfo>):void
 		{
 			var i:int = begin, j:int = mid;
@@ -637,14 +652,14 @@ package animations
 							{return 1;}
 					}
 				}
-				else if(info1.GetTargetFlag() > 0 && info2.GetTargetFlag() == 0) //Compared info1 target depth to info2's depth
+				else if(info1.GetTargetFlag() > 0 && info2.GetTargetFlag() == 0) //Compare info1 target depth to info2's depth
 				{
 					if (info1.GetTargetDepth() <= info2.GetDepth())
 						{return 0;}
 					else
 						{return 1;}
 				}
-				else if(info1.GetTargetFlag() == 0 && info2.GetTargetFlag() > 0) //Compared info2 target depth to info1's depth
+				else if(info1.GetTargetFlag() == 0 && info2.GetTargetFlag() > 0) //Compare info2 target depth to info1's depth
 				{
 					if (info1.GetDepth() <= info2.GetTargetDepth())
 						{return 0;}
@@ -654,31 +669,27 @@ package animations
 				else //Both have a flag > 0, sort by target depth since masking and setting a parent are incompatible
 				{
 					if (info1.GetTargetDepth() <= info2.GetTargetDepth())
+						{return 0;}
+					else
+						{return 1;}
+				}
+			}
+			else //Neither dispobjinfo indicate that their Sprite should be masked or a child, just need to compare their depths.
+			{
+				if (info1.GetDepth() <= info2.GetDepth())
 					{return 0;}
 				else
 					{return 1;}
-				}
-			}
-			else
-			{
-				if (info1.GetDepth() <= info2.GetDepth())
-				{
-					return 0;
-				}
-				else
-				{
-					return 1;
-				}
 			}
 		}
 		//}
 		/* End of Animation Creation Functions */
 		
 		
-		public function GetPPPPU_Stage():PPPPU_Stage
+		/*public function GetPPPPU_Stage():PPPPU_Stage
 		{
 			return m_ppppuStage;
-		}
+		}*/
 		[Inline]
 		final public function RoundToNearest(roundTo:Number, value:Number):Number{
 		return Math.round(value/roundTo)*roundTo;
@@ -710,10 +721,10 @@ package animations
 			target.visible = visible;
 		}*/
 		
-		private function LoopAnimation(e:TweenEvent):void
+		/*private function LoopAnimation(e:TweenEvent):void
 		{
 			masterTimeline.gotoAndPlay(0);
-		}
+		}*/
 	}
 
 }

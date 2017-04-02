@@ -78,7 +78,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import modifications.MusicMod;
 	import modifications.Mod;
 	import audio.MusicPlayer;
-	import animations.TemplateBase;
+	import animations.Canvas;
 	import flash.ui.Keyboard;
 	import flash.utils.*;
 	
@@ -351,7 +351,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				System.pauseForGCIfCollectionImminent(1);
 				System.pauseForGCIfCollectionImminent(1);
-				SwitchCharacter(0);
+				//SwitchCharacter(0);
 				//SwitchTemplateAnimation(0);
 				//backgroundMasterTimeline.gotoAndPlay(0);
 				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
@@ -979,6 +979,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (targetName == "characterSelector")
 			{
 				SwitchCharacter(value as int);
+				
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
@@ -1034,9 +1035,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (targetName == "FileLoaded")
 			{
 				//Things should happen here but for quick test purposes they don't.
-				//var 
-				//binaryLoader.append(new BinaryDataLoader(value as String));
-				//signal2.dispatch(targetName, value);
+				
 			}
 		}
 		function roundToNearest(roundTo:Number, value:Number):Number{
