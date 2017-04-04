@@ -1,4 +1,4 @@
-package 
+package  
 {
 	import characters.ColorValueHolder;
 	import flash.display.IGraphicsData;

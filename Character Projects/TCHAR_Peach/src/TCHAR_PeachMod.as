@@ -18,6 +18,8 @@ package
 			
 			characterData.Color.Iris = 0x3671C1FF;
 			characterData.Color.Skin = 0xFFDCC6FF;
+			characterData.Color.SkinHighlight = 0xFFFFFFFF;
+			characterData.Color.Hair = 0xFEB60DFF;
 			characterData.Color.Lip = 0xFF99CCFF
 			characterData.Color.Legging = [0xECC6FFFF, 0xE0A6FCFF];
 			var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243, 182, 154, 255));
@@ -30,7 +32,8 @@ package
 			characterData.Color.Ear = [skinGradientEndPoint.CreateLinkedColorHolder(), 0xFFDCC6FF];//2
 			characterData.Color.Breast = [0xFFDCC6FF,0xFFDCC6FF, skinGradientEndPoint.CreateLinkedColorHolder()];//3
 			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
-			characterData.skinGradient_Anus = [UtilityFunctions.GetColorUintFromRGB(255, 166, 159), 0xFFDCC6];//2
+			
+			characterData.skinGradient_Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;
 			//characterData.DiamondCenterColor = 0x000000;

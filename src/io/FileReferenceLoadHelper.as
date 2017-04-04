@@ -1,4 +1,4 @@
-package io 
+package io
 {
 	import com.jacksondunstan.signals.Signal2;
 	import com.jacksondunstan.signals.Slot2;

@@ -1,4 +1,4 @@
-package animations 
+package animations
 {
 	import flash.utils.Dictionary;
 	/**
@@ -26,7 +26,7 @@ package animations
 		{
 			var targetCollection:Vector.<Dictionary> = baseShard ? baseShardsCollection : additionalShardsCollection;
 			//Create enough new indexes in the targetted collection so an index for the animationId exists.
-			while (animationId > targetCollection.length)
+			while (animationId > targetCollection.length-1)
 			{
 				targetCollection[targetCollection.length] = new Dictionary();
 			}

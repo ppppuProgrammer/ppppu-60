@@ -1,4 +1,4 @@
-package 
+package  
 {
 	/*body type > animation > variation
 
@@ -153,7 +153,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		public var DEBUG_playSpeed:Number = 1.0;
 		
 		private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
-		private var binaryLoader:LoaderMax = new LoaderMax({name:"BinaryLoader", onChildComplete:BinarySubLoadComplete} );
 		private var colorizer:Colorizer = new Colorizer();
 		
 		CONFIG::debug
@@ -316,7 +315,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Peach_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Rosalina_Shards.swf"));
 			
-			binaryLoader.autoLoad = true;
+			startupLoader.append(new SWFLoader("ARCH_BlowjobAnimation_Shards.swf"));
+			startupLoader.append(new SWFLoader("ARCH_Blowjob_Peach_Shards.swf"));
+			startupLoader.append(new SWFLoader("ARCH_Blowjob_Rosalina_Shards.swf"));
+			
 			//startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
 			//startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
 			
@@ -817,6 +819,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					for (var i:int = 0, l:int = data.length; i < l; ++i)
 					{
 						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
+						if (timelines[timelines.length-1] == null)
+						{
+							CONFIG::debug
+							{
+								devMenuSignaller1.dispatch("Animation " + animationName + ": Could not create timeline for element " + data[i].targetName);
+							}
+						}
 					}
 					var shard:AnimateShard = new AnimateShard(timelines, shardMod.GetDisplayObjectOrders());
 					var shardAddResult:Boolean = shardLib.AddShardToLibrary(animationIndex, shard, shardMod.GetShardName(), shardMod.GetIfBaseShard());
@@ -854,7 +863,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var assetMod:AssetsMod = mod as AssetsMod;
 				if (assetMod)
 				{
-					if (masterTemplate.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
+					//For graphic sets this needs to be changed. Assets should be added to a graphic set. To be used the Actor necessary for the asset needs to be added and that will be handled when a timeline is created.
+					/*if (masterTemplate.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
 					{
 						addedMod = true;
 						//Asset was added, so can see if it had additional data and make use of it
@@ -869,7 +879,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 								}
 							}
 						}
-					}
+					}*/
 				}
 			}
 			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately

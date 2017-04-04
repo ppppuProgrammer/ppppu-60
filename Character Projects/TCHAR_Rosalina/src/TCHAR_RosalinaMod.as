@@ -19,7 +19,9 @@ package
 			characterData.Color.Iris = 0x36BDC1FF;
 			characterData.Color.Skin = 0xFFDCC6FF;
 			characterData.Color.Lip =  UtilityFunctions.CreateColorTransformFromHex(0xFF99CC, 51);
-			characterData.Color.Legging = [0xFFFFFFFF, 0xC5F7EBFF];			
+			characterData.Color.Legging = [0xFFFFFFFF, 0xC5F7EBFF];	
+			characterData.Color.SkinHighlight = 0xFFFFFFFF;
+			characterData.Color.Hair = 0xFEA972FF;
 			var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243,182,154, 255));
 			//var standardGradientEndPoint:uint = UtilityFunctions.GetColorUintFromRGB(243,182,154);
 			characterData.Color.Eyelid = 0xF0A586FF;

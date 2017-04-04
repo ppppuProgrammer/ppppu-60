@@ -1,4 +1,4 @@
-package animations 
+package animations
 {
 	import flash.net.registerClassAlias;
 	/**

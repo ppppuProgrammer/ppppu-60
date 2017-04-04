@@ -1,4 +1,4 @@
-package audio 
+package audio
 {
 	import flash.media.Sound;
 	import flash.media.SoundChannel;

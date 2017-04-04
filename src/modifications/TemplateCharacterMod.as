@@ -1,4 +1,4 @@
-package modifications 
+package modifications
 {
 	import mx.utils.StringUtil;
 	/**

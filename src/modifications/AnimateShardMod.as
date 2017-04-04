@@ -1,4 +1,4 @@
-package modifications 
+package modifications
 {
 	import animations.DispObjInfo;
 	import mx.utils.StringUtil;

@@ -85,7 +85,7 @@ package animations
 		
 		//Holds the various Sprites that can be placed onto the canvas.
 		private var elementDict:Dictionary = new Dictionary();
-		
+		private var actorDict:Dictionary = new Dictionary();
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
 		/* Creation and Initialization */
@@ -97,10 +97,10 @@ package animations
 			var layer2:Sprite = new Sprite();
 			var layer3:Sprite = new Sprite();
 			var layer4:Sprite = new Sprite();*/
-			AddNewSpriteInstance(new Sprite, "HairFrontLayer");
+			/*AddNewSpriteInstance(new Sprite, "HairFrontLayer");
 			AddNewSpriteInstance(new Sprite, "HairBehindFaceLayer");
 			AddNewSpriteInstance(new Sprite, "HairBehindHeadwearLayer");
-			AddNewSpriteInstance(new Sprite, "HairBackLayer");
+			AddNewSpriteInstance(new Sprite, "HairBackLayer");*/
 			//addChild(); addChild(); addChild(); addChild();
 			addEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
 		}
@@ -151,7 +151,13 @@ package animations
 		{
 			var tweenData:Vector.<Object> = timelineData.tweenProperties;
 			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
-			var target:Sprite = elementDict[timelineData.targetName] as Sprite;
+			//var target:Sprite = elementDict[timelineData.targetName] as Sprite;
+			var target:Sprite = actorDict[timelineData.targetName] as Sprite;
+			if (target == null)
+			{
+				AddNewActor(timelineData.targetName);
+				target = actorDict[timelineData.targetName] as Sprite;
+			}
 			var timeline:SerialTween = null;
 			var currentTweenData:Object, previousTweenData:Object;
 			if (target)
@@ -286,7 +292,26 @@ package animations
 			return position;
 		}
 		
-		public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
+		public function AddNewActor(actorName:String):Boolean
+		{
+			var result:Boolean;
+			if (actorName in actorDict)
+			{
+				//Actor with same name was already added.
+				result = false;
+			}
+			else
+			{
+				var actor:Actor = new Actor();
+				actor.name = actorName;
+				actor.mouseChildren = actor.mouseEnabled = false;
+				actorDict[actorName] = actor;
+				result = true;
+			}
+			return result;
+		}
+		
+		/*public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
 		{
 			var result:Boolean;
 			if (spriteName in elementDict)
@@ -302,7 +327,7 @@ package animations
 				result = true;
 			}
 			return result;
-		}
+		}*/
 		
 		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
 		/*public function ChangeAnimation(displayLayout:AnimationLayout, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
@@ -380,7 +405,8 @@ package animations
 			//Unoptimized version
 			for (var vecIndex:int = 0, vecLength:int = layoutVector.length; vecIndex < vecLength; ++vecIndex )
 			{
-				var element:Sprite = elementDict[layoutVector[vecIndex].GetControlObjectName()];
+				//var element:Sprite = elementDict[layoutVector[vecIndex].GetControlObjectName()];
+				var element:Sprite = actorDict[layoutVector[vecIndex].GetControlObjectName()];
 				if (element)
 				{
 					var flag:int = layoutVector[vecIndex].GetTargetFlag();
@@ -396,7 +422,8 @@ package animations
 					}
 					else
 					{
-						var targetElement:Sprite = elementDict[layoutVector[vecIndex].GetTargetObjName()];
+						//var targetElement:Sprite = elementDict[layoutVector[vecIndex].GetTargetObjName()];
+						var targetElement:Sprite = actorDict[layoutVector[vecIndex].GetTargetObjName()];
 						if (targetElement)
 						{
 							if (flag == 1)

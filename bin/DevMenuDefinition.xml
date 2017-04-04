@@ -29,7 +29,7 @@
 	</Window>
 	
 	<!-- Section 4 Debug output -->
-	<Window id="consoleWindow" title="NX developer debug output" x="0" y="420" width="480" height="160" hasMinimizeButton="true" minimized="true">
+	<Window id="consoleWindow" title="NX developer debug output" x="0" y="420" width="480" height="160" hasMinimizeButton="true" minimized="false">
 		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
 	</Window>
 	

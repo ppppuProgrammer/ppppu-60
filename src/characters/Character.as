@@ -1,4 +1,5 @@
-﻿package characters {
+﻿package characters
+{
 	import flash.filters.ColorMatrixFilter;
 	import flash.geom.ColorTransform;
 	import flash.display.MovieClip;

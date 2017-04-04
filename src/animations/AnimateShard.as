@@ -1,4 +1,4 @@
-package animations 
+package animations
 {
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
 	/**

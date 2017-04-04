@@ -1,4 +1,4 @@
-package io 
+package io
 {
 	import flash.display.Bitmap;
 	import flash.events.Event;
