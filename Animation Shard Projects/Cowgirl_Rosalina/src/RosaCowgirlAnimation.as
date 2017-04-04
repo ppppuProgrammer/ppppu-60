@@ -48,7 +48,7 @@ package
 		private function CreateDisplayInfoForHair():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-			dispInfo[dispInfo.length] = new DispObjInfo("RosHairFront", 500, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("RosaHairFront", 500, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
 			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair2L", 400, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
 			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair2R", 300, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
 			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair1L", 200, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);

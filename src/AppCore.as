@@ -33,6 +33,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import modifications.AnimationMod;
 	import animations.background.*;
 	import modifications.AssetsMod;
+	import modifications.GraphicSetMod;
 	import modifications.TemplateAnimationMod;
 	import modifications.TemplateCharacterMod;
 	import mx.utils.StringUtil;
@@ -97,7 +98,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		//A movie clip that holds all the body elements used to create an animation. The elements in this class are controlled
 		//TODO: Test the extendability of the master template. Can custom elements be easily added to it without big issues?
-		private var masterTemplate:MasterTemplate;// = new MasterTemplate();
+		private var canvas:Canvas;// = new MasterTemplate();
 		//Responsible for holding the various timelines that will be added to a template. This dictionary is 3 levels deep, which is expressed by: timelineDict[Animation][Character][Part]
 		//private var timelinesDict:Dictionary = new Dictionary();
 		
@@ -169,11 +170,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//Create the "main stage" that holds the character template and various other movieclips such as the transition and backlight 
 			mainStage = new PPPPU_Stage();
 			mainStage.Backlight.visible = mainStage.OuterDiamond.visible = mainStage.InnerDiamond.visible = 
-			mainStage.TransitionDiamond.visible = mainStage.Compositor.visible = mainStage.DisplayArea.visible = false;
+			mainStage.TransitionDiamond.visible = mainStage.DisplayArea.visible = false;
 			
 			//mainStage.stop();
 			//Hide the master template until everything is initialized
-			mainStage.Compositor.visible = false;
+			//mainStage.Compositor.visible = false;
 			addChild(mainStage);
 			mainStage.stopAllMovieClips();
 			//masterTemplate = //mainStage.DisplayArea.MasterTemplateInstance;
@@ -185,9 +186,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			test.AddSprites(null, new DaisyHairBack(), null, new RosalinaHairBack());
 			test.x = test.y = 200; 
 			addChild(test);*/
-			masterTemplate = mainStage.Compositor;
-			
-			masterTemplate.Initialize(shardLib);
+			//canvas = mainStage.Compositor;
+			canvas = new Canvas;
+			mainStage.addChild(canvas);
+			canvas.Initialize(shardLib);
 			//masterTemplate.visible = false;
 			//characterList[0].SetID(0);
 			//masterTemplate.
@@ -241,8 +243,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mainStage.TransitionDiamond.mouseEnabled = false;
 			
 			//Master template mouse event disabling
-			masterTemplate.mouseChildren = false;
-			masterTemplate.mouseEnabled = false;
+			canvas.mouseChildren = false;
+			canvas.mouseEnabled = false;
 			
 			//AddCharacter(PeachCharacter);
 			
@@ -305,6 +307,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			startupLoader.autoLoad = true;
 			startupLoader.append(new SWFLoader("ARCH_BaseAssets.swf"));
+			startupLoader.append(new SWFLoader("GFXSET_Standard.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Rosalina.swf"));
 			CONFIG::debug
@@ -362,7 +365,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					tl.play(0);
 				}*/
 				//masterTemplate.PlayAnimation(0);
-				masterTemplate.visible = true;
+				canvas.visible = true;
 				firstTimeInLoop = false;
 				//previousUpdateTime = backgroundMasterTimeline.position;// .totalTime();//(getTimer() / 1000.0);
 				ppppuRunTimeCounter = 0;
@@ -371,11 +374,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
 
-				var animationPosition:Number = masterTemplate.Update();
+				var animationPosition:Number = canvas.Update();
 				CONFIG::debug
 				{
 					devMenuSignaller2.dispatch("timeText", animationPosition);
-					devMenuSignaller2.dispatch("updatedAnimation", masterTemplate);
+					devMenuSignaller2.dispatch("updatedAnimation", canvas);
 				}
 
 			/*else
@@ -458,7 +461,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					var randomAnimIndex:int = Math.floor(Math.random() * animationNameIndexes.length);
 					//SwitchTemplateAnimation(randomAnimIndex);
-					masterTemplate.PlayAnimation(-1);
+					canvas.PlayAnimation(-1);
 				}
 				else if((!(Keyboard.NUMBER_0 > keyPressed) && !(keyPressed > Keyboard.NUMBER_9 )) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
 				{
@@ -471,18 +474,18 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					{
 					//SwitchTemplateAnimation(keyPressed - 49);
 					}*/
-					masterTemplate.PlayAnimation(0);
+					canvas.PlayAnimation(0);
 				}
 				
 				if (keyPressed == Keyboard.UP)
 				{
 					DEBUG_playSpeed += .05;
-					masterTemplate.ChangePlaySpeed(DEBUG_playSpeed);
+					canvas.ChangePlaySpeed(DEBUG_playSpeed);
 				}
 				else if (keyPressed == Keyboard.DOWN)
 				{
 					DEBUG_playSpeed -= .05;
-					masterTemplate.ChangePlaySpeed(DEBUG_playSpeed);
+					canvas.ChangePlaySpeed(DEBUG_playSpeed);
 					//ScaleFromCenter(//mainStage.DisplayArea, //mainStage.DisplayArea.scaleX - .05, //mainStage.DisplayArea.scaleY - .05);
 				}
 				
@@ -518,7 +521,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					//mainStage.stop();
 					backgroundMasterTimeline.stop();
-					masterTemplate.StopAnimation();
+					canvas.StopAnimation();
 				}
 				else if (keyPressed == Keyboard.R)
 				{
@@ -528,7 +531,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					{
 						tl.play(0);
 					}
-					masterTemplate.ResumePlayingAnimation();
+					canvas.ResumePlayingAnimation();
 				}
 				keyDownStatus[keyEvent.keyCode] = true;
 			}
@@ -561,7 +564,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				currentCharAnimLayout = layerInfoDict[animationName][defaultCharacterName];
 			}*/
 			//masterTemplate.ChangeAnimation(currentCharLayerInfo, animationIndex, currentCharacter.GetID(), "Standard");
-			masterTemplate.ChangeAnimation(currentCharAnimLayout, animationIndex, currentCharacter.GetID(), bodyTypeString);
+			//canvas.ChangeAnimation(currentCharAnimLayout, animationIndex, currentCharacter.GetID(), bodyTypeString);
 			/*masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
 			
 			masterTemplate.ChangeBaseTimelinesUsed(animationIndex);
@@ -576,7 +579,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			masterTemplate.ImmediantLayoutUpdate();*/
 			
-			animationDuration = masterTemplate.GetDurationOfCurrentAnimation();
+			animationDuration = canvas.GetDurationOfCurrentAnimation();
 			CONFIG::debug
 			{
 				devMenuSignaller2.dispatch("animationDuration", animationDuration);
@@ -670,19 +673,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mod = null;
 			//e.target.unload();
 			//e.target.dispose();
-		}
-		
-		private function BinarySubLoadComplete(e:LoaderEvent):void
-		{
-			if (e.target is BinaryDataLoader)
-			{
-				var byteArray:ByteArray = e.target.content as ByteArray;
-				var deserializedObj:Object = byteArray.readObject();
-				if (deserializedObj is AnimationList)
-				{
-					var animList:AnimationList = deserializedObj as AnimationList;
-				}
-			}
 		}
 		
 		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter
@@ -818,7 +808,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var data:Vector.<Object> = shardMod.GetTimelineConstructionData();
 					for (var i:int = 0, l:int = data.length; i < l; ++i)
 					{
-						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
+						timelines[timelines.length] = canvas.CreateTimelineFromData(data[i], canvas);
 						if (timelines[timelines.length-1] == null)
 						{
 							CONFIG::debug
@@ -864,7 +854,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (assetMod)
 				{
 					//For graphic sets this needs to be changed. Assets should be added to a graphic set. To be used the Actor necessary for the asset needs to be added and that will be handled when a timeline is created.
-					/*if (masterTemplate.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
+					if (canvas.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
 					{
 						addedMod = true;
 						//Asset was added, so can see if it had additional data and make use of it
@@ -879,7 +869,39 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 								}
 							}
 						}
-					}*/
+					}
+				}
+			}
+			else if (modType == Mod.MOD_GRAPHICSET)
+			{
+				var graphicSet:GraphicSetMod = mod as GraphicSetMod;
+				if (graphicSet)
+				{
+					var gfxSet:GraphicSet = new GraphicSet();
+					var assetData:Array;
+					for (var j:int = 0, k:int = graphicSet.setData.length; j < k; j++) 
+					{
+						assetData = graphicSet.setData[j];
+						var assetProperties:Object = assetData[3] as Object;
+						if (gfxSet.AddAssetToSet(assetData[0] as Sprite, assetData[1] as String, assetData[2] as int, assetProperties))
+						{
+							//New graphic asset was added to the set, now can see if there was colorable data.
+							if (assetProperties != null)
+							{
+								if ("Colorable" in assetProperties)
+								{
+									var colorableData:Object = assetProperties.Colorable;
+									if (colorableData != null)
+									{
+										colorizer.AddColorizeData(assetData[0] as Sprite, colorableData);
+									}
+								}
+							}
+						}
+					}
+					//Done for testing purposes, resort to a better code design later.
+					canvas.currentGraphicSets[canvas.currentGraphicSets.length] = gfxSet;
+					
 				}
 			}
 			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
@@ -940,22 +962,22 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			var target:String = targetName as String;
 			if (target == "animPlayButton")
 			{
-				masterTemplate.ResumePlayingAnimation();
+				canvas.ResumePlayingAnimation();
 			}
 			else if (target == "animPauseButton")
 			{
-				masterTemplate.StopAnimation();
+				canvas.StopAnimation();
 			}
 			else if (target.search(RegExp(/[+-]\d*.F/)) > -1)
 			{
 				var sign:int = target.charAt(0) == "-"? -1:1;
 				target = target.substring(1, target.length -1);
 				var frameAmount:int = int(target);
-				var position:Number = masterTemplate.GetTimeInCurrentAnimation();
+				var position:Number = canvas.GetTimeInCurrentAnimation();
 				position = roundToNearest(1.0 / stage.frameRate, position);
 				position +=  (sign * frameAmount)*(1.0 / stage.frameRate);
-				masterTemplate.JumpToPosition(position);
-				devMenuSignaller2.dispatch("timeText",masterTemplate.GetTimeInCurrentAnimation());
+				canvas.JumpToPosition(position);
+				devMenuSignaller2.dispatch("timeText",canvas.GetTimeInCurrentAnimation());
 			}
 		}
 		
@@ -979,12 +1001,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else */if (targetName == "setFrameButton")
 			{
 				
-				masterTemplate.JumpToPosition((value as int) * (1.0 / stage.frameRate));
+				canvas.JumpToPosition((value as int) * (1.0 / stage.frameRate));
 				//masterTemplate.ResumePlayingAnimation();
 			}
 			else if (targetName == "setAnimationTime")
 			{
-				masterTemplate.JumpToPosition(value as Number);
+				canvas.JumpToPosition(value as Number);
 			}
 			else if (targetName == "characterSelector")
 			{
@@ -1008,8 +1030,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (targetName == "CompileShards")
 			{
 				var shardsToCompile:Vector.<AnimateShard> = value as Vector.<AnimateShard>;
-				masterTemplate.CompileAnimation(shardsToCompile);
-				var animationDuration:Number = masterTemplate.GetDurationOfCurrentAnimation();
+				canvas.CompileAnimation(shardsToCompile);
+				var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
 				CONFIG::debug
 				{
 					devMenuSignaller2.dispatch("animationDuration", animationDuration);

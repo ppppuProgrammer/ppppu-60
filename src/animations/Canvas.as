@@ -35,7 +35,7 @@ package animations
 	 * TODO: Need to remove the master template Sprite from the ppppu stage in ppppu60.fla as this class being so coupled to the fla is no longer necessary.
 	 * @author 
 	 */
-	public dynamic class Canvas extends Sprite
+	public class Canvas extends Sprite
 	{
 		/*Master timeline for the template animation. Contains all the timelines for parts of the animation that are 
 		 * controlled  by series of tweens defined by a motion xml.*/
@@ -88,6 +88,8 @@ package animations
 		private var actorDict:Dictionary = new Dictionary();
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
+		public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
+		
 		/* Creation and Initialization */
 		//{
 		public function Canvas()
@@ -97,12 +99,16 @@ package animations
 			var layer2:Sprite = new Sprite();
 			var layer3:Sprite = new Sprite();
 			var layer4:Sprite = new Sprite();*/
-			/*AddNewSpriteInstance(new Sprite, "HairFrontLayer");
+			AddNewSpriteInstance(new Sprite, "HairFrontLayer");
 			AddNewSpriteInstance(new Sprite, "HairBehindFaceLayer");
 			AddNewSpriteInstance(new Sprite, "HairBehindHeadwearLayer");
-			AddNewSpriteInstance(new Sprite, "HairBackLayer");*/
-			//addChild(); addChild(); addChild(); addChild();
-			addEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
+			AddNewSpriteInstance(new Sprite, "HairBackLayer");
+			
+			
+			/*AddNewActor("HairFrontLayer");
+			AddNewActor("HairBehindFaceLayer");
+			AddNewActor("HairBehindHeadwearLayer");
+			AddNewActor("HairBackLayer");*/
 		}
 		
 		public function Initialize(shardLibrary:AnimateShardLibrary/*timelineLibrary:TimelineLibrary*/):void
@@ -119,31 +125,6 @@ package animations
 				}
 			}
 		}
-		
-		public function TemplateAddedToStage(e:Event):void
-		{
-			var displayObjBeingChecked:DisplayObjectContainer = this;
-			/*while (displayObjBeingChecked != stage && !(displayObjBeingChecked is PPPPU_Stage))
-			{
-				displayObjBeingChecked = displayObjBeingChecked.parent;
-				if (displayObjBeingChecked is PPPPU_Stage)
-				{
-					m_ppppuStage = displayObjBeingChecked as PPPPU_Stage;
-				}
-			}*/
-			
-			//Adds any child display objects into the element dictionary. Unoptimized and display objects ideally would not be children of the template base in the first place.
-			var element:Sprite;
-			for (var i:int = 0; i < this.numChildren; i++) 
-			{
-				element = this.getChildAt(i) as Sprite;
-				elementDict[element.name] = element;
-			}
-			
-			this.removeChildren();
-			
-			removeEventListener(Event.ADDED_TO_STAGE, TemplateAddedToStage);
-		}
 		//}
 		/* End of Creation and Initialization */
 		
@@ -151,6 +132,7 @@ package animations
 		{
 			var tweenData:Vector.<Object> = timelineData.tweenProperties;
 			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
+			//Hacky but for now elements have higher prio
 			//var target:Sprite = elementDict[timelineData.targetName] as Sprite;
 			var target:Sprite = actorDict[timelineData.targetName] as Sprite;
 			if (target == null)
@@ -276,6 +258,7 @@ package animations
 					}
 					//Finally change the depths
 					ChangeElementDepths(frameLayout, true);
+					
 				}
 				else if (displayLayout.frameVector.length == 0 && masterTimeline != null)
 				{
@@ -290,6 +273,39 @@ package animations
 				position = masterTimeline.position;
 			}
 			return position;
+		}
+		
+		public function ClearGraphicsFromAllActorsOnCanvas():void
+		{
+			var actor:Actor;
+			for (var i:int = 0; i < this.numChildren; i++) 
+			{
+				actor = this.getChildAt(i) as Actor;
+				if (actor)
+				{
+					actor.ClearAllGraphics();
+				}
+			}
+		}
+		
+		public function ApplyCurrentGraphicSets():void
+		{
+			for (var i:int = 0, l:int = currentGraphicSets.length; i < l; i++) 
+			{
+				var gfxSet:GraphicSet = currentGraphicSets[i];
+				var assetData:GraphicSetData;
+				for (var j:int = 0, k:int = gfxSet.collection.length; j < k; j++) 
+				{
+					assetData = gfxSet.collection[j];
+					var actor:Actor = actorDict[assetData.targetActor];
+					if (actor)
+					{
+						actor.ChangeGraphicInLayer(assetData.layer, assetData.asset);
+					}
+				}
+				
+			}
+			//currentGraphicSets
 		}
 		
 		public function AddNewActor(actorName:String):Boolean
@@ -311,7 +327,7 @@ package animations
 			return result;
 		}
 		
-		/*public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
+		public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
 		{
 			var result:Boolean;
 			if (spriteName in elementDict)
@@ -323,11 +339,11 @@ package animations
 			{
 				sprite.name = spriteName;
 				sprite.mouseChildren = sprite.mouseEnabled = false;
-				elementDict[spriteName] = sprite;
+				actorDict[spriteName] = sprite;
 				result = true;
 			}
 			return result;
-		}*/
+		}
 		
 		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
 		/*public function ChangeAnimation(displayLayout:AnimationLayout, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
@@ -414,6 +430,11 @@ package animations
 					if (flag == 0)
 					{
 						addChild(element);
+						//Add an asset loaded from an asset mod into the actor. This is a horrible way of handling it but for alpha sake it is still done. Figure out a better way to handle this, even if it means solely using graphic sets.
+						/*if (elementDict[layoutVector[vecIndex].GetControlObjectName()] != null)
+						{
+							(element as Actor).ChangeGraphicInLayer(1, elementDict[layoutVector[vecIndex].GetControlObjectName()]);
+						}*/
 						latestElement = element;
 						if (latestMaskedContainer != null)
 						{
@@ -429,6 +450,10 @@ package animations
 							if (flag == 1)
 							{
 								targetElement.addChild(element);
+								/*if (elementDict[layoutVector[vecIndex].GetControlObjectName()] != null)
+								{
+									(element as Actor).ChangeGraphicInLayer(1, elementDict[layoutVector[vecIndex].GetControlObjectName()]);
+								}*/
 								latestMaskedContainer = null;
 								containers.push(targetElement);
 							}
@@ -442,6 +467,10 @@ package animations
 									containers.push(latestMaskedContainer);
 								}
 								latestMaskedContainer.addChild(element);
+								/*if (elementDict[layoutVector[vecIndex].GetControlObjectName()] != null)
+								{
+									(element as Actor).ChangeGraphicInLayer(1, elementDict[layoutVector[vecIndex].GetControlObjectName()]);
+								}*/
 								
 							}
 						}
@@ -555,6 +584,10 @@ package animations
 			{
 				masterTimeline.stop();
 			}
+			
+			ClearGraphicsFromAllActorsOnCanvas();
+			ApplyCurrentGraphicSets();
+			
 			masterTimeline = compiledAnimation;	
 			//Reset the latest and next times for depth changes. -1 is used to indicate that the animation is being ran for the first time and should be checked.
 			latestDepthChangeTime = nextDepthChangeTime = -1;
