@@ -43,6 +43,22 @@ package animations
 			//if (baseShardsCollection.length > 0) { HasValidBaseTimeline = true;}
 		}
 		
+		public function GetListOfShards(animationId:int, shardNames:Vector.<String>, shardTypes:Vector.<Boolean>):Vector.<AnimateShard>
+		{
+			var shards:Vector.<AnimateShard> = new Vector.<AnimateShard>();
+			var shard:AnimateShard;
+			for (var i:int = 0, l:int = Math.min(shardNames.length, shardTypes.length); i < l; i++) 
+			{
+				shard = GetShard(animationId, shardTypes[i], shardNames[i]);
+				if (shard)
+				{
+					shards [ shards.length] = shard;
+				}
+			}
+			
+			return shards;
+		}
+		
 		public function GetListOfShardNames(animationId:int, getBaseShards:Boolean):Vector.<String>
 		{
 			var targetCollection:Vector.<Dictionary> = getBaseShards ? baseShardsCollection : additionalShardsCollection;
@@ -56,6 +72,7 @@ package animations
 			return shardNameList;
 		}
 		
+		[inline]
 		public function GetShard(animationId:int, shardTypeIsBase:Boolean, shardName:String):AnimateShard
 		{
 			var targetCollection:Vector.<Dictionary> = shardTypeIsBase ? baseShardsCollection : additionalShardsCollection;

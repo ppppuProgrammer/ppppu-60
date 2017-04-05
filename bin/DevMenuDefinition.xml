@@ -28,10 +28,7 @@
 		
 	</Window>
 	
-	<!-- Section 4 Debug output -->
-	<Window id="consoleWindow" title="NX developer debug output" x="0" y="420" width="480" height="160" hasMinimizeButton="true" minimized="false">
-		<TextArea id="debugOutput" x="0" y="00" width="480" height="160" editable="false"/>
-	</Window>
+	
 	
 	<!-- Section 5 Tween testing -->
 	<!-- <Window id="tweenWindow" title="Tween debug window" x="0" y="560" width="480" height="160" hasMinimizeButton="true" minimized="true">
@@ -64,6 +61,18 @@
 		<HUISlider id="frameSlider" x="300" y="50" label="" minimum="1" value="1" labelPrecision="0"/>
 	</Window>
 	
+	<Window id="gfxSetWindow" title="Graphic set window" x="0" y="420" width="480" height="120" hasMinimizeButton="true" minimized="false">
+		<ComboBox id="gfxSetSelector"  x="0" y="0" width="300"/>
+		<List id="gfxSetList" x="0" y="20" width="480" height="80"/>
+		
+		<PushButton id="addGfxSetButton" x="320" y="0" label="Add set" width="60"/>
+		<PushButton id="removeGfxSetButton" x="390" y="0" label="Remove set" width="60"/>
+	</Window>
+	
+	<!-- Section 4 Debug output -->
+	<Window id="consoleWindow" title="NX developer debug output" x="0" y="620" width="480" height="100" hasMinimizeButton="true" minimized="false">
+		<TextArea id="debugOutput" x="0" y="00" width="480" height="80" editable="false"/>
+	</Window>
 	<!-- Outdated Section 1
 		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
 		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>

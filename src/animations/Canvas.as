@@ -287,7 +287,7 @@ package animations
 				}
 			}
 		}
-		
+		[inline]
 		public function ApplyCurrentGraphicSets():void
 		{
 			for (var i:int = 0, l:int = currentGraphicSets.length; i < l; i++) 
@@ -516,6 +516,13 @@ package animations
 			masterTimeline.stop();
 		}
 		
+		public function ChangeGraphicSetsUsed(sets:Vector.<GraphicSet>):void
+		{
+			currentGraphicSets = sets;
+			ClearGraphicsFromAllActorsOnCanvas();
+			ApplyCurrentGraphicSets();
+		}
+		
 		/* Animation Creation Functions */
 		//{
 		public function CompileAnimation(shards:Vector.<AnimateShard>):void
@@ -585,8 +592,8 @@ package animations
 				masterTimeline.stop();
 			}
 			
-			ClearGraphicsFromAllActorsOnCanvas();
-			ApplyCurrentGraphicSets();
+			//ClearGraphicsFromAllActorsOnCanvas();
+			//ApplyCurrentGraphicSets();
 			
 			masterTimeline = compiledAnimation;	
 			//Reset the latest and next times for depth changes. -1 is used to indicate that the animation is being ran for the first time and should be checked.

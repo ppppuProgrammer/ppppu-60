@@ -20,6 +20,7 @@ how to accomplish base + rosa body parts + peach hair (char is peach)
 * Can't have timelines tied to character.
 Need to set base. Need to add/replace with rosa body parts timelines. Need to then add peach hair timelines.*/
 	//import AnimationSettings.CowgirlInfo;
+	import adobe.utils.CustomActions;
 	import animations.AnimateShard;
 	import animations.AnimateShardLibrary;
 	import animations.AnimationLayout;
@@ -106,7 +107,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var layerInfoDict:Dictionary = new Dictionary();
 		private var animInfoDict:Dictionary = new Dictionary();
-		public var mainStage:PPPPU_Stage;
+		//Main Stage is the movie clip where a major of the graphics are displayed
+		public var mainStage:MainStage;
 		//Keeps track of what keys were pressed and/or held down
 		private var keyDownStatus:Array = [];
 		//Contains the names of the various animations that the master template can switch between. The names are indexed by their position in the vector.
@@ -153,22 +155,24 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
-		private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
+		//private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
 		private var colorizer:Colorizer = new Colorizer();
 		
 		CONFIG::debug
-		private var devMenu:menu.DeveloperMenu = new menu.DeveloperMenu();
+		private var devMenu:DeveloperMenu;// = new menu.DeveloperMenu();
 
 		private var devMenuSignaller1:Signal1 = new Signal1();
 		private var devMenuSignaller2:Signal2 = new Signal2();
 		
+		private var modsLoadedAtStartUp:Array;
 		
+		private var graphicSets:Dictionary = new Dictionary();
 		
 		//Constructor
 		public function AppCore() 
 		{
 			//Create the "main stage" that holds the character template and various other movieclips such as the transition and backlight 
-			mainStage = new PPPPU_Stage();
+			mainStage = new MainStage();
 			mainStage.Backlight.visible = mainStage.OuterDiamond.visible = mainStage.InnerDiamond.visible = 
 			mainStage.TransitionDiamond.visible = mainStage.DisplayArea.visible = false;
 			
@@ -190,6 +194,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			canvas = new Canvas;
 			mainStage.addChild(canvas);
 			canvas.Initialize(shardLib);
+			//startupLoader.autoLoad = true;
 			//masterTemplate.visible = false;
 			//characterList[0].SetID(0);
 			//masterTemplate.
@@ -206,7 +211,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		}
 		
 		//Sets up the various aspects of the flash to get it ready for performing.
-		public function Initialize():void
+		public function Initialize(startupMods:Array = null):void
 		{
 			//Add the key listeners
 			//TODO: Re-enable when done testing menus
@@ -217,14 +222,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//AddCharacter(PeachCharacter);
 			//AddCharacter(RosalinaCharacter);
 			
-			CONFIG::TweenLib == "GSAP"
+			/*CONFIG::TweenLib == "GSAP"
 			{
 			//Initializing plugins for the GSAP library
 			TweenPlugin.activate([FramePlugin, FrameLabelPlugin, TransformMatrixPlugin, VisiblePlugin, ColorTransformPlugin]);
 			//Set the default Ease for the tweens
 			TweenLite.defaultEase = Linear.ease;
 			TweenLite.defaultOverwrite = "none";
-			}
+			}*/
 			//Disable mouse interaction for various objects
 			////mainStage.MenuLayer.mouseEnabled = true;
 			//Disable mouse interaction for various objects
@@ -298,16 +303,22 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			CONFIG::debug
 			{
+				devMenu = new DeveloperMenu(this);
 				devMenu.x = 480;
 				addChild(devMenu);
-				devMenu.SetupHooksToApp(this);
+				//devMenu.SetupHooksToApp(this);
 				SetupDevMenuHooks();
 				
 			}
 			
-			startupLoader.autoLoad = true;
-			startupLoader.append(new SWFLoader("ARCH_BaseAssets.swf"));
+			modsLoadedAtStartUp = startupMods;
+			
+
+			//startupMods = null;
+			
+			/*startupLoader.append(new SWFLoader("ARCH_BaseAssets.swf"));
 			startupLoader.append(new SWFLoader("GFXSET_Standard.swf"));
+			startupLoader.append(new SWFLoader("GFXSET_RosaAlt.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
 			startupLoader.append(new SWFLoader("TCHAR_Rosalina.swf"));
 			CONFIG::debug
@@ -320,7 +331,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			startupLoader.append(new SWFLoader("ARCH_BlowjobAnimation_Shards.swf"));
 			startupLoader.append(new SWFLoader("ARCH_Blowjob_Peach_Shards.swf"));
-			startupLoader.append(new SWFLoader("ARCH_Blowjob_Rosalina_Shards.swf"));
+			startupLoader.append(new SWFLoader("ARCH_Blowjob_Rosalina_Shards.swf"));*/
 			
 			//startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
 			//startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
@@ -336,17 +347,46 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//startupLoader.load();
 		}
 		
+		private function ProcessStartupMods():void
+		{
+			if (modsLoadedAtStartUp != null)
+			{
+				var startupModNum:int = modsLoadedAtStartUp.length;
+				for (var i:int = 0; i < startupModNum; ++i)
+				{
+					try
+					{
+						var successfulModAdd:Boolean = ProcessMod(modsLoadedAtStartUp[i]);
+						if (successfulModAdd == false)
+						{
+							//logger.warn("Mod that could not be added: " + startupMods[i].UrlLoadedFrom);
+						}
+					}
+					catch (e:Error)
+					{
+						//logger.error("Failed to load " + getQualifiedClassName(startupMods[i]) + "\nCall stack:\n" + e.getStackTrace());
+					}
+					finally
+					{
+						modsLoadedAtStartUp[i] = null;
+					}
+				}
+			}
+			modsLoadedAtStartUp = null;
+			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
+		}
+		
 		//The "heart beat" of the flash. Ran every frame to monitor and react to certain, often frame sensitive, events
 		private function RunLoop(e:Event):void
 		{
 			//Checks if the timeline lib has a valid base animation set. If it doesn't, return until there is one loaded in.
-			CONFIG::debug
+			/*CONFIG::debug
 			{
 			if (devMenu.ReadyCheck() == false)
 			{
 				return;
 			}
-			}
+			}*/
 			/*if (!timelineLib.HasValidBaseAnimation())
 			{
 				return;
@@ -422,7 +462,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				//}*/
 		}
 		
-		private function StartupLoadsComplete(e:LoaderEvent):void
+		/*private function StartupLoadsComplete(e:LoaderEvent):void
 		{
 			//Add an event listener that'll allow for frame checking.
 			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
@@ -437,7 +477,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//runTimer.start();
 			e.currentTarget.unload();
 			e.currentTarget.dispose();
-		}
+		}*/
 		
 		//Activated if a key is detected to be released. Sets the keys "down" status to false
 		private function KeyReleaseCheck(keyEvent:KeyboardEvent):void
@@ -662,7 +702,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			trace("Was unable to load file \"MouthTest.txt\"");
 		}
 		
-		private function FinishedLoadingSWF(e:LoaderEvent):void
+		/*private function FinishedLoadingSWF(e:LoaderEvent):void
 		{
 			var mod:Mod = (e.target.content.rawContent as Mod);
 			//Add the mod to the stage so the first frame function can get started, allowing the content to be ready to be used.
@@ -673,7 +713,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mod = null;
 			//e.target.unload();
 			//e.target.dispose();
-		}
+		}*/
 		
 		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter
 		and the mod could not be added.*/
@@ -899,8 +939,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 							}
 						}
 					}
-					//Done for testing purposes, resort to a better code design later.
-					canvas.currentGraphicSets[canvas.currentGraphicSets.length] = gfxSet;
+					if (!(graphicSet.setName in graphicSets))
+					{
+						graphicSets[graphicSet.setName] = gfxSet;
+						CONFIG::debug
+						{
+							devMenu.AddNewGraphicSet(graphicSet.setName);
+						}
+					}
 					
 				}
 			}
@@ -979,6 +1025,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				canvas.JumpToPosition(position);
 				devMenuSignaller2.dispatch("timeText",canvas.GetTimeInCurrentAnimation());
 			}
+			else if (target == "MenuFinishedInitializing")
+			{
+				this.ProcessStartupMods();
+			}
 		}
 		
 		public function onSignal2(targetName:*, value:*):void
@@ -1023,22 +1073,44 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (targetName == "shardSelector")
 			{
 				var shard:AnimateShard = shardLib.GetShard(value[0] as int, value[1] as Boolean, value[2] as String);
-				devMenuSignaller2.dispatch("SetShard", [shard, shardLib.GetInformationOnShard(shard)]);
+				devMenuSignaller2.dispatch("SetShardDescription", /*[shard,*/ shardLib.GetInformationOnShard(shard)/*]*/);
 				//devMenu.SetSelectedShard(shard);
 				//devMenu.set
 			}
-			else if (targetName == "CompileShards")
+			else if (targetName == "CompileAnimationFromAnimationList")
 			{
-				var shardsToCompile:Vector.<AnimateShard> = value as Vector.<AnimateShard>;
-				canvas.CompileAnimation(shardsToCompile);
-				var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
-				CONFIG::debug
+				//Compiles an animation by using an animation list. Goes through the list and builds a vector of shards then passes the vector to the canvas.
+				//Value is an animation list.
+				var animList:AnimationList = value as AnimationList;
+				//Make sure animation list exists and is the supported version of the list for the program.
+				if (animList)
 				{
-					devMenuSignaller2.dispatch("animationDuration", animationDuration);
+					var animationId:int = animationNameIndexes.indexOf(animList.TargetAnimationName);
+					var shardsForAnimation:Vector.<AnimateShard> = shardLib.GetListOfShards(animationId, animList.ShardNameList, animList.ShardTypeList);
+					canvas.CompileAnimation(shardsForAnimation);
+					var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
+					CONFIG::debug
+					{
+						devMenuSignaller2.dispatch("animationDuration", animationDuration);
+					}
 				}
+			}
+			else if (targetName == "UpdateGraphicSetsUsed")
+			{
+				var gfxSetNames:Vector.<String> = value as Vector.<String>;
+				var setsToUse:Vector.<GraphicSet> = new Vector.<GraphicSet>();
+				for (var j:int = 0, k:int = gfxSetNames.length; j < k; j++) 
+				{
+					if (graphicSets[gfxSetNames[j]] != null)
+					{
+						setsToUse[setsToUse.length] = graphicSets[gfxSetNames[j]];
+					}
+				}
+				canvas.ChangeGraphicSetsUsed(setsToUse);
 			}
 			else if (targetName == "ProcessAnimationList")
 			{
+				//Used when an animation list is loaded from file to populate the list of set shards in the developer/edit menu.
 				var list:AnimationList = value as AnimationList;
 				if (list)
 				{
@@ -1055,18 +1127,19 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var shard:AnimateShard;
 					for (var i:int = 0, l:int = Math.min(names.length, types.length); i < l; i++) 
 					{
+						//Verify that the shard exists
 						shard = shardLib.GetShard(animationId, (types[i] as Boolean/* == "Base"*/)/* ? true : false*/, names[i]);
 						if (shard)
 						{
-							shardsData[shardsData.length] = [names[i], types[i], shard];
+							shardsData[shardsData.length] = [names[i], types[i]/*, shard*/];
 						}
 					}
-					devMenuSignaller2.dispatch("SetShardsFromList", shardsData);
+					devMenuSignaller2.dispatch("SetupShardsList", shardsData);
 				}
 			}
 			else if (targetName == "FileLoaded")
 			{
-				//Things should happen here but for quick test purposes they don't.
+				//Things may happen here but for now they don't.
 				
 			}
 		}

@@ -50,15 +50,23 @@ package menu
 		
 		private var currentSelectedAnimationId:int;
 		private var currentSelectedShardTypeIsBase:Boolean;
-		private var currentSelectedShard:AnimateShard;
+		private var currentSelectedShardItem:ShardItem;
 		private var currentSelectedShardName:String;
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
 		private var serialTweenDict:Dictionary = new Dictionary();
-		public function DeveloperMenu() 
+		public function DeveloperMenu(app:AppCore) 
 		{			
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
+			
+			addEventListener(MouseEvent.CLICK, ClickEventHandler, true);
+			addEventListener(Event.CHANGE, ChangeEventHandler, true);
+			addEventListener(Event.SELECT, SelectEventHandler, true);
+
+			signal1.addSlot(app);
+			signal2.addSlot(app);
+			
 			config.loadXML("DevMenuDefinition.xml");
 			
 		}
@@ -68,7 +76,7 @@ package menu
 			return !waitingForComponentsCreation;
 		}
 		
-		public function SetupHooksToApp(app:AppCore):void
+		/*public function SetupHooksToApp(app:AppCore):void
 		{
 			signal1.addSlot(app);
 			addEventListener(MouseEvent.CLICK, ClickEventHandler, true);
@@ -78,7 +86,7 @@ package menu
 			addEventListener(Event.SELECT, SelectEventHandler, true);
 			
 			addEventListener(Event.CHANGE, ChangeEventHandler, true);
-		}
+		}*/
 		
 		private function ClickEventHandler(e:MouseEvent):void
 		{
@@ -95,7 +103,8 @@ package menu
 			}*/
 			else if (e.target.name == "finalizeButton")
 			{
-				CompileShardsIntoAnimation();
+				CompileAnimation();
+				//CompileShardsIntoAnimation();
 			}
 			else if (e.target.name == "removeShardButton")
 			{
@@ -109,15 +118,43 @@ package menu
 			{
 				SaveAnimationListToFile();
 			}
+			else if (e.target.name == "addGfxSetButton")
+			{
+				var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
+				var gfxSetList:List = config.getCompById("gfxSetList") as List;
+				if (gfxSetCBox && gfxSetList)
+				{
+					if (gfxSetCBox.selectedItem != null && gfxSetList.items.indexOf(gfxSetCBox.selectedItem) == -1)
+					{
+						gfxSetList.addItem(gfxSetCBox.selectedItem);
+					}
+				}
+				
+				UpdateGraphicSetsUsed();
+			}
+			else if (e.target.name == "removeGfxSetButton")
+			{
+				var gfxSetList:List = config.getCompById("gfxSetList") as List;
+				if (gfxSetList)
+				{
+					if (gfxSetList.selectedIndex != -1)
+					{
+						gfxSetList.removeItemAt(gfxSetList.selectedIndex);
+					}
+				}
+				
+				UpdateGraphicSetsUsed();
+			}
 			else if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
 				signal1.dispatch(e.target.name);
-			}
+			}		
 			else
 			{
 				//setFrameButton needs to also send data on what frame to go to.
 				signal2.dispatch(e.target.name, int((config.getCompById("frameSlider") as HUISlider).value));
 			}
+			
 		}
 		
 		private function ChangeEventHandler(e:Event):void
@@ -173,7 +210,7 @@ package menu
 				cbox3.removeAll();
 				cbox3.selectedItem = -1;
 				currentSelectedShardName = null;
-				SetSelectedShard(null, null);
+				SetSelectedShard(null/*, null*/);
 				
 				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase]);
 				//UpdateShardComboBox();
@@ -181,7 +218,8 @@ package menu
 			else if (e.target.name == "shardSelector")
 			{
 				var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
-				if (cbox.selectedIndex == -1) { return;}
+				if (cbox.selectedIndex == -1) { return; }
+				//currentSelectedShardItem = cbox.selectedItem as ShardItem;
 				currentSelectedShardName = cbox.selectedItem as String;
 				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase, currentSelectedShardName]);
 				//UpdateShardComboBox();
@@ -208,6 +246,20 @@ package menu
 			}
 		}
 		
+		private function UpdateGraphicSetsUsed():void
+		{
+			var gfxSetList:List = config.getCompById("gfxSetList") as List;
+			if (gfxSetList)
+			{
+				var gfxSetNames:Vector.<String> = new Vector.<String>();
+				for (var i:int = 0, l:int = gfxSetList.items.length; i < l; i++) 
+				{
+					gfxSetNames[gfxSetNames.length] = gfxSetList.items[i];
+				}
+				signal2.dispatch("UpdateGraphicSetsUsed", gfxSetNames);
+			}
+		}
+		
 		public function UpdateShardsCombobox(shardNames:Vector.<String>):void 
 		{
 			var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
@@ -222,7 +274,7 @@ package menu
 		public function AddSelectedShardToAnimationList():void
 		{
 			//If a shard isn't selected then exit this function
-			if (currentSelectedShard == null) return;
+			if (currentSelectedShardName == null) return;
 			
 			
 			var animList:List = config.getCompById("animList") as List
@@ -230,11 +282,11 @@ package menu
 			var listItems:Array = animList.items;
 			for (var i:int = 0, l:int = listItems.length; i < l; i++) 
 			{
-				if (listItems[i].shard == currentSelectedShard)
+				if (listItems[i].name == currentSelectedShardName)
 					return;
 			}
 			
-			animList.addItem({name: currentSelectedShardName, shard: currentSelectedShard, type: currentSelectedShardTypeIsBase});
+			animList.addItem({name: currentSelectedShardName/*, shard: currentSelectedShard*/, type: currentSelectedShardTypeIsBase});
 			//if(animList.items.indexOf(
 			
 		}
@@ -246,6 +298,12 @@ package menu
 			{
 				animList.removeItemAt(animList.selectedIndex);
 			}
+		}
+		
+		public function CompileAnimation():void
+		{
+			var animateList:AnimationList = CreateAnimationList();
+			signal2.dispatch("CompileAnimationFromAnimationList", animateList);
 		}
 		
 		public function CompileShardsIntoAnimation():void
@@ -276,6 +334,8 @@ package menu
 			
 			var window:Window = config.getCompById("mainWindow") as Window;
 			window.title += " v" + Version.VERSION;//window.title + 
+			
+			signal1.dispatch("MenuFinishedInitializing");
 		}
 		public function AddNewAnimation(name:String):void
 		{
@@ -304,9 +364,43 @@ package menu
 			}
 		}
 		
-		private function SaveAnimationListToFile():void
+		public function AddNewGraphicSet(name:String):void
+		{
+			var cbox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
+			if (cbox)
+			{
+				cbox.addItem(name);
+			}
+		}
+		
+		private function CreateAnimationList():AnimationList
 		{
 			//Need to prepare data to create the animation list.
+			var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+			if (cbox.selectedIndex == -1) { return null; }
+		
+			var animList:List = config.getCompById("animList") as List;
+			var shardsList:Array = animList.items;
+			var listLength:int = shardsList.length;
+			if (listLength == 0) { return null;}
+			var shardNames:Vector.<String> = new Vector.<String>();
+			var shardTypes:Vector.<Boolean> = new Vector.<Boolean>();
+			for (var i:int = 0; i < listLength; i++) 
+			{
+				shardNames[shardNames.length] = (shardsList[i].name) as String;
+				shardTypes[shardTypes.length] = (shardsList[i].type) as Boolean;
+			}
+			//Create the animation List.
+			var list:AnimationList = new AnimationList(/*cbox.selectedItem as String, shardNames*/);
+			list.TargetAnimationName = cbox.selectedItem as String;
+			list.ShardNameList = shardNames;
+			list.ShardTypeList = shardTypes;
+			return list;
+		}
+		
+		private function SaveAnimationListToFile():void
+		{
+			/*//Need to prepare data to create the animation list.
 			var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
 			if (cbox.selectedIndex == -1) { return; }
 		
@@ -322,13 +416,13 @@ package menu
 				shardTypes[shardTypes.length] = (shardsList[i].type) as Boolean;
 			}
 			//Create the animation List.
-			var list:AnimationList = new AnimationList(/*cbox.selectedItem as String, shardNames*/);
+			var list:AnimationList = new AnimationList();
 			list.TargetAnimationName = cbox.selectedItem as String;
 			list.ShardNameList = shardNames;
-			list.ShardTypeList = shardTypes;
+			list.ShardTypeList = shardTypes;*/
 			
 			//Need to ask the user where they want to save the list.
-			var file:FileReferenceSaveHelper = new FileReferenceSaveHelper(null, list, "file.pasl");
+			var file:FileReferenceSaveHelper = new FileReferenceSaveHelper(null, CreateAnimationList(), "file.pasl");
 			
 		}
 		
@@ -343,6 +437,8 @@ package menu
 			var output:TextArea = config.getCompById("debugOutput") as TextArea;
 			output.text += (output.text.length > 0 ? "\n" : "") + textToAdd as String;
 		}
+		
+		//private function Update
 		
 		//Used exclusively for debug messages.
 		public function onSignal1(string:*):void
@@ -392,9 +488,9 @@ package menu
 				animationDuration = value;
 				(config.getCompById("frameSlider") as HUISlider).maximum = value*stage.frameRate;
 			}
-			else if (targetName == "SetShard")
+			else if (targetName == "SetShardDescription")
 			{
-				SetSelectedShard(value[0] as AnimateShard, value[1] as String);
+				SetSelectedShard(value as String/*value[0] as AnimateShard, value[1] as String*/);
 			}
 			else if (targetName == "elementSelector")
 			{
@@ -432,7 +528,27 @@ package menu
 				}
 				//currentTimelineSet = timelines;
 			}
-			else if (targetName == "SetShardsFromList") //Add shards that were referred in an animation list
+			else if (targetName == "SetupShardsList")
+			{
+				var shardsData:Vector.<Array> = value as Vector.<Array>;
+				if (shardsData)
+				{
+					var animateList:List = config.getCompById("animList") as List;	
+					
+					if (animateList)
+					{
+						animateList.removeAll();
+						//value is vector of arrays hold the following in order: shard name, shard type, shard
+						//var shardsData:Vector.<Array> = value as Vector.<Array>;
+						for (var j:int = 0, k:int = shardsData.length; j < k; j++) 
+						{
+							animateList.addItem({name: shardsData[j][0] as String, type: shardsData[j][1] as Boolean});
+							//animateList.addItem(list.ShardNameList[j]);
+						}
+					}
+				}
+			}
+			/*else if (targetName == "SetShardsFromList") //Add shards that were referred in an animation list
 			{
 				var shardsData:Vector.<Array> = value as Vector.<Array>;
 				if (shardsData)
@@ -451,7 +567,7 @@ package menu
 						}
 					}
 				}
-			}
+			}*/
 			else if (targetName == "FileLoaded")
 			{
 				//value is an array, index 0 is the data from the file, index 1 is the name of the file
@@ -494,9 +610,10 @@ package menu
 			}
 		}
 		
-		private function SetSelectedShard(shard:AnimateShard/*, shardName:String*/, description:String):void
+		private function SetSelectedShard(/*shard:AnimateShard, shardName:String,*/ description:String):void
 		{
-			currentSelectedShard = shard;
+			
+			//currentSelectedShardItem = shard;
 			//currentSelectedShardName = shardName;
 			(config.getCompById("shardInfoText") as TextArea).text = description;
 		}
