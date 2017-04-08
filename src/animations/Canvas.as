@@ -63,6 +63,8 @@ package animations
 		
 		private var latestAnimationDuration:Number;
 		
+		private var currentAnimationName:String;
+		
 		//The primary movie clip for the flash in terms as asset displaying.
 		//private var m_ppppuStage:PPPPU_Stage;
 		
@@ -89,6 +91,9 @@ package animations
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
 		public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
+		
+		private var disableActorsBasedOnGfxSetData:Vector.<DisableActorInfo> = new Vector.<DisableActorInfo>;
+		//private var 
 		
 		/* Creation and Initialization */
 		//{
@@ -258,7 +263,7 @@ package animations
 					}
 					//Finally change the depths
 					ChangeElementDepths(frameLayout, true);
-					
+					GraphicSetDisableActorCheck();
 				}
 				else if (displayLayout.frameVector.length == 0 && masterTimeline != null)
 				{
@@ -284,8 +289,10 @@ package animations
 				if (actor)
 				{
 					actor.ClearAllGraphics();
+					actor.ChangeVisibility(true);
 				}
 			}
+			disableActorsBasedOnGfxSetData = new Vector.<DisableActorInfo>();
 		}
 		[inline]
 		public function ApplyCurrentGraphicSets():void
@@ -301,11 +308,72 @@ package animations
 					if (actor)
 					{
 						actor.ChangeGraphicInLayer(assetData.layer, assetData.asset);
+						if (assetData.properties && "DisableActor" in assetData.properties)
+						{
+							
+							var disableArray:Array = assetData.properties.DisableActor as Array;
+							var actorToDisable:Actor;
+							//var animationName:String;
+							//var depthFlag:int;
+							for (var m:int = 0, n:int = disableArray.length; m < n && n % 3 == 0; m+=3) 
+							{
+								actorToDisable = actorDict[disableArray[m] as String];
+								if (actorToDisable)
+								{
+									disableActorsBasedOnGfxSetData[disableActorsBasedOnGfxSetData.length] = new DisableActorInfo(actor, actorToDisable, disableArray[m + 1] as String, disableArray[m + 2] as int);
+								}
+							}							
+						}
 					}
 				}
 				
 			}
 			//currentGraphicSets
+		}
+		
+		//Checks to see if an actor needs to be disabled (made invisible) due to a graphic set in use.
+		private function GraphicSetDisableActorCheck():void
+		{
+			//Disable array expects to have a length that's a multiple of 3. Every 1st value is the name of the actor to disable, every 2nd value is the animation to disable it for (can specify "_ALL" to disable the actor for all animations) and the 3rd is to disable the actor based on it's depth relative to the current actor, with -1 for when it's [the actor to disable] depth is lower, 0 to disable regardless of depth and 1 if the depth is higher.
+			var targetActor:Actor;
+			var actorToDisable:Actor;
+			var animationName:String;
+			var depthFlag:int;
+			var disableArray:Vector.<DisableActorInfo> = disableActorsBasedOnGfxSetData;
+			for (var i:int = 0, l:int = disableArray.length; i < l; ++i) 
+			{
+				targetActor = disableActorsBasedOnGfxSetData[i].targetActor;
+				actorToDisable = disableActorsBasedOnGfxSetData[i].disableActor;
+				animationName = disableActorsBasedOnGfxSetData[i].animationName;
+				//For testing purposes depth flag is forced to 0
+				depthFlag = 0;// disableActorsBasedOnGfxSetData[i].depthFlag;
+				
+				if (actorToDisable && (animationName == "_ALL" || currentAnimationName))
+				{
+					if (depthFlag == 0)
+					{
+						actorToDisable.ChangeVisibility(false);
+					}
+					else
+					{
+						var currentActorDepth:int = this.getChildIndex(targetActor);
+						var disableActorDepth:int = this.getChildIndex(actorToDisable);
+						if (depthFlag == 1 && disableActorDepth > currentActorDepth)
+						{
+							actorToDisable.ChangeVisibility(false);
+						}
+						else if (depthFlag == -1 && disableActorDepth < currentActorDepth)
+						{
+							actorToDisable.ChangeVisibility(false);
+						}
+						else
+						{
+							actorToDisable.ChangeVisibility(true);
+						}
+					}
+					
+				}
+			}
 		}
 		
 		public function AddNewActor(actorName:String):Boolean
@@ -492,28 +560,40 @@ package animations
 				startTime = masterTimeline.position;
 			}
 			if (animationPaused) { animationPaused = false; }
-			masterTimeline.stopOnComplete = false;	
-			masterTimeline.gotoAndPlay(startTime);
+			if (masterTimeline)
+			{
+				masterTimeline.stopOnComplete = false;	
+				masterTimeline.gotoAndPlay(startTime);
+			}
 		}
 		
 		public function ResumePlayingAnimation():void
 		{
-			animationPaused = false;
-			masterTimeline.stopOnComplete = false;
-			masterTimeline.play();
+			if (masterTimeline != null)
+			{
+				animationPaused = false;
+				masterTimeline.stopOnComplete = false;
+				masterTimeline.play();
+			}
 		}
 		
 		public function JumpToPosition(time:Number):void
 		{
+			if (masterTimeline)
+			{
 				masterTimeline.gotoAndStop(time);
+			}
 		}
 		
 		/*Pauses the animation. Currently used, it's just here in case there is a time where the animation needs to be paused. 
 		Might be useful when character editing facilities are better and they need a still to look at.*/
 		public function StopAnimation():void
 		{
-			animationPaused = true;
-			masterTimeline.stop();
+			if (masterTimeline != null)
+			{
+				animationPaused = true;
+				masterTimeline.stop();
+			}
 		}
 		
 		public function ChangeGraphicSetsUsed(sets:Vector.<GraphicSet>):void
@@ -525,8 +605,9 @@ package animations
 		
 		/* Animation Creation Functions */
 		//{
-		public function CompileAnimation(shards:Vector.<AnimateShard>):void
+		public function CompileAnimation(shards:Vector.<AnimateShard>, animationName:String):void
 		{
+			currentAnimationName = animationName;
 			var timelines:Array = new Array;
 			var shardTimelines:Vector.<SerialTween>;
 			var shardDispObjInfoVector:Vector.<DispObjInfo>;
@@ -598,6 +679,7 @@ package animations
 			masterTimeline = compiledAnimation;	
 			//Reset the latest and next times for depth changes. -1 is used to indicate that the animation is being ran for the first time and should be checked.
 			latestDepthChangeTime = nextDepthChangeTime = -1;
+			GraphicSetDisableActorCheck();
 			masterTimeline.gotoAndPlay(0.0);
 		}
 		
@@ -770,7 +852,7 @@ package animations
 		
 		public function GetTimeInCurrentAnimation():Number
 		{
-			return masterTimeline.position;
+			return (masterTimeline) ? masterTimeline.position : Number.NaN;
 		}
 		
 		/*private function ConvertVectorToArray(vector:Vector.<SerialTween>):Array
@@ -794,4 +876,19 @@ package animations
 		}*/
 	}
 
+}
+import animations.Actor;
+class DisableActorInfo
+{
+	public var targetActor:Actor;
+	public var disableActor:Actor;
+	public var animationName:String;
+	public var depthFlag:int;
+	public function DisableActorInfo(actor:Actor, actorToDisable:Actor, animName:String, flag:int)
+	{
+		targetActor = actor;
+		disableActor = actorToDisable;
+		animationName = animName;
+		depthFlag = flag;
+	}
 }

@@ -1087,7 +1087,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					var animationId:int = animationNameIndexes.indexOf(animList.TargetAnimationName);
 					var shardsForAnimation:Vector.<AnimateShard> = shardLib.GetListOfShards(animationId, animList.ShardNameList, animList.ShardTypeList);
-					canvas.CompileAnimation(shardsForAnimation);
+					canvas.CompileAnimation(shardsForAnimation, animList.TargetAnimationName);
 					var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
 					CONFIG::debug
 					{

@@ -19,22 +19,25 @@ package animations
 		public function Actor() 
 		{
 			super();
-			topLayer = new Sprite();
-			topLayer.name = "Top";
-			mainLayer = new Sprite();
-			mainLayer.name = "Main";
-			bottomLayer = new Sprite();
-			bottomLayer.name = "Bottom";
-			addChild(bottomLayer);
-			addChild(mainLayer);
-			addChild(topLayer);
+			//topLayer = new Sprite();
+			//topLayer.name = "Top";
+			//mainLayer = new Sprite();
+			//mainLayer.name = "Main";
+			//bottomLayer = new Sprite();
+			//bottomLayer.name = "Bottom";
+			//addChild(bottomLayer);
+			//addChild(mainLayer);
+			//addChild(topLayer);
 		}
 		
+		//Removes all graphics from the actor's layers and also removes the layers from the actor's display list.
 		public function ClearAllGraphics():void
 		{
-			topLayer.removeChildren();
-			mainLayer.removeChildren();
-			bottomLayer.removeChildren();
+			this.removeChildren();
+			topLayer = mainLayer = bottomLayer = null; //null the references to the graphic set asset.
+			//topLayer.removeChildren();
+			//mainLayer.removeChildren();
+			//bottomLayer.removeChildren();
 		}
 		
 		public function ChangeGraphicInLayer(layer:int, sprite:Sprite):void
@@ -52,11 +55,50 @@ package animations
 					layerSprite = bottomLayer;
 					break;
 			}
+			//Something is already in the layer we want to assign the given sprite to.
+			if (layerSprite)
+			{
+				this.removeChild(layerSprite);
+				layerSprite = null;
+			}
+			layerSprite = sprite;
+			if (this.contains(layerSprite) == false)
+			{
+				this.addChildAt(layerSprite, Math.min(layer, this.numChildren));
+			}
+			
+			/*var layerSprite:Sprite;
+			switch(layer)
+			{
+				case LAYER_TOP:
+					layerSprite = topLayer;
+					break;
+				case LAYER_MAIN:
+					layerSprite = mainLayer;
+					break;
+				case LAYER_BOTTOM:
+					layerSprite = bottomLayer;
+					break;
+			}
 			if (layerSprite)
 			{
 				layerSprite.removeChildren();
 				layerSprite.addChild(sprite);
-			}			
+				if (layerSprite.parent == null)
+				{
+					this.addChildAt(layerSprite, Math.min(layer, this.numChildren));
+				}
+			}	*/		
+		}
+		
+		//Changes the visibility of the children display objects in the actor. Done this way as a tween may control the visibility of the actor itself, there by undoing any direct visibility changes done to the actor.
+		public function ChangeVisibility(visible:Boolean):void
+		{
+			for (var i:int = 0,l:int = this.numChildren; i < l; i++) 
+			{
+				this.getChildAt(i).visible = visible;
+			}
+			//topLayer.visible = mainLayer.visible = bottomLayer.visible = visible;
 		}
 		
 	}
