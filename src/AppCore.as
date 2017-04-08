@@ -174,7 +174,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//Create the "main stage" that holds the character template and various other movieclips such as the transition and backlight 
 			mainStage = new MainStage();
 			mainStage.Backlight.visible = mainStage.OuterDiamond.visible = mainStage.InnerDiamond.visible = 
-			mainStage.TransitionDiamond.visible = mainStage.DisplayArea.visible = false;
+			mainStage.TransitionDiamond.visible = mainStage.DisplayArea.visible = mainStage.Compositor.visible = false;
 			
 			//mainStage.stop();
 			//Hide the master template until everything is initialized
@@ -190,8 +190,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			test.AddSprites(null, new DaisyHairBack(), null, new RosalinaHairBack());
 			test.x = test.y = 200; 
 			addChild(test);*/
-			//canvas = mainStage.Compositor;
-			canvas = new Canvas;
+			canvas = mainStage.Compositor;
+			//canvas = new Canvas;
+			
 			mainStage.addChild(canvas);
 			canvas.Initialize(shardLib);
 			//startupLoader.autoLoad = true;

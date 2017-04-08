@@ -1,6 +1,7 @@
 package
 {
 	import flash.display.DisplayObject;
+	import flash.display.Sprite;
 	import flash.display.MovieClip;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -132,7 +133,7 @@ package
 					modsListLoader.append(new DataLoader(modLoadList));
 					mouseEnabled = false;
 					//Add background
-					var preloaderBackground:MovieClip = new PlanetBackground();
+					var preloaderBackground:Sprite = new PlanetBackground();
 					preloaderBackground.x = (stage.stageWidth - 480)/2;
 					addChild(preloaderBackground);
 					var loadBorder:LoadBarBorder = new LoadBarBorder();
