@@ -25,6 +25,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.AnimateShardLibrary;
 	import animations.AnimationLayout;
 	import animations.AnimationList;
+	import animations.Director;
 	import animations.TimelineLibrary;
 	import com.greensock.loading.BinaryDataLoader;
 	import com.jacksondunstan.signals.*;
@@ -97,9 +98,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private var shardLib:AnimateShardLibrary = new AnimateShardLibrary();
 		
 		
-		//A movie clip that holds all the body elements used to create an animation. The elements in this class are controlled
-		//TODO: Test the extendability of the master template. Can custom elements be easily added to it without big issues?
+		//A movie clip that holds all the body elements used to create an animation. This is to be a reference to a canvas instance created in the main stage (this is done for performance reasons, performance tanks if the canvas was created in as3.)
 		private var canvas:Canvas;// = new MasterTemplate();
+		//
+		//private var director:Director;
 		//Responsible for holding the various timelines that will be added to a template. This dictionary is 3 levels deep, which is expressed by: timelineDict[Animation][Character][Part]
 		//private var timelinesDict:Dictionary = new Dictionary();
 		
@@ -113,12 +115,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private var keyDownStatus:Array = [];
 		//Contains the names of the various animations that the master template can switch between. The names are indexed by their position in the vector.
 		private var animationNameIndexes:Vector.<String> = new Vector.< String > ();// ["Cowgirl", "LeanBack", "LeanForward", "Grind", "ReverseCowgirl", "Paizuri", "Blowjob", "SideRide", "Swivel", "Anal"];
-		private var basisBodyTypes:Vector.<String> = new Vector.<String>();
+		//private var basisBodyTypes:Vector.<String> = new Vector.<String>();
 		private var characterList:Vector.<Character> = new Vector.<Character>();//[new PeachCharacter, new RosalinaCharacter];
-		private var defaultCharacter:Character;// = characterList[0];
-		private var defaultCharacterName:String;// = defaultCharacter.GetName();
 		private var currentCharacter:Character;// = defaultCharacter;
-		private var currentAnimationIndex:int = -1;
+		//private var currentAnimationIndex:int = -1;
 		public var currentAnimationName:String = "None";
 		//private var embedTweenDataConverter:TweenDataParser = new TweenDataParser();
 		
@@ -193,8 +193,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			canvas = mainStage.Compositor;
 			//canvas = new Canvas;
 			
-			mainStage.addChild(canvas);
-			canvas.Initialize(shardLib);
+			//mainStage.addChild(canvas);
+			
+			
+			//director = new Director(colorizer);
 			//startupLoader.autoLoad = true;
 			//masterTemplate.visible = false;
 			//characterList[0].SetID(0);
@@ -214,6 +216,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//Sets up the various aspects of the flash to get it ready for performing.
 		public function Initialize(startupMods:Array = null):void
 		{
+			var director:Director = new Director(colorizer);
+			canvas.Initialize(shardLib, director);
 			//Add the key listeners
 			//TODO: Re-enable when done testing menus
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyPressCheck);
@@ -304,7 +308,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			CONFIG::debug
 			{
-				devMenu = new DeveloperMenu(this);
+				devMenu = new DeveloperMenu(this, director);
 				devMenu.x = 480;
 				addChild(devMenu);
 				//devMenu.SetupHooksToApp(this);
@@ -530,32 +534,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					//ScaleFromCenter(//mainStage.DisplayArea, //mainStage.DisplayArea.scaleX - .05, //mainStage.DisplayArea.scaleY - .05);
 				}
 				
-				/*if (keyPressed == Keyboard.Q)
-				{
-					if (currentCharacter.GetID() != 0)
-					{
-						currentCharacter = characterList[0];
-						//masterTemplate.ClearTimelines();
-						masterTemplate.AddTimelines(timelineLib.GetBaseTimelinesFromLibrary(this.currentAnimationIndex));
-						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][currentAnimationName]);
-						masterTemplate.ImmediantLayoutUpdate();
-						//masterTemplate.ResumePlayingAnimation();
-					}
-					//masterTemplate.HairFront.ChangeDisplayedSprite(0);
-				}
-				else if (keyPressed == Keyboard.W)
-				{
-					if (currentCharacter.GetID() != 1)
-					{
-						//Can crash if character isn't found, range error.
-						currentCharacter = characterList[1];
-						masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(this.currentAnimationIndex, currentCharacter.GetID(), "Standard"));
-						masterTemplate.SetElementDepthLayout(layerInfoDict[currentCharacter.GetName()][currentAnimationName]);
-						masterTemplate.ImmediantLayoutUpdate();
-						//masterTemplate.ResumePlayingAnimation();
-					}
-					//masterTemplate["HairFront"].ChangeDisplayedSprite(1);
-				}*/
+				
 				
 				//Debugger
 				if (keyPressed == Keyboard.S)
@@ -576,56 +555,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				}
 				keyDownStatus[keyEvent.keyCode] = true;
 			}
-		}
-		
-		//Switches to a templated animation of a specified name
-		private function SwitchTemplateAnimation(animationIndex:uint, bodyType:int):void
-		{
-			if (animationIndex >= animationNameIndexes.length || bodyType == -1) { return;}
-			var animationName:String = animationNameIndexes[animationIndex];
-			var currentCharacterName:String = currentCharacter.GetName();
-			currentAnimationName = animationName;
-			var bodyTypeString:String = basisBodyTypes[bodyType];
-
-			
-			//if(!timelineLib.DoesBaseTimelinesForAnimationExist(animationIndex))
-			//{
-				//return;
-				//CreateTimelinesForCharacterAnimation(defaultCharacterName, animationIndex);
-			//}
-			//var defaultLayerInfo:Object = layerInfoDict[defaultCharacterName][animationName];
-			/*var currentCharLayerInfo:Object = layerInfoDict[currentCharacterName][animationName];
-			if (currentCharLayerInfo == null && currentCharacterName != defaultCharacterName)
-			{
-				currentCharLayerInfo = layerInfoDict[defaultCharacterName][animationName];
-			}*/
-			var currentCharAnimLayout:AnimationLayout = layerInfoDict[animationName][bodyTypeString];
-			/*if (currentCharAnimLayout == null && currentCharacterName != defaultCharacterName)
-			{
-				currentCharAnimLayout = layerInfoDict[animationName][defaultCharacterName];
-			}*/
-			//masterTemplate.ChangeAnimation(currentCharLayerInfo, animationIndex, currentCharacter.GetID(), "Standard");
-			//canvas.ChangeAnimation(currentCharAnimLayout, animationIndex, currentCharacter.GetID(), bodyTypeString);
-			/*masterTemplate.SetElementDepthLayout(currentCharLayerInfo);
-			
-			masterTemplate.ChangeBaseTimelinesUsed(animationIndex);
-			
-			if (currentCharacter != defaultCharacter)
-			{
-				if (timelineLib.DoesCharacterSetExists(animationIndex, currentCharacter.GetID(), "Standard"))
-				{
-					masterTemplate.AddTimelines(timelineLib.GetReplacementTimelinesToLibrary(animationIndex, currentCharacter.GetID(), "Standard"));
-				}
-			}
-			
-			masterTemplate.ImmediantLayoutUpdate();*/
-			
-			animationDuration = canvas.GetDurationOfCurrentAnimation();
-			CONFIG::debug
-			{
-				devMenuSignaller2.dispatch("animationDuration", animationDuration);
-			}
-			currentAnimationIndex = animationIndex;
 		}
 		
 		[Inline]
@@ -666,11 +595,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		{
 			var character:Character = new characterClass;
 			character.SetID(characterList.length);
-			if (characterList.length == 0)
+			/*if (characterList.length == 0)
 			{
 				defaultCharacter = character;
 				defaultCharacterName = character.GetName();
-			}
+			}*/
 			characterList[characterList.length] = character;
 		}
 		
@@ -732,85 +661,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			if (modType == Mod.MOD_TEMPLATEANIMATION)
 			{
-				/*var animation:TemplateAnimationMod = mod as TemplateAnimationMod;
-				if (animation)
-				{
-					var data:Vector.<Object> = animation.GetDataForTimelinesCreation();
-
-					var timelines:Vector.<SerialTween> = new Vector.<SerialTween>();
-					
-					var displayOrderCommands:String = animation.GetDisplayOrderList();
-					var displayLayout:Object = null;
-					if (displayOrderCommands.length > 0)
-					{
-						displayLayout = JSON.parse(animation.GetDisplayOrderList());
-					}
-					
-					var charName:String = animation.GetCharacterName();
-					var animName:String = animation.GetAnimationName();
-					var bodyName:String = animation.GetBodyTypeName();
-					
-					var animationIndex:int = animationNameIndexes.indexOf(animName);
-					//Animations can not be added until the default character has their data for the particular animation loaded in.
-					if (animationIndex == -1)
-					{
-						animationIndex = animationNameIndexes.length;
-						animationNameIndexes[animationIndex] = animName;
-						
-						CONFIG::debug
-						{
-						devMenu.AddNewAnimation(animName);
-						}
-					}
-					
-					//If the layer info dictionary for the animation doesn't exist, create it.
-					if (layerInfoDict[animName] == null) 
-					{ layerInfoDict[animName] = new Dictionary(); }
-					//If the layer info dictionary for the character doesn't exist, create it.
-					//if (layerInfoDict[animName][charName] == null) 
-					//{ layerInfoDict[animName][charName] = new Dictionary(); }
-					//{ layerInfoDict[bodyName] = new Dictionary(); }
-					//Set the layer info for an animation of the character
-					//layerInfoDict[charName][animName] = displayLayout;
-					
-					
-					//If animation is to be used as the basis, it might define a new body type.  
-					if (animation.GetIfBasisTemplate() == true)
-					{
-						//bodyName is used to define the name of the body type in the case of a basis animation.
-						//So check that the body type of the mod is not already in the basis body types list.
-						if (basisBodyTypes.indexOf(bodyName) == -1)
-						{
-							
-							basisBodyTypes[basisBodyTypes.length] = bodyName;
-							
-							layerInfoDict[animName][bodyName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
-						}
-					}
-					else
-					{
-						if (layerInfoDict[animName][charName] == null && displayLayout != null)
-						{
-							layerInfoDict[animName][charName] = ConvertLayoutObjectToAnimationLayout(displayLayout);
-						}
-					}
-					
-					
-					for (var i:int = 0, l:int = data.length; i < l; ++i)
-					{
-						timelines[timelines.length] = masterTemplate.CreateTimelineFromData(data[i], masterTemplate);
-						//timelines[i].play();
-						
-					}
-					if (animation.GetIfBasisTemplate() == true)
-					{
-						//timelineLib.AddBaseTimelinesToLibrary(animationIndex, timelines);
-					}
-					else
-					{
-					}
-					return true;
-				}*/
 			}
 			else if (modType == Mod.MOD_TEMPLATECHARACTER)
 			{
@@ -894,8 +744,27 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var assetMod:AssetsMod = mod as AssetsMod;
 				if (assetMod)
 				{
+					var assetData:AssetData = new AssetData(assetMod.setName, assetMod.asset, assetMod.layer, assetMod.data);
+					canvas.AddAssetToActor(assetMod.targetActorName, assetData);
+					CONFIG::debug
+					{
+						devMenu.AddNewGraphicSet(assetMod.setName);
+					}
+					//Handle colorable data now <- scratch that, Actors should send a command to have assets with Colorable data be added for colorization.
+					/*if (assetData.properties != null)
+					{
+						if ("Colorable" in assetData.properties)
+						{
+							var colorableData:Object = assetData.properties.Colorable;
+							if (colorableData != null)
+							{
+								colorizer.AddColorizeData(assetData.asset,colorableData);
+							}
+						}
+					}*/
+					
 					//For graphic sets this needs to be changed. Assets should be added to a graphic set. To be used the Actor necessary for the asset needs to be added and that will be handled when a timeline is created.
-					if (canvas.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
+					/*if (canvas.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
 					{
 						addedMod = true;
 						//Asset was added, so can see if it had additional data and make use of it
@@ -910,10 +779,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 								}
 							}
 						}
-					}
+					}*/
 				}
 			}
-			else if (modType == Mod.MOD_GRAPHICSET)
+			/*else if (modType == Mod.MOD_GRAPHICSET)
 			{
 				var graphicSet:GraphicSetMod = mod as GraphicSetMod;
 				if (graphicSet)
@@ -950,7 +819,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					}
 					
 				}
-			}
+			}*/
 			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
 			else if (modType == Mod.MOD_ARCHIVE)
 			{

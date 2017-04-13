@@ -1,8 +1,12 @@
 package menu
 {
 	import adobe.utils.CustomActions;
-	import animations.AnimateShard;
+	import com.greensock.motionPaths.RectanglePath2D;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	//import animations.AnimateShard;
 	import animations.AnimationList;
+	import animations.Director;
 	import com.bit101.components.*;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -55,7 +59,8 @@ package menu
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
 		private var serialTweenDict:Dictionary = new Dictionary();
-		public function DeveloperMenu(app:AppCore) 
+		private var assetPreviewSprites:Dictionary = new Dictionary();
+		public function DeveloperMenu(app:AppCore, director:Director) 
 		{			
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
@@ -67,6 +72,9 @@ package menu
 			signal1.addSlot(app);
 			signal2.addSlot(app);
 			
+			//Allow the director and dev menu to communicate with each other
+			signal2.addSlot(director);
+			director.RegisterMenuForMessaging(this);
 			config.loadXML("DevMenuDefinition.xml");
 			
 		}
@@ -159,6 +167,40 @@ package menu
 		
 		private function ChangeEventHandler(e:Event):void
 		{
+			if (e.target.name == "assetSelectSlider")
+			{
+				var assetText:TextArea = config.getCompById("assetInformation") as TextArea;
+				
+				var item:Object;
+				if ((e.target as HGUISlider).selectedItem != null)
+				{
+					item = (e.target as HGUISlider).selectedItem;
+				}
+				if (item)
+				{
+					var layerText:String;
+					switch(item.layer)
+					{
+						case 0:
+							layerText = "Bottom";
+							break;
+						case 1:
+							layerText = "Main";
+							break;
+						case 2:
+							layerText = "Top";
+							break;
+						default:
+							layerText = "Invalid";
+					}
+					assetText.text = StringUtil.substitute("Set: {0}\nLayer: {1}", item.displayName, layerText);
+				}
+				else
+				{
+					assetText.text = "Information unavailable";
+				}
+				
+			}
 			/*if (e.target.name == "tweenSelectSlider")
 			{
 				var serialTweenForElement:SerialTween = serialTweenDict[(config.getCompById("elementSelector") as ComboBox).selectedItem];
@@ -224,18 +266,18 @@ package menu
 				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase, currentSelectedShardName]);
 				//UpdateShardComboBox();
 			}
-			/*else if(e.target.name == "elementSelector")
+			else if(e.target.name == "actorSelector")
 			{
-				var serialTweenForElement:SerialTween = serialTweenDict[(config.getCompById("elementSelector") as ComboBox).selectedItem];
-				var tweenSlider:HUISlider = (config.getCompById("tweenSelectSlider") as HUISlider);
-				//Need to find out how many ITweens are in the serial tween.
-				var tweenAmount:int=0;
-				while (serialTweenForElement.getTweenAt(tweenAmount) != null)
+				
+				var actorName:String = (config.getCompById("actorSelector") as ComboBox).selectedItem as String;
+				if (actorName && actorName.length > 0)
 				{
-					++tweenAmount;
+					signal2.dispatch("ActorAssetListRequest", actorName);
 				}
-				tweenSlider.maximum = tweenAmount;
-			}*/
+				//var tweenSlider:HUISlider = (config.getCompById("tweenSelectSlider") as HUISlider);
+				
+				
+			}
 			else
 			{
 				try
@@ -306,7 +348,7 @@ package menu
 			signal2.dispatch("CompileAnimationFromAnimationList", animateList);
 		}
 		
-		public function CompileShardsIntoAnimation():void
+		/*public function CompileShardsIntoAnimation():void
 		{
 			var shardsToCompile:Vector.<AnimateShard> = new Vector.<AnimateShard>();
 			var animList:List = config.getCompById("animList") as List
@@ -318,7 +360,7 @@ package menu
 				shardsToCompile[shardsToCompile.length] = listItems[i].shard;
 			}
 			signal2.dispatch("CompileShards", shardsToCompile);
-		}
+		}*/
 		
 		public function FinishedLoadingXML(e:Event):void
 		{
@@ -331,6 +373,9 @@ package menu
 			
 			var animList:List = config.getCompById("animList") as List;
 			animList.listItemClass = ShardItem;
+			
+			var guiSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
+			guiSlider.listItemClass = GUISliderItem;
 			
 			var window:Window = config.getCompById("mainWindow") as Window;
 			window.title += " v" + Version.VERSION;//window.title + 
@@ -364,10 +409,20 @@ package menu
 			}
 		}
 		
+		[inline]
+		private function AddNewActor(name:String):void
+		{
+			var cbox:ComboBox = config.getCompById("actorSelector") as ComboBox;
+			if (cbox)
+			{
+				cbox.addItem(name);
+			}
+		}
+		
 		public function AddNewGraphicSet(name:String):void
 		{
 			var cbox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
-			if (cbox)
+			if (cbox && cbox.items.indexOf(name) == -1)
 			{
 				cbox.addItem(name);
 			}
@@ -448,19 +503,20 @@ package menu
 		
 		public function onSignal2(targetName:*, value:*):void
 		{
-			if (targetName == "timeText")
+			var command:String = targetName as String;
+			if (command == "timeText")
 			{
 				//var position:Number = roundToNearest(.01, value);
 				var position:Number = value;
 				var timeStr:String = position.toFixed(2) + " / " + animationDuration.toFixed(2);
-				(config.getCompById(targetName) as Label).text = timeStr;
+				(config.getCompById(command) as Label).text = timeStr;
 				
 				//Update the label that indicates the frame
 				var animationTotalKeyframes:Number = TimeUtil.toFrames(animationDuration, 30.0);
 				var frameStr:String = (((TimeUtil.toFrames(position, 30)+1.0)%animationTotalKeyframes).toFixed(1)) + " / " + int(animationTotalKeyframes);
 				(config.getCompById("frameText") as Label).text = frameStr;
 			}
-			else if (targetName == "updatedAnimation")
+			else if (command == "updatedAnimation")
 			{
 				var elementSelectBox:ComboBox = config.getCompById("elementSelector") as ComboBox;
 				if (elementSelectBox)
@@ -483,16 +539,16 @@ package menu
 					}
 				}
 			}
-			else if (targetName == "animationDuration")
+			else if (command == "animationDuration")
 			{
 				animationDuration = value;
 				(config.getCompById("frameSlider") as HUISlider).maximum = value*stage.frameRate;
 			}
-			else if (targetName == "SetShardDescription")
+			else if (command == "SetShardDescription")
 			{
 				SetSelectedShard(value as String/*value[0] as AnimateShard, value[1] as String*/);
 			}
-			else if (targetName == "elementSelector")
+			else if (command == "elementSelector")
 			{
 				var elementSelectBox:ComboBox = config.getCompById("elementSelector") as ComboBox;
 				
@@ -528,7 +584,7 @@ package menu
 				}
 				//currentTimelineSet = timelines;
 			}
-			else if (targetName == "SetupShardsList")
+			else if (command == "SetupShardsList")
 			{
 				var shardsData:Vector.<Array> = value as Vector.<Array>;
 				if (shardsData)
@@ -548,30 +604,104 @@ package menu
 					}
 				}
 			}
-			/*else if (targetName == "SetShardsFromList") //Add shards that were referred in an animation list
+			else if (command == "NewActorRegistered") //Add shards that were referred in an animation list
 			{
-				var shardsData:Vector.<Array> = value as Vector.<Array>;
-				if (shardsData)
+				var actorName:String = value as String;
+				if (actorName)
 				{
-					var animateList:List = config.getCompById("animList") as List;	
-					
-					if (animateList)
+					AddNewActor(actorName);
+				}
+			}
+			else if (command == "AssetListDelivery")
+			{
+				
+				//Got the asset list from the actor that was selected by the actorSelector combo box.
+				var assetGuiSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;	
+				
+				var assetList:Vector.<Object> = value as Vector.<Object>;
+				if (!assetGuiSlider || !assetList) { return; }
+				assetGuiSlider.removeAll();
+				var items:Array = [];
+				
+				for (var y:int = 0, z:int = assetList.length; y < z; y++) 
+				{
+					if (assetList[y] != null)
 					{
-						animateList.removeAll();
-						//value is vector of arrays hold the following in order: shard name, shard type, shard
-						//var shardsData:Vector.<Array> = value as Vector.<Array>;
-						for (var j:int = 0, k:int = shardsData.length; j < k; j++) 
+						var item:Object = { };
+						var spriteClass:Class = (assetList[y] as Object).AssetClass as Class;
+						if (!(spriteClass in assetPreviewSprites))
 						{
-							animateList.addItem({name: shardsData[j][0] as String, type: shardsData[j][1] as Boolean, shard: shardsData[j][2] as AnimateShard});
-							//animateList.addItem(list.ShardNameList[j]);
+							var previewSprite:Sprite = new spriteClass();
+							
+							//var spriteBounds:Rectangle = previewSprite.getBounds(previewSprite);
+							//spriteBounds.offset( -spriteBounds.left, -spriteBounds.top);
+							//previewSprite.bound
+							//previewSprite.transform.pixelBounds.offsetPoint(new Point(0, 0));
+							assetPreviewSprites[spriteClass] = previewSprite;
+							//Resize the preview sprite to fit in the preview display box.
+							var displayAreaDimension:Vector.<Number> = assetGuiSlider.GetDimensionsOfDisplayBox();
+							
+							if (previewSprite.width > previewSprite.height)
+							{
+								previewSprite.width = displayAreaDimension[0];
+								previewSprite.scaleY = previewSprite.scaleX;
+							}
+							else
+							{
+								previewSprite.height = displayAreaDimension[1];
+								previewSprite.scaleX = previewSprite.scaleY;
+							}
+							stage.addChild(previewSprite);
+							//Get the registration point of the sprite.
+							var regPoint:Point = UtilityFunctions.GetAnchorPoint(previewSprite);
+							//Get the bounds of the sprite
+							var spriteBounds:Rectangle = previewSprite.getBounds(previewSprite);
+							//Using the reg point and bounds, calculate the position of the registration point as a percentage of the sprite.
+							var regPointWidthPercent:Number = ((100 / spriteBounds.width) * regPoint.x) * .01;
+							var regPointHeightPercent:Number = ((100 / spriteBounds.height) * regPoint.y) * .01;
+							stage.removeChild(previewSprite);
+						//	WriteToDebugOutput(regPoint.x + ", " + regPoint.y);
+						//	previewSprite.transform.
+							if (regPointWidthPercent == 0.0)
+							{
+								previewSprite.x = (displayAreaDimension[0] - previewSprite.width)/2;
+								
+							}
+							else
+							{
+								previewSprite.x = displayAreaDimension[0] * regPointWidthPercent;// (spriteBounds.left + spriteBounds.right);
+								
+							}
+							if (regPointHeightPercent == 0.0)
+							{
+								previewSprite.y = (displayAreaDimension[1] - previewSprite.height)/2;
+							}
+							else
+							{
+								previewSprite.y = displayAreaDimension[1] * regPointHeightPercent;// (spriteBounds.top + spriteBounds.bottom);
+							}
+							//previewSprite.width = spriteSize[0]; previewSprite.height = spriteSize[1];
+							//previewSprite.x =  32 + .15;// (spriteBounds.width - spriteBounds.right ) / 2;//  * previewSprite.scaleX;// 64 - regPoint.x;// displayAreaDimension[0] - (spriteBounds.width - spriteBounds.right) ; 
+							//previewSprite.y = 32 + 1.35; //regPoint.y * previewSprite.scaleY;// (64 - previewSprite.height) / 2;// spriteBounds.bottom / 2;// (  - displayAreaDimension[1] + previewSprite.height) / 2;
+							
+							//the preview sprite isn't (or at least shouldn't be) subject to changes it can be cached as a bitmap for performance.
+							previewSprite.cacheAsBitmap = true;
+							previewSprite.mouseEnabled = previewSprite.mouseChildren = false;
 						}
+						item.displayImage = assetPreviewSprites[spriteClass];
+						item.displayName = (assetList[y] as Object).AssetSet as String;
+						item.layer = (assetList[y] as Object).AssetLayer as int;
+						//slider = item;
+						assetGuiSlider.addItem(item);
 					}
 				}
-			}*/
-			else if (targetName == "FileLoaded")
+				//assetGuiSlider.items = items;
+				
+			}
+			else if (command == "FileLoaded")
 			{
 				//value is an array, index 0 is the data from the file, index 1 is the name of the file
-				//signal2.dispatch(targetName, value);
+				//signal2.dispatch(command, value);
 				var bytes:ByteArray = value[0] as ByteArray;
 				//bytes.position = 0;
 				var list:AnimationList = bytes.readObject() as AnimationList;

@@ -1,6 +1,9 @@
 package   
 {
+	import flash.display.DisplayObject;
 	import flash.geom.ColorTransform;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	/**
 	 * Holds various static functions that can be useful for various parts of the program. Due to their static nature, the use of
 	 * these functions in performance critical code and used within functions called multiple times within a short period is discouraged.
@@ -55,6 +58,19 @@ package
 			//var output:String = "";
 			return JSON.stringify(obj);
 			//return output;
+		}
+		
+		public static function GetAnchorPoint(o:DisplayObject):Point
+		{
+			var onStage:Boolean;
+			var p:DisplayObject=o.parent;
+			onStage=(o.stage!=null);
+			if (!onStage) return null;
+			var res:Point=new Point();
+			var rect:Rectangle=o.getRect(o);
+			res.x=-1*rect.x;
+			res.y=-1*rect.y;
+			return res;
 		}
 		
 	}

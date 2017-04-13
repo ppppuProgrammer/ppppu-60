@@ -238,6 +238,7 @@ package com.bit101.utils
 		HRangeSlider;
 		HScrollBar;
 		HSlider;
+		HGUISlider;
 		HUISlider;
 		IndicatorLight;
 		InputText;

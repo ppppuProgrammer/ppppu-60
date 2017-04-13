@@ -34,6 +34,7 @@ package
 			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
 			
 			characterData.skinGradient_Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
+			
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;
 			//characterData.DiamondCenterColor = 0x000000;

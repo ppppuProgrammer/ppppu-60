@@ -93,7 +93,10 @@ package animations
 		public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
 		
 		private var disableActorsBasedOnGfxSetData:Vector.<DisableActorInfo> = new Vector.<DisableActorInfo>;
-		//private var 
+		//Holds assets that couldn't be added due to a missing actor. Array holds 2 values, the actor name and the asset data.
+		private var assetsInStorage:Vector.<Array> = new Vector.<Array>;
+		
+		private var director:Director;
 		
 		/* Creation and Initialization */
 		//{
@@ -116,10 +119,10 @@ package animations
 			AddNewActor("HairBackLayer");*/
 		}
 		
-		public function Initialize(shardLibrary:AnimateShardLibrary/*timelineLibrary:TimelineLibrary*/):void
+		public function Initialize(shardLibrary:AnimateShardLibrary, actorDirector:Director/*,timelineLibrary:TimelineLibrary*/):void
 		{
 			shardLib = shardLibrary;
-			
+			director = actorDirector;
 			for (var i:int = 0, l:int = this.numChildren; i < l; ++i)
 			{
 				var child:Sprite = this.getChildAt(i) as Sprite;
@@ -133,17 +136,32 @@ package animations
 		//}
 		/* End of Creation and Initialization */
 		
+		private function GetActorByName(actorName:String):Sprite
+		{
+			if (actorName in actorDict)
+			{
+				return actorDict[actorName];
+			}
+			else
+			{
+				if (AddNewActor(actorName) == true)
+				{
+					return actorDict[actorName];
+				}
+			}
+			return null;
+		}
+		
 		public function CreateTimelineFromData(timelineData:Object, displayObjContainingTarget:Sprite):SerialTween
 		{
 			var tweenData:Vector.<Object> = timelineData.tweenProperties;
 			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
 			//Hacky but for now elements have higher prio
 			//var target:Sprite = elementDict[timelineData.targetName] as Sprite;
-			var target:Sprite = actorDict[timelineData.targetName] as Sprite;
+			var target:Sprite = GetActorByName(timelineData.targetName);
 			if (target == null)
 			{
-				AddNewActor(timelineData.targetName);
-				target = actorDict[timelineData.targetName] as Sprite;
+				return null;
 			}
 			var timeline:SerialTween = null;
 			var currentTweenData:Object, previousTweenData:Object;
@@ -383,6 +401,7 @@ package animations
 			{
 				//Actor with same name was already added.
 				result = false;
+				
 			}
 			else
 			{
@@ -390,9 +409,47 @@ package animations
 				actor.name = actorName;
 				actor.mouseChildren = actor.mouseEnabled = false;
 				actorDict[actorName] = actor;
+				director.RegisterActor(actor);
 				result = true;
+				//See if there are any assets that tried to be added but couldn't since the actor didn't exist when they were loaded in.
+				if (assetsInStorage.length > 0)
+				{
+					for (var i:int = 0, l:int = assetsInStorage.length; i < l; i++) 
+					{
+						if (assetsInStorage[i] != null && (assetsInStorage[i][0] as String) == actorName)
+						{
+							actor.AddAsset(assetsInStorage[i][1] as AssetData);
+							assetsInStorage[i] = null;							
+						}
+					}
+				}
 			}
 			return result;
+		}
+		
+		public function AddAssetToActor(actorName:String, data:AssetData):void
+		{
+			var actor:Actor = actorDict[actorName];
+			
+			if (actor)
+			{
+				actor.AddAsset(data);
+			}
+			else
+			{
+				//Try to find an empty space in the vector
+				for (var i:int = 0, l:int = assetsInStorage.length; i < l; i++) 
+				{
+					if (assetsInStorage[i] == null)
+					{
+						assetsInStorage[i] = [actorName, data];
+						return;
+					}
+				}
+				
+				//If an empty space didn't exist, add to the end of the vector
+				assetsInStorage[assetsInStorage.length] = [actorName, data];
+			}
 		}
 		
 		public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
@@ -607,6 +664,11 @@ package animations
 		//{
 		public function CompileAnimation(shards:Vector.<AnimateShard>, animationName:String):void
 		{
+			if (currentAnimationName != animationName)
+			{
+				//Tell the director that the animation name has changed.
+				director.UpdateAnimationInUse(animationName);
+			}
 			currentAnimationName = animationName;
 			var timelines:Array = new Array;
 			var shardTimelines:Vector.<SerialTween>;
@@ -679,7 +741,10 @@ package animations
 			masterTimeline = compiledAnimation;	
 			//Reset the latest and next times for depth changes. -1 is used to indicate that the animation is being ran for the first time and should be checked.
 			latestDepthChangeTime = nextDepthChangeTime = -1;
-			GraphicSetDisableActorCheck();
+			//GraphicSetDisableActorCheck();
+			//For testing purposes.
+			director.ChangeAssetForAllActorsBySetName("Standard");
+			
 			masterTimeline.gotoAndPlay(0.0);
 		}
 		

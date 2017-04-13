@@ -117,10 +117,6 @@ package com.bit101.components
 //			draw();
 			if(this.hasEventListener(Event.ENTER_FRAME) == false)
 			{
-				if (name == "SamusP Icon Holder")
-				{
-				trace(this.name + " is to be redrawn.");
-				}
 				addEventListener(Event.ENTER_FRAME, onInvalidate);
 			}
 		}
@@ -159,22 +155,10 @@ package com.bit101.components
 		 */
 		public function setSize(w:Number, h:Number):void
 		{
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 			_width = w;
 			_height = h;
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 			dispatchEvent(new Event(Event.RESIZE));
 			invalidate();
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 		}
 		
 		/**
@@ -182,15 +166,8 @@ package com.bit101.components
 		 */
 		public function draw():void
 		{
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
+
 			dispatchEvent(new Event(Component.DRAW));
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 		}
 		
 		
@@ -205,16 +182,9 @@ package com.bit101.components
 		 */
 		protected function onInvalidate(event:Event):void
 		{
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
+
 			removeEventListener(Event.ENTER_FRAME, onInvalidate);
 			draw();
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 		}
 		
 		
@@ -229,15 +199,7 @@ package com.bit101.components
 		 */
 		override public function set width(w:Number):void
 		{
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 			_width = w;
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 			invalidate();
 			dispatchEvent(new Event(Event.RESIZE));
 		}
@@ -251,15 +213,8 @@ package com.bit101.components
 		 */
 		override public function set height(h:Number):void
 		{
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
+
 			_height = h;
-			if (name == "SamusP Icon Holder")
-			{
-				trace("SP Icon Holder: " + _width + "," + _height);
-			}
 			invalidate();
 			dispatchEvent(new Event(Event.RESIZE));
 		}
