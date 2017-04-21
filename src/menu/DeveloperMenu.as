@@ -3,7 +3,7 @@ package menu
 	import adobe.utils.CustomActions;
 	import com.greensock.motionPaths.RectanglePath2D;
 	import flash.geom.Point;
-	import flash.geom.Rectangle;
+	
 	//import animations.AnimateShard;
 	import animations.AnimationList;
 	import animations.Director;
@@ -126,32 +126,37 @@ package menu
 			{
 				SaveAnimationListToFile();
 			}
-			else if (e.target.name == "addGfxSetButton")
+			else if (e.target.name == "applyAssetToActorButton")
+			{
+				//var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
+				var assetSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
+				var actorCBox:ComboBox = config.getCompById("actorSelector") as ComboBox;
+				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
+				if (assetSlider && actorCBox)
+				{
+					//Asset slider needs to have an item to select.
+					if (assetSlider.selectedIndex > -1 && actorCBox.selectedIndex > -1)
+					{
+						signal2.dispatch("ApplyAssetToActor", [actorCBox.selectedItem ,assetSlider.selectedIndex]);
+					}
+				}
+				
+				//UpdateGraphicSetsUsed();
+			}
+			else if (e.target.name == "applySetToAllActorsButton" || e.target.name =="removeSetToAllActorsButton")
 			{
 				var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
-				var gfxSetList:List = config.getCompById("gfxSetList") as List;
-				if (gfxSetCBox && gfxSetList)
+				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
+				if (gfxSetCBox)
 				{
-					if (gfxSetCBox.selectedItem != null && gfxSetList.items.indexOf(gfxSetCBox.selectedItem) == -1)
+					if (gfxSetCBox.selectedIndex != -1)
 					{
-						gfxSetList.addItem(gfxSetCBox.selectedItem);
+						var applyingSet:Boolean = (e.target.name == "applySetToAllActorsButton") ? true : false;
+						signal2.dispatch("ApplySetToAllActors", [gfxSetCBox.selectedItem, applyingSet]);
 					}
 				}
 				
-				UpdateGraphicSetsUsed();
-			}
-			else if (e.target.name == "removeGfxSetButton")
-			{
-				var gfxSetList:List = config.getCompById("gfxSetList") as List;
-				if (gfxSetList)
-				{
-					if (gfxSetList.selectedIndex != -1)
-					{
-						gfxSetList.removeItemAt(gfxSetList.selectedIndex);
-					}
-				}
-				
-				UpdateGraphicSetsUsed();
+				//UpdateGraphicSetsUsed();
 			}
 			else if (e.target.name != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
@@ -260,7 +265,7 @@ package menu
 			else if (e.target.name == "shardSelector")
 			{
 				var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
-				if (cbox.selectedIndex == -1) { return; }
+				if (cbox.selectedIndex == -1 || cbox.selectedItem == null) { return; }
 				//currentSelectedShardItem = cbox.selectedItem as ShardItem;
 				currentSelectedShardName = cbox.selectedItem as String;
 				signal2.dispatch(e.target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase, currentSelectedShardName]);
@@ -306,6 +311,7 @@ package menu
 		{
 			var cbox:ComboBox = config.getCompById("shardSelector") as ComboBox;
 			cbox.removeAll();
+			if (shardNames == null) { return;}
 			for (var i:int = 0; i < shardNames.length; i++) 
 			{
 				cbox.addItem(shardNames[i]);
@@ -370,15 +376,16 @@ package menu
 			var cbox:ComboBox = config.getCompById("shardTypeSelector") as ComboBox;
 			cbox.addItem("Base");
 			cbox.addItem("Addition");
+			cbox.selectedIndex = 0;
 			
 			var animList:List = config.getCompById("animList") as List;
 			animList.listItemClass = ShardItem;
 			
 			var guiSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
-			guiSlider.listItemClass = GUISliderItem;
+			//guiSlider.listItemClass = GUISliderItem;
 			
 			var window:Window = config.getCompById("mainWindow") as Window;
-			window.title += " v" + Version.VERSION;//window.title + 
+			window.title += " v" + AppVersion.VERSION;//window.title + 
 			
 			signal1.dispatch("MenuFinishedInitializing");
 		}
@@ -639,47 +646,9 @@ package menu
 							//previewSprite.transform.pixelBounds.offsetPoint(new Point(0, 0));
 							assetPreviewSprites[spriteClass] = previewSprite;
 							//Resize the preview sprite to fit in the preview display box.
-							var displayAreaDimension:Vector.<Number> = assetGuiSlider.GetDimensionsOfDisplayBox();
+							//var displayAreaDimension:Vector.<Number> = assetGuiSlider.GetDimensionsOfDisplayBox();
 							
-							if (previewSprite.width > previewSprite.height)
-							{
-								previewSprite.width = displayAreaDimension[0];
-								previewSprite.scaleY = previewSprite.scaleX;
-							}
-							else
-							{
-								previewSprite.height = displayAreaDimension[1];
-								previewSprite.scaleX = previewSprite.scaleY;
-							}
-							stage.addChild(previewSprite);
-							//Get the registration point of the sprite.
-							var regPoint:Point = UtilityFunctions.GetAnchorPoint(previewSprite);
-							//Get the bounds of the sprite
-							var spriteBounds:Rectangle = previewSprite.getBounds(previewSprite);
-							//Using the reg point and bounds, calculate the position of the registration point as a percentage of the sprite.
-							var regPointWidthPercent:Number = ((100 / spriteBounds.width) * regPoint.x) * .01;
-							var regPointHeightPercent:Number = ((100 / spriteBounds.height) * regPoint.y) * .01;
-							stage.removeChild(previewSprite);
-						//	WriteToDebugOutput(regPoint.x + ", " + regPoint.y);
-						//	previewSprite.transform.
-							if (regPointWidthPercent == 0.0)
-							{
-								previewSprite.x = (displayAreaDimension[0] - previewSprite.width)/2;
-								
-							}
-							else
-							{
-								previewSprite.x = displayAreaDimension[0] * regPointWidthPercent;// (spriteBounds.left + spriteBounds.right);
-								
-							}
-							if (regPointHeightPercent == 0.0)
-							{
-								previewSprite.y = (displayAreaDimension[1] - previewSprite.height)/2;
-							}
-							else
-							{
-								previewSprite.y = displayAreaDimension[1] * regPointHeightPercent;// (spriteBounds.top + spriteBounds.bottom);
-							}
+				
 							//previewSprite.width = spriteSize[0]; previewSprite.height = spriteSize[1];
 							//previewSprite.x =  32 + .15;// (spriteBounds.width - spriteBounds.right ) / 2;//  * previewSprite.scaleX;// 64 - regPoint.x;// displayAreaDimension[0] - (spriteBounds.width - spriteBounds.right) ; 
 							//previewSprite.y = 32 + 1.35; //regPoint.y * previewSprite.scaleY;// (64 - previewSprite.height) / 2;// spriteBounds.bottom / 2;// (  - displayAreaDimension[1] + previewSprite.height) / 2;
@@ -695,6 +664,8 @@ package menu
 						assetGuiSlider.addItem(item);
 					}
 				}
+				//assetGuiSlider.value = (assetGuiSlider.items.length > 0) ? 0 : -1;
+				assetGuiSlider.selectedIndex = (assetGuiSlider.items.length > 0) ? 0 : -1;
 				//assetGuiSlider.items = items;
 				
 			}
@@ -746,10 +717,6 @@ package menu
 			//currentSelectedShardItem = shard;
 			//currentSelectedShardName = shardName;
 			(config.getCompById("shardInfoText") as TextArea).text = description;
-		}
-		
-		function roundToNearest(roundTo:Number, value:Number):Number{
-			return Math.round(value/roundTo)*roundTo;
 		}
 	}
 }

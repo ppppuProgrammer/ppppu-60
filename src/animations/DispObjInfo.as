@@ -16,7 +16,7 @@ package animations
 		private var targetDispObj:String = null;
 		//Flags that change the behavior of using the targetDispObj. 0 means nothing special (depth is absolute), 1 is relative (depth will be set relative to the targetDispObj's depth), 2 is masked (controlDispObj will be masked by the targetDispObj and will be 1 depth behind targetDispObj, depth will control the priority the controlDispObj will have when masked with other display objects.) 3 will have the control object added to the target object as a child.
 		private var targetFlag:int;
-		private var targetDepth:int;
+		//private var targetDepth:int;
 		
 		public static const FLAG_CHILD:int = 1;
 		public static const FLAG_MASKED:int = 2;
@@ -42,8 +42,8 @@ package animations
 		public function GetTargetObjName():String{ return targetDispObj;}
 		public function GetTargetFlag():int { return targetFlag; }
 		
-		public function GetTargetDepth():int { return targetDepth; }
-		public function SetTargetDepth(depth:int):void { targetDepth = depth; }
+		//public function GetTargetDepth():int { return targetDepth; }
+		//public function SetTargetDepth(depth:int):void { targetDepth = depth; }
 		
 	}
 

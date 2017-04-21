@@ -16,9 +16,9 @@ package animations
 		{
 			
 		}
-		public function AddNewFrameVector(time:Number, dispInfoVector:Vector.<DispObjInfo>/*, animationCanvas:Sprite*/):void
+		public function AddNewFrameVector(time:Number, dispInfoVector:Vector.<DispObjInfo>/*, overrideDataList:Vector.<Object>*/):void
 		{
-			frameVector[frameVector.length] = new LayoutFrameVector(time, dispInfoVector/*, animationCanvas*/);
+			frameVector[frameVector.length] = new LayoutFrameVector(time, dispInfoVector/*, overrideDataList*/);
 		}
 	}
 

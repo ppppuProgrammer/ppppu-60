@@ -8,7 +8,7 @@ package animations
 	import flash.utils.getQualifiedClassName;
 	
 	/**
-	 * Actors are Sprites that are added to the Canvas (aka TemplateBase). They are the actual sprites that take orders from DispObjInfo and tweens. Actors have 3 layers for placing graphics into. Think of these layers as costumes, they change the appearance of the actor. The layers are top, main, and bottom. Main is the primary layer that graphics are added to, top and bottom layers exist to add onto the main layer without actually modifying the graphics in the main layer, which could cause visual discrepancies later on.
+	 * Actors are Sprites that are added to the Canvas. They are the actual sprites that are affected by DispObjInfo (for ordering) and tweens (for animation). Actors have 3 layers for placing graphics into. Think of these layers as costumes, they change the appearance of the actor. The layers are top, main, and bottom. Main is the primary layer that graphics are added to, top and bottom layers exist to add onto the main layer without actually modifying the graphics in the main layer, which could cause visual discrepancies later on. Once a graphic is set to it, the main layer must always have a graphic.
 	 * @author 
 	 */
 	public class Actor extends Sprite implements Slot2, Slot3
@@ -25,8 +25,12 @@ package animations
 		public static const LAYER_BOTTOM:int = 0;		
 		public static const LAYER_TOP:int = 2;
 		
+		//The number of assets that have requested this actor to be disabled (invisible).
+		private var disableRequestCount:int = 0;
+		
 		//A list of assets that can be applied to this particular actor and the data for utilizing them.
 		private var assetList:Vector.<AssetData> = new Vector.<AssetData>;
+		//Signals used to communicate with the director.
 		private var signal2:Signal2 = new Signal2;
 		private var signal3:Signal3 = new Signal3;
 		public function Actor() 
@@ -43,16 +47,6 @@ package animations
 			addChild(topLayer);
 		}
 		
-		//Removes all graphics from the actor's layers and also removes the layers from the actor's display list.
-		public function ClearAllGraphics():void
-		{
-			//this.removeChildren();
-			//topLayer = mainLayer = bottomLayer = null; //null the references to the graphic set asset.
-			topLayer.removeChildren();
-			mainLayer.removeChildren();
-			bottomLayer.removeChildren();
-		}
-		
 		public function RegisterDirector(director:Director):void
 		{
 			signal2.addSlot(director);
@@ -62,11 +56,65 @@ package animations
 		public function SelectAssetToUse(assetId:int):void
 		{
 			var assetData:AssetData = assetList[assetId];
-			ChangeGraphicInLayer(assetData.layer, assetData.asset); 
+			var assetCurrentlyUsed:AssetData = GetCurrentlyUsedAssetForLayer(assetData.layer);
+			
+			if (assetCurrentlyUsed == assetData) //Both are the same and i's already in use, so see if the asset should be removed from its layer.
+			{
+				//Main layer is not allowed to be empty once an asset is set to it.
+				
+				//Check that the layer is not main. If this is true, unset the asset
+				if (assetData.layer != LAYER_MAIN)
+				{
+					RemoveAssetFromUse(assetData);
+				}
+			}
+			else //An unused asset was selected to be used
+			{
+				//Remove the currently used asset
+				RemoveAssetFromUse(assetCurrentlyUsed);
+				SetAssetForUse(assetData);
+			}
+			
+		}
+		
+		public function RemoveAssetFromUse(assetData:AssetData):void
+		{
+			if (assetData == null) { return; }
+			
 			switch(assetData.layer)
 			{
 				case LAYER_TOP:
-					topAssetInUse = assetData
+					if (topAssetInUse == null) { return;}
+					topAssetInUse = null;
+					break;
+				case LAYER_MAIN:
+					if (mainAssetInUse == null) { return;}
+					mainAssetInUse = null;
+					break;
+				case LAYER_BOTTOM:
+					if (bottomAssetInUse == null) { return;}
+					bottomAssetInUse = null;
+					break;
+			}
+			//Send a message to reduce the disable actor requests if this asset was capable of making such a request.
+			var enableActorData:Array = GetDisableActorDataFromAsset(assetData);
+			if (enableActorData)
+			{
+				//Send a request to enable an actor. This is the inverse of the "DisableActorsForAssetChangeRequest" request, particulary in the regard that both requests do not know what the current animation is and need the director to get that information.
+				signal2.dispatch("EnableActorRequest", enableActorData);
+			}
+			//Removes the graphic from the layer
+			ChangeGraphicInLayer(assetData.layer, null);
+		}
+		
+		public function SetAssetForUse(assetData:AssetData):void
+		{
+			if (assetData == null) { return; }
+			
+			switch(assetData.layer)
+			{
+				case LAYER_TOP:
+					topAssetInUse = assetData;
 					break;
 				case LAYER_MAIN:
 					mainAssetInUse = assetData;
@@ -74,6 +122,43 @@ package animations
 				case LAYER_BOTTOM:
 					bottomAssetInUse = assetData;
 					break;
+			}
+			
+			//Send a message to reduce the disable actor requests if this asset was capable of making such a request.
+			var disableActorData:Array = GetDisableActorDataFromAsset(assetData);
+			if (disableActorData)
+			{
+				//Send a request to disable an actor. This is the inverse of the "EnableActorRequest" request, particulary in the regard that both requests do not know what the current animation is and need the director to get that information.
+				signal2.dispatch("DisableActorsForAssetChangeRequest", disableActorData);
+			}
+			//Add the graphic to the layer
+			ChangeGraphicInLayer(assetData.layer, assetData.asset);
+		}
+		
+		[inline]
+		private function GetDisableActorDataFromAsset(assetData:AssetData):Array
+		{
+			if (assetData.properties != null && "DisableActor" in assetData.properties)
+			{return assetData.properties.DisableActor as Array; }
+			else
+			{return null;}
+		}
+		
+		[inline]
+		private function GetCurrentlyUsedAssetForLayer(layer:int):AssetData
+		{
+			switch(layer)
+			{
+				case LAYER_TOP:
+					return topAssetInUse;
+					break;
+				case LAYER_MAIN:
+					return mainAssetInUse;
+					break;
+				case LAYER_BOTTOM:
+					return bottomAssetInUse;
+				default:
+					return null;
 			}
 		}
 		
@@ -96,10 +181,13 @@ package animations
 			if (layerSprite)
 			{
 				layerSprite.removeChildren();
-				layerSprite.addChild(sprite);
-				if (layerSprite.parent == null)
+				if (sprite)
 				{
-					this.addChildAt(layerSprite, Math.min(layer, this.numChildren));
+					layerSprite.addChild(sprite);
+					if (layerSprite.parent == null)
+					{
+						this.addChildAt(layerSprite, Math.min(layer, this.numChildren));
+					}
 				}
 			}	
 		}
@@ -133,50 +221,59 @@ package animations
 			}
 		}
 		
-		//
-		/*public function onSignal0(): void
-		{
-		}*/
-		
 		public function onSignal2(command:*, value:*): void
 		{
 			var commandStr:String = command as String;
 			if (commandStr == "AnimationChanged")
 			{
 				var animationName:String = value as String;
-				DisableActorsCheck(topAssetInUse, animationName);
-				DisableActorsCheck(mainAssetInUse, animationName);
-				DisableActorsCheck(bottomAssetInUse, animationName);
+				//Since the new animation may not require an actor to be disabled, reset the count.
+				disableRequestCount = 0;
+				DisableActorsCheck_OnAnimationSwitch(topAssetInUse, animationName);
+				DisableActorsCheck_OnAnimationSwitch(mainAssetInUse, animationName);
+				DisableActorsCheck_OnAnimationSwitch(bottomAssetInUse, animationName);
 			}
 			else if (commandStr == "DisableActorsCommand")
 			{
 				var disableList:Vector.<String> = value as Vector.<String>;
+				
 				if (disableList.indexOf(this.name) > -1)
 				{
-					this.ChangeVisibility(false);
-				}
+					++disableRequestCount;					
+				}	
+				DisableRequestCountCheck();
 			}
-			else if (commandStr == "ChangeAssetForAllActors")
+			else if (commandStr == "EnableActorsCommand")
 			{
-				var setName:String = value as String;
-				for (var i:int = 0, l:int = assetList.length; i < l; i++) 
+				var enableList:Vector.<String> = value as Vector.<String>;
+				
+				if (enableList.indexOf(this.name) > -1)
 				{
-					if (assetList[i].setName == setName)
-					{
-						ChangeGraphicInLayer(assetList[i].layer, assetList[i].asset);
-						return;
-					}
-				}
+					--disableRequestCount;	
+
+				}	
+				DisableRequestCountCheck();
 			}
+			
 			else if (commandStr == "ActorAssetListRequest")
 			{
 				var actorName:String = value as String;
 				if (actorName == this.name)
 				{
 					var assetPayload:Vector.<Object> = new Vector.<Object>();
+					var showAssetInList:Boolean = true;
 					for (var j:int = 0, k:int = assetList.length; j < k; j++) 
 					{
-						assetPayload[assetPayload.length] = {AssetSet: assetList[j].setName, AssetClass: Object(assetList[j].asset).constructor, AssetLayer: assetList[j].layer };
+						if (assetList[j].properties && ("ShowInMenus" in assetList[j].properties))
+						{
+							//showAssetInList = assetList[j].properties.ShowInMenus as Boolean;
+						}
+						if (showAssetInList)
+						{
+							assetPayload[assetPayload.length] = { AssetSet: assetList[j].setName, AssetClass: Object(assetList[j].asset).constructor, AssetLayer: assetList[j].layer };
+						}
+						//reset the value so the next asset isn't affected if there the ShowInMenus property isn't found in the assetdata.
+						showAssetInList = true;
 					}
 					
 					signal2.dispatch("AssetListDelivery", assetPayload);
@@ -196,28 +293,70 @@ package animations
 					SelectAssetToUse(value2 as int);
 				}
 			}
+			else if (commandStr == "ChangeAssetForAllActors")
+			{
+				var setName:String = value as String;
+				var applySet:Boolean = value2 as Boolean;
+				var asset:AssetData;
+				for (var i:int = 0, l:int = assetList.length; i < l; i++) 
+				{
+					asset = assetList[i];
+					if (asset.setName == setName)
+					{
+						//Actor is to use the set
+						if (applySet)
+						{
+							RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(asset.layer));
+							SetAssetForUse(asset);
+						}
+						else
+						{
+							//Actor is to remove the set. 
+							//Main layer assets can not be removed unless there is another asset ready to take its place.
+							if (asset.layer != LAYER_MAIN)
+							{
+								RemoveAssetFromUse(asset);
+							}
+							
+						}
+					}
+				}
+			}
 			
 		}
-		//Parameters:
-		//assetData - contains the data for the asset that is currently being used for the actor.
-		//animationName - The name of the current animation being played
-		private function DisableActorsCheck(assetData:AssetData, animationName:String):void
+		//Called when an asset for an actor was changed and sends a requests for other actors to be disabled. Since actors do not know what the current animation is, the director will need to do some additional checks to see if the actors should be disabled.
+		/*private function DisableActorsCheck_OnAssetSwitch(assetData:AssetData)
 		{
 			if (assetData == null) { return; }
 			
-			var disableActorData:Array = (assetData.properties != null && "DisableActor" in assetData.properties) ? assetData.properties.DisableActor : null;
+			var disableActorData:Array = GetDisableActorDataFromAsset(assetData);
 			if (disableActorData)
 			{
-				//disableActorData is a 2n array (2 values are used every for iteration), which the values used being for actor name, animations for, and unused.
+				signal2.dispatch("DisableActorsForAssetChangeRequest", disableActorData);
+			}
+		}*/
+		
+		//Called when the animation was changed and sends a requests for other actors to be disabled
+		//Parameters:
+		//assetData - contains the data for the asset that is currently being used for the actor.
+		//animationName - The name of the current animation being played
+		private function DisableActorsCheck_OnAnimationSwitch(assetData:AssetData, animationName:String):void
+		{
+			if (assetData == null) { return; }
+			
+			var disableActorData:Array = GetDisableActorDataFromAsset(assetData);
+			if (disableActorData)
+			{
+				//disableActorData is a 2n array (2 values are used every for iteration), which the values used being for actor name and animations in that order
 				var disableActorsList:Vector.<String> = new Vector.<String>;
 				//The animation that an actor will be disabled for
 				var animationFor:String;
-				for (var i:int = 0, l:int = disableActorData.length / 2 ; i < l; ++i) 
+				for (var i:int = 0, l:int = disableActorData.length ; i < l; i+=2) 
 				{
-					animationFor = disableActorData[1] as String;
+					animationFor = disableActorData[i+1] as String;
 					if (animationFor == "_ALL" || animationName)
 					{
-						disableActorsList[disableActorsList.length] == disableActorData[0] as String;
+						disableActorsList[disableActorsList.length] = disableActorData[i] as String;
 					}
 				}
 				if (disableActorsList.length > 0)
@@ -225,6 +364,15 @@ package animations
 					signal2.dispatch("DisableActorsRequest", disableActorsList);
 				}
 			}
+		}
+		
+		[inline]
+		private function DisableRequestCountCheck():void
+		{
+			if (disableRequestCount > 0)
+			{this.ChangeVisibility(false);}
+			else
+			{this.ChangeVisibility(true);}
 		}
 		
 	}

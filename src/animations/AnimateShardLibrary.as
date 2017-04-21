@@ -63,6 +63,7 @@ package animations
 		{
 			var targetCollection:Vector.<Dictionary> = getBaseShards ? baseShardsCollection : additionalShardsCollection;
 			var shardNameList:Vector.<String> = new Vector.<String>();
+			if (!(animationId in targetCollection)) { return null;}
 			var dict:Dictionary = targetCollection[animationId];
 			var shardName:String;
 			for (shardName in dict) 

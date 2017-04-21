@@ -35,7 +35,7 @@ currentDirectory = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
 srcPath = currentDirectory.joinpath("src")
 #print(srcPath)
 if srcPath.is_dir():
-    versionFilePath = srcPath.joinpath("Version.as")
+    versionFilePath = srcPath.joinpath("AppVersion.as")
     #print(versionFilePath)
     if versionFilePath.exists() == True:
         with versionFilePath.open('r') as file:

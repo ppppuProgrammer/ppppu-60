@@ -1,9 +1,11 @@
 package   
 {
+	import animations.DispObjInfo;
 	import flash.display.DisplayObject;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.ByteArray;
 	/**
 	 * Holds various static functions that can be useful for various parts of the program. Due to their static nature, the use of
 	 * these functions in performance critical code and used within functions called multiple times within a short period is discouraged.
@@ -73,6 +75,29 @@ package
 			return res;
 		}
 		
+		public static function roundToNearest(roundTo:Number, value:Number):Number
+		{
+			return Math.round(value/roundTo)*roundTo;
+		}
+		
+		public static function TraceDispObjInfoVector(vector:Vector.<DispObjInfo>):void
+		{
+			var output:String = "";
+			for (var i:int = 0, l:int = vector.length; i < l; i++) 
+			{
+				output += vector[i].GetControlObjectName() + " targets " + vector[i].GetTargetObjName() + " (flag: " + vector[i].GetTargetFlag() + ")\n";
+			}
+			trace(output);
+		}
+		
+		public static function CloneObject(obj:Object):Object
+		{
+			var byteArray:ByteArray = new ByteArray();
+			byteArray.writeObject(obj);
+			byteArray.position = 0;
+			var clone:Object = byteArray.readObject();
+			return clone;
+		}
 	}
 
 }

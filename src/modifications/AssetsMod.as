@@ -3,11 +3,12 @@ package modifications
 	import flash.display.Sprite;
 	import mx.utils.StringUtil;
 	/**
-	 * Mod that allows new graphics to be added.
+	 * Mod that allows new graphics to be added for Actors.
 	 * @author 
 	 */
 	public class AssetsMod extends Mod implements IModdable 
 	{
+		
 		public var asset:Sprite;
 		//The actor that the asset is for.
 		public var targetActorName:String;
@@ -19,7 +20,7 @@ package modifications
 		public function AssetsMod(graphic:Sprite, actorName:String, gfxSetName:String, actorLayer:int, properties:Object=null) 
 		{
 			super();
-			modType = MOD_ASSETS;
+			modType = MOD_ASSET;
 			asset = graphic;
 			setName = gfxSetName;
 			targetActorName = actorName;

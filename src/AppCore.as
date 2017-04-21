@@ -26,6 +26,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.AnimationLayout;
 	import animations.AnimationList;
 	import animations.Director;
+	import animations.ExchangeableBackground;
 	import animations.TimelineLibrary;
 	import com.greensock.loading.BinaryDataLoader;
 	import com.jacksondunstan.signals.*;
@@ -35,7 +36,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import modifications.AnimationMod;
 	import animations.background.*;
 	import modifications.AssetsMod;
-	import modifications.GraphicSetMod;
+	import modifications.BackgroundAssetMod;
 	import modifications.TemplateAnimationMod;
 	import modifications.TemplateCharacterMod;
 	import mx.utils.StringUtil;
@@ -278,6 +279,30 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//charVoiceSystem = new SoundEffectSystem();
 			
 			//Set timelines up for background elements.
+			var bg:Array = [];
+			bg.push(canvas.CreateTimelineForSprite(new BacklightTimelineData().GetTimelineData(), mainStage));
+			bg.push(canvas.CreateTimelineForSprite(new InnerDiamondTimelineData().GetTimelineData(), mainStage));
+			bg.push(canvas.CreateTimelineForSprite(new OuterDiamondTimelineData().GetTimelineData(), mainStage));
+			bg.push(canvas.CreateTimelineForSprite(new TransitionDiamondTimelineData().GetTimelineData(), mainStage));
+			backgroundMasterTimeline = BetweenAS3.parallelTweens(bg) as ParallelTween;
+			backgroundMasterTimeline.stopOnComplete = false;
+			
+			var planetBGMod:BackgroundAssetMod = new BackgroundAssetMod(new PlanetBackground, "Standard", "Background", null);
+			var outerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new OuterDiamondBG, "Standard", "OuterDiamond", null);
+			
+			var innerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new InnerDiamondBG, "Standard", "InnerDiamond", null);
+			var transitionBGMod:BackgroundAssetMod = new BackgroundAssetMod(new TransitionDiamondBG, "Standard", "TransitionDiamond", null);
+			var lightBGMod:BackgroundAssetMod = new BackgroundAssetMod(new Light, "Standard", "Backlight", null);
+			ProcessMod(planetBGMod);
+			ProcessMod(outerBGMod);
+			ProcessMod(innerBGMod);
+			ProcessMod(transitionBGMod);
+			ProcessMod(lightBGMod);
+			mainStage.InnerDiamond.SelectBackgroundAsset(0);
+			mainStage.OuterDiamond.SelectBackgroundAsset(0);
+			mainStage.TransitionDiamond.SelectBackgroundAsset(0);
+			mainStage.Background.SelectBackgroundAsset(0);
+			mainStage.Backlight.SelectBackgroundAsset(0);
 			/*var backlightTLDef:TimelineDefinition = new BacklightTimelineData();
 			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(backlightTLDef.GetTimelineData(), mainStage);
 			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
@@ -317,39 +342,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			
 			modsLoadedAtStartUp = startupMods;
-			
-
-			//startupMods = null;
-			
-			/*startupLoader.append(new SWFLoader("ARCH_BaseAssets.swf"));
-			startupLoader.append(new SWFLoader("GFXSET_Standard.swf"));
-			startupLoader.append(new SWFLoader("GFXSET_RosaAlt.swf"));
-			startupLoader.append(new SWFLoader("TCHAR_Peach.swf"));
-			startupLoader.append(new SWFLoader("TCHAR_Rosalina.swf"));
-			CONFIG::debug
-			{
-				startupLoader.append(new SWFLoader("TCHAR_Shantae.swf"));
-			}
-			startupLoader.append(new SWFLoader("ARCH_CowgirlAnimation_Shards.swf"));
-			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Peach_Shards.swf"));
-			startupLoader.append(new SWFLoader("ARCH_Cowgirl_Rosalina_Shards.swf"));
-			
-			startupLoader.append(new SWFLoader("ARCH_BlowjobAnimation_Shards.swf"));
-			startupLoader.append(new SWFLoader("ARCH_Blowjob_Peach_Shards.swf"));
-			startupLoader.append(new SWFLoader("ARCH_Blowjob_Rosalina_Shards.swf"));*/
-			
-			//startupLoader.append(new SWFLoader("CowgirlAnimation.swf"));
-			//startupLoader.append(new SWFLoader("CowgirlAnimation_Peach.swf"));
-			
-			//startupLoader.append(new SWFLoader("PistonAnimation.swf"));
-			//startupLoader.append(new SWFLoader("LeanTowardsAnimation.swf"));
-			//startupLoader.append(new SWFLoader("RosaCowgirlAnimation.swf"));
-			//startupLoader.append(new SWFLoader("RosaPistonAnimation.swf"));
-			//startupLoader.append(new SWFLoader("RosaLeanTowardsAnimation.swf"));
-			//startupLoader.append(new SWFLoader("bbskywayMusic.swf"));
-			
-			//LoaderMax.parse(["./bbskywayMusic.swf", "RosaLeanTowardsAnimation.swf"], { name:"parsedLoader"} );
-			//startupLoader.load();
 		}
 		
 		private function ProcessStartupMods():void
@@ -414,6 +406,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				firstTimeInLoop = false;
 				//previousUpdateTime = backgroundMasterTimeline.position;// .totalTime();//(getTimer() / 1000.0);
 				ppppuRunTimeCounter = 0;
+				
 				//musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
 
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
@@ -568,6 +561,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					colorizer.ChangeColorsUsingCharacterData(charData.Color);
 				}
+				if ("GraphicSets" in charData)
+				{
+					canvas.ChangeGraphicSets(charData.GraphicSets);
+				}
+				//canvas.ApplyShardOverrides();
 				/*charVoiceSystem.ChangeCharacterVoiceSet(currentCharacter.GetVoiceSet());
 				charVoiceSystem.ChangeCharacterVoiceChance(currentCharacter.GetVoicePlayChance());
 				charVoiceSystem.ChangeCharacterVoiceCooldown(currentCharacter.GetVoiceCooldown());
@@ -659,10 +657,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			var modType:int = mod.GetModType();
 			
-			if (modType == Mod.MOD_TEMPLATEANIMATION)
-			{
-			}
-			else if (modType == Mod.MOD_TEMPLATECHARACTER)
+			if (modType == Mod.MOD_TEMPLATECHARACTER)
 			{
 				var tcharacter:TemplateCharacterMod = mod as TemplateCharacterMod;
 				if (tcharacter)
@@ -699,12 +694,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var data:Vector.<Object> = shardMod.GetTimelineConstructionData();
 					for (var i:int = 0, l:int = data.length; i < l; ++i)
 					{
-						timelines[timelines.length] = canvas.CreateTimelineFromData(data[i], canvas);
+						timelines[timelines.length] = canvas.CreateTimelineForActor(data[i]);
 						if (timelines[timelines.length-1] == null)
 						{
 							CONFIG::debug
 							{
-								devMenuSignaller1.dispatch("Animation " + animationName + ": Could not create timeline for element " + data[i].targetName);
+							devMenuSignaller1.dispatch("Animation " + animationName + ": Could not create timeline for element " + data[i].targetName);
 							}
 						}
 					}
@@ -739,7 +734,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					//musicPlayer.AddMusic(music.GetMusicData(), music.GetName(), music.GetStartLoopTime(), music.GetEndLoopTime(), music.GetStartTime());
 				}
 			}
-			else if (modType == Mod.MOD_ASSETS)
+			else if (modType == Mod.MOD_ASSET)
 			{
 				var assetMod:AssetsMod = mod as AssetsMod;
 				if (assetMod)
@@ -781,6 +776,37 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						}
 					}*/
 				}
+				
+				else
+				{
+					trace("Failed to add asset: " + assetMod.setName + ", " + assetMod.asset);
+				}
+			}
+			else if (modType == Mod.MOD_BACKGROUNDASSET)
+			{
+				var bgAsset:BackgroundAssetMod = mod as BackgroundAssetMod;
+				if (bgAsset)
+				{
+					if (bgAsset.asset && bgAsset.assetName && bgAsset.assetName.length > 0)
+					{
+						bgAsset.name = bgAsset.assetName;
+						var targetExBg:ExchangeableBackground = mainStage.getChildByName(bgAsset.targetSpriteName) as ExchangeableBackground;
+						if (targetExBg)
+						{
+							if (targetExBg.AddNewBackgroundAsset(bgAsset.asset))
+							{
+								if (bgAsset.properties && "Colorable" in bgAsset.properties)
+								{
+									colorizer.AddColorizeData(bgAsset.asset, bgAsset.properties.Colorable);
+								}
+							}
+						}
+					}
+				}
+			}
+			else if (modType == Mod.MOD_SOUNDASSET)
+			{
+				
 			}
 			/*else if (modType == Mod.MOD_GRAPHICSET)
 			{
@@ -879,10 +905,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			if (target == "animPlayButton")
 			{
 				canvas.ResumePlayingAnimation();
+				backgroundMasterTimeline.gotoAndPlay(canvas.GetTimeInCurrentAnimation());
 			}
 			else if (target == "animPauseButton")
 			{
 				canvas.StopAnimation();
+				backgroundMasterTimeline.stop();
 			}
 			else if (target.search(RegExp(/[+-]\d*.F/)) > -1)
 			{
@@ -893,6 +921,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				position = roundToNearest(1.0 / stage.frameRate, position);
 				position +=  (sign * frameAmount)*(1.0 / stage.frameRate);
 				canvas.JumpToPosition(position);
+				backgroundMasterTimeline.gotoAndStop(position);
 				devMenuSignaller2.dispatch("timeText",canvas.GetTimeInCurrentAnimation());
 			}
 			else if (target == "MenuFinishedInitializing")
@@ -920,13 +949,15 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else */if (targetName == "setFrameButton")
 			{
-				
-				canvas.JumpToPosition((value as int) * (1.0 / stage.frameRate));
+				var position:Number = (value as int) * (1.0 / stage.frameRate);
+				canvas.JumpToPosition(position);
+				backgroundMasterTimeline.gotoAndStop(position);
 				//masterTemplate.ResumePlayingAnimation();
 			}
 			else if (targetName == "setAnimationTime")
 			{
 				canvas.JumpToPosition(value as Number);
+				backgroundMasterTimeline.gotoAndStop(value as Number);
 			}
 			else if (targetName == "characterSelector")
 			{
@@ -958,6 +989,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var animationId:int = animationNameIndexes.indexOf(animList.TargetAnimationName);
 					var shardsForAnimation:Vector.<AnimateShard> = shardLib.GetListOfShards(animationId, animList.ShardNameList, animList.ShardTypeList);
 					canvas.CompileAnimation(shardsForAnimation, animList.TargetAnimationName);
+					backgroundMasterTimeline.gotoAndStop(canvas.GetTimeInCurrentAnimation());
 					var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
 					CONFIG::debug
 					{
@@ -965,7 +997,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					}
 				}
 			}
-			else if (targetName == "UpdateGraphicSetsUsed")
+			/*else if (targetName == "UpdateGraphicSetsUsed")
 			{
 				var gfxSetNames:Vector.<String> = value as Vector.<String>;
 				var setsToUse:Vector.<GraphicSet> = new Vector.<GraphicSet>();
@@ -977,7 +1009,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					}
 				}
 				canvas.ChangeGraphicSetsUsed(setsToUse);
-			}
+			}*/
 			else if (targetName == "ProcessAnimationList")
 			{
 				//Used when an animation list is loaded from file to populate the list of set shards in the developer/edit menu.

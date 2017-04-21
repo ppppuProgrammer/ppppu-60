@@ -10,11 +10,18 @@ package animations
 		//The timelines (a series of tweens that are to move a specified display object) for the shard.
 		private var timelines:Vector.<SerialTween>;
 		private var displayObjectData:Vector.<DispObjInfo>;
-		public function AnimateShard(timelineTweens:Vector.<SerialTween>, dispObjInfoVector:Vector.<DispObjInfo>) 
+		//private var overrideData:Object;
+		public function AnimateShard(timelineTweens:Vector.<SerialTween>, dispObjInfoVector:Vector.<DispObjInfo>/*,data:Object=null*/) 
 		{
 			timelines = timelineTweens;
 			displayObjectData = dispObjInfoVector;
+			//overrideData = data;
 		}
+		
+		/*public function GetOverrideData():Object
+		{
+			return overrideData;
+		}*/
 		
 		public function GetTimelines():Vector.<SerialTween>
 		{

@@ -54,6 +54,8 @@ package
 			
 			modsList[modsList.length] = new AssetsMod(new Arm, "ArmL", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Arm, "ArmR", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Arm2, "Arm2L", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Arm2, "Arm2R", "Standard", 1, { Colorable: skinColorProperties } );						
 			modsList[modsList.length] = new AssetsMod(new Arm3, "Arm3L", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Arm3, "Arm3R", "Standard", 1, { Colorable: skinColorProperties } );
 			
@@ -72,6 +74,7 @@ package
 			modsList[modsList.length] = new AssetsMod(new FaceAngled2, "FaceAngled2", "Standard", 1, { Colorable: faceWithHairColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new FaceAngled3, "FaceAngled3", "Standard", 1, { Colorable: faceWithHairColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Nose, "Nose", "Standard", 1);
+			modsList[modsList.length] = new AssetsMod(new NoseAngled, "NoseAngled", "Standard", 1);
 			
 			var earColorProperties:Object = { Group: "Ear", Target: "Color" };
 			modsList[modsList.length] = new AssetsMod(new Ear, "EarL", "Standard", 1, { Colorable: earColorProperties } );
@@ -85,31 +88,33 @@ package
 			modsList[modsList.length] = new AssetsMod(new Grin, "Grin", "Standard", 1);
 			
 			/* Hair */
-			modsList[modsList.length] = new AssetsMod(new PchHair1, "PchHair1R", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHair1, "PchHair1L", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHair2, "PchHair2L", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHair2, "PchHair2R", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHair3, "PchHair3L", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHair3, "PchHair3R", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHairFront, "PchHairFront", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHairFrontAngled2, "PchHairFrontAngled2", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchHairBack, "PchHairBack", "Hair_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchEarring, "PchEarringL", "Earring_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchEarring, "PchEarringR", "Earring_Peach", 1);
-			modsList[modsList.length] = new AssetsMod(new PchCrown, "PchCrown", "Headwear_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHair1, "Hair1R", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHair1, "Hair1L", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHair2, "Hair2L", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHair2, "Hair2R", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHair3, "Hair3L", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHair3, "Hair3R", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHairFront, "HairFront", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHairFrontAngled, "HairFrontAngled", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHairFrontAngled2, "HairFrontAngled2", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchHairBack, "HairBack", "Hair_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchEarring, "EarringL", "Earring_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchEarring, "EarringR", "Earring_Peach", 1);
+			modsList[modsList.length] = new AssetsMod(new PchCrown, "Headwear", "Headwear_Peach", 1);
 			
-			modsList[modsList.length] = new AssetsMod(new RosaHair1, "RosaHair1R", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHair1, "RosaHair1L", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHair2, "RosaHair2L", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHair2, "RosaHair2R", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHair3, "RosaHair3L", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHair3, "RosaHair3R", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHairFront, "RosaHairFront", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHairBack, "RosaHairBack", "Hair_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaEarring, "RosaEarringL", "Earrring_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaEarring, "RosaEarringR", "Earrring_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaCrown, "RosaCrown", "Headwear_Rosalina", 1);
-			modsList[modsList.length] = new AssetsMod(new RosaHairFrontAngled, "RosaHairFrontAngled", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHair1, "Hair1R", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHair1, "Hair1L", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHair2, "Hair2L", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHair2, "Hair2R", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHair3, "Hair3L", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHair3, "Hair3R", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHairFront, "HairFront", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHairBack, "HairBack", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaEarring, "EarringL", "Earrring_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaEarring, "EarringR", "Earrring_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaCrown, "Headwear", "Headwear_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHairFrontAngled, "HairFrontAngled", "Hair_Rosalina", 1);
+			modsList[modsList.length] = new AssetsMod(new RosaHairFrontAngled, "HairFrontAngled2", "Hair_Rosalina", 1);
 			//Not sure if highlights should be in base assets or in the standard graphic set
 			//modsList[modsList.length] = new AssetsMod(new PenisHighlight, "PenisHighlight");
 			
@@ -124,11 +129,15 @@ package
 			/* Torso related*/
 			modsList[modsList.length] = new AssetsMod(new Hips, "Hips", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Hips2, "Hips2", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new BackHipsAngled, "BackHipsAngled", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Chest, "Chest", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new UpperBackAngled, "UpperBackAngled", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new LowerBackAngled, "LowerBackAngled", "Standard", 1, { Colorable: skinColorProperties } );
 			
 			modsList[modsList.length] = new AssetsMod(new Boob, "BoobL", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Boob, "BoobR", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
-			
+			modsList[modsList.length] = new AssetsMod(new SideBoob, "SideBoobL", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new SideBoob, "SideBoobR", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			var breastGradientColorProperties:Object  = { Group: ["Breast", "SkinHighlight"], Target: ["Color", "Highlight"] };
 			modsList[modsList.length] = new AssetsMod(new Boob2, "Boob2L", "Standard", 1, { Colorable: breastGradientColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Boob2, "Boob2R", "Standard", 1, { Colorable: breastGradientColorProperties } );
@@ -142,8 +151,8 @@ package
 			modsList[modsList.length] = new AssetsMod(new Areola, "AreolaR", "Standard", 1, { Colorable: areolaColorProperties } );
 			
 			var charSkinHighlightColorProperties:Object = { Group: "SkinHighlight", Target: "Highlight" };
-			modsList[modsList.length] = new AssetsMod(new BoobHighlight, "BoobHighlightL", "Standard", 1, { Colorable: charSkinHighlightColorProperties } );
-			modsList[modsList.length] = new AssetsMod(new BoobHighlight, "BoobHighlightR", "Standard", 1, { Colorable: charSkinHighlightColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new BoobHighlight, "BoobHighlightL", "Standard", 1, { Colorable: charSkinHighlightColorProperties, ShowInMenus: false } );
+			modsList[modsList.length] = new AssetsMod(new BoobHighlight, "BoobHighlightR", "Standard", 1, { Colorable: charSkinHighlightColorProperties, ShowInMenus: false } );
 			
 			modsList[modsList.length] = new AssetsMod(new Navel, "Navel", "Standard", 1, { Colorable: skinColorProperties } );
 			
@@ -156,12 +165,20 @@ package
 			modsList[modsList.length] = new AssetsMod(new UpperLeg, "UpperLegL", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new UpperLeg, "UpperLegR", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			
+			modsList[modsList.length] = new AssetsMod(new Buttcheek, "ButtcheekL", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Buttcheek, "ButtcheekR", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new ButtcheekShadow, "ButtcheekShadowL1", "Standard", 1);
+			modsList[modsList.length] = new AssetsMod(new ButtcheekShadow, "ButtcheekShadowL2", "Standard", 1);
+			modsList[modsList.length] = new AssetsMod(new ButtcheekShadow, "ButtcheekShadowR1", "Standard", 1);
+			modsList[modsList.length] = new AssetsMod(new ButtcheekShadow, "ButtcheekShadowR2", "Standard", 1);
 			modsList[modsList.length] = new AssetsMod(new FrontButt, "FrontButtL", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new FrontButt, "FrontButtR", "Standard", 1, { Colorable: skinColorProperties } );
 			
 			modsList[modsList.length] = new AssetsMod(new Groin, "Groin", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Groin2, "Groin2", "Standard", 1, { Colorable: skinColorProperties } );
 			var vulvaColorProperties:Object = { Group: ["Vulva", "SkinHighlight", "SkinHighlight"], Target: ["Color", "Highlight", "Highlight2"] };
 			modsList[modsList.length] = new AssetsMod(new Vulva, "Vulva", "Standard", 1, { Colorable: vulvaColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new BackVulva, "BackVulva", "Standard", 1, { Colorable: { Group: "Vulva", Target: "Color" } } );
 			
 			/* Male */
 			modsList[modsList.length] = new AssetsMod(new MalePenisHead, "MalePenisHead", "Standard", Actor.LAYER_MAIN, null);
@@ -174,7 +191,7 @@ package
 			modsList[modsList.length] = new AssetsMod(new ShaftMask, "ShaftMask", "Standard", Actor.LAYER_MAIN, null);
 			modsList[modsList.length] = new AssetsMod(new ShaftMask2, "ShaftMask2", "Standard", Actor.LAYER_MAIN, null);
 			//Not sure if highlights should be in base assets or in the standard graphic set
-			//modsList[modsList.length] = [new PenisHighlight, "PenisHighlight", Actor.LAYER_MAIN, null];
+			modsList[modsList.length] =  new AssetsMod(new PenisHighlight, "PenisHighlight", "Standard", Actor.LAYER_MAIN, {ShowInMenus: false});
 			//modsList[modsList.length] = [new , "", Actor.LAYER_MAIN, null];
 			
 			

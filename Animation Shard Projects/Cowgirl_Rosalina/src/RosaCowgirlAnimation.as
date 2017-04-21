@@ -21,6 +21,9 @@ package
 			modsList.push(CreateShardModForEarringL());
 			modsList.push(CreateShardModForEarringR());
 			modsList.push(CreateShardModForBodyChanges());
+			modsList.push(CreateShardModForEyeL());
+			modsList.push(CreateShardModForEyeR());
+			modsList.push(CreateShardModForMouth());
 			/*timelinesData = new Vector.<Object>();
 			this.addEventListener(Event.ADDED_TO_STAGE, FirstFrame);
 			this.characterName = "Rosalina";
@@ -34,40 +37,30 @@ package
 		private function GetTimelineDataForHair():Vector.<Object>
 		{
 			var vector:Vector.<Object> = new Vector.<Object>();
-			vector.push(new RosaHair1LTimelineData().GetTimelineData());
-			vector.push(new RosaHair1RTimelineData().GetTimelineData());
-			vector.push(new RosaHair2LTimelineData().GetTimelineData());
-			vector.push(new RosaHair2RTimelineData().GetTimelineData());
-			vector.push(new RosaHair3LTimelineData().GetTimelineData());
-			vector.push(new RosaHair3RTimelineData().GetTimelineData());
-			vector.push(new RosaHairBackTimelineData().GetTimelineData());
-			vector.push(new RosHairFrontTimelineData().GetTimelineData());
+			vector.push(new Hair1LTimelineData().GetTimelineData());
+			vector.push(new Hair1RTimelineData().GetTimelineData());
+			vector.push(new Hair2LTimelineData().GetTimelineData());
+			vector.push(new Hair2RTimelineData().GetTimelineData());
+			vector.push(new Hair3LTimelineData().GetTimelineData());
+			vector.push(new Hair3RTimelineData().GetTimelineData());
+			vector.push(new HairBackTimelineData().GetTimelineData());
+			vector.push(new HairFrontTimelineData().GetTimelineData());
 			return vector;
 		}
 		
 		private function CreateDisplayInfoForHair():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHairFront", 500, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair2L", 400, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair2R", 300, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair1L", 200, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair1R", 100, 0.0, "HairFrontLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("HairBack", 200, 0, "BackLayer", DispObjInfo.FLAG_CHILD);
 			
-			
-			
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair3L", 300, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHair3R", 200, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
-			
-			
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaHairBack", 100, 0.0, "HairBackLayer", DispObjInfo.FLAG_CHILD);
-			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 0, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 1, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 1, 0.0, "MaleGroin", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 1, 0.0, "Vulva", 1);*/
+			dispInfo[dispInfo.length] = new DispObjInfo("Hair3R", 400, 0, "BehindEarLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair3L", 600, 0, "BehindEarLayer", DispObjInfo.FLAG_CHILD);
+
+			dispInfo[dispInfo.length] = new DispObjInfo("Hair1R", 200, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair1L", 400, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair2R", 600, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair2L", 800, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("HairFront", 1000, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
 			return dispInfo;
 		}
 		
@@ -85,21 +78,14 @@ package
 		private function GetTimelineDataForCrown():Vector.<Object>
 		{
 			var vector:Vector.<Object> = new Vector.<Object>();
-			vector.push(new RosaCrownTimelineData().GetTimelineData());
+			vector.push(new HeadwearTimelineData().GetTimelineData());
 			return vector;
 		}
 		
 		private function CreateDisplayInfoForCrown():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaCrown", 100, 0.0, "HairBehindHeadwearLayer", DispObjInfo.FLAG_CHILD);
-			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 0, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 1, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 1, 0.0, "MaleGroin", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 1, 0.0, "Vulva", 1);*/
+			dispInfo[dispInfo.length] = new DispObjInfo("Headwear", 100, 0, "BehindEarLayer", DispObjInfo.FLAG_CHILD);
 			return dispInfo;
 		}
 		
@@ -117,8 +103,7 @@ package
 		private function GetTimelineDataForEarringL():Vector.<Object>
 		{
 			var vector:Vector.<Object> = new Vector.<Object>();
-			vector.push(new RosaEarringLTimelineData().GetTimelineData());
-			//vector.push(new RosaEarringRTimelineData().GetTimelineData());
+			vector.push(new EarringLTimelineData().GetTimelineData());
 			return vector;
 		}
 		
@@ -126,14 +111,7 @@ package
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
 			
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaEarringL", 100, 0.0, "HairBehindFaceLayer", DispObjInfo.FLAG_CHILD);
-			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 0, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 1, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 1, 0.0, "MaleGroin", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 1, 0.0, "Vulva", 1);*/
+			dispInfo[dispInfo.length] = new DispObjInfo("EarringL", 500, 0, "BehindEarLayer", DispObjInfo.FLAG_CHILD);
 			return dispInfo;
 		}
 		
@@ -151,22 +129,14 @@ package
 		private function GetTimelineDataForEarringR():Vector.<Object>
 		{
 			var vector:Vector.<Object> = new Vector.<Object>();
-			//vector.push(new RosaEarringLTimelineData().GetTimelineData());
-			vector.push(new RosaEarringRTimelineData().GetTimelineData());
+			vector.push(new EarringRTimelineData().GetTimelineData());
 			return vector;
 		}
 		
 		private function CreateDisplayInfoForEarringR():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-			dispInfo[dispInfo.length] = new DispObjInfo("RosaEarringR", 200, 0.0, "HairBehindFaceLayer", DispObjInfo.FLAG_CHILD);
-			/*dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 1, 0.0, "Navel", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 0, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 1, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 1, 0.0, "MaleGroin", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 1, 0.0, "Vulva", 1);*/
+			dispInfo[dispInfo.length] = new DispObjInfo("EarringR", 600, 0, "BehindEarLayer", DispObjInfo.FLAG_CHILD);
 			return dispInfo;
 		}
 		
@@ -201,13 +171,7 @@ package
 			
 			vector.push(new ForearmRTimelineData().GetTimelineData());
 			vector.push(new HandRTimelineData().GetTimelineData());
-			vector.push(new RosaClosedSmileTimelineData().GetTimelineData());
-			
-			
-			
-			
-			//
-			//vector.push(new RosaLowerLegRTimelineData().GetTimelineData());
+			vector.push(new ClosedSmileTimelineData().GetTimelineData());
 			
 			return vector;
 		}
@@ -215,23 +179,57 @@ package
 		private function CreateDisplayInfoForBodyChanges():Vector.<DispObjInfo>
 		{
 			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-			//dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 1, 0.0, "", 1);
-			//dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 1, 0.0, "", 1);
-			//dispInfo[dispInfo.length] = new DispObjInfo("ForearmR", 5000, 0.0);
-			//dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 1, 0.0);
-			//dispInfo[dispInfo.length] = new DispObjInfo("RosaClosedSmile", 1, 0.0);
+			/*dispInfo[dispInfo.length] = new DispObjInfo("BackLayer", 200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("BehindHeadLayer", 400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ArmL", 600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("HandR", 800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ArmR", 1000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ShoulderL", 1200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ShoulderR", 1400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Neck", 1600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("FrontButtR", 1800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("FrontButtL", 2000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Chest", 2200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Hips", 2400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Navel", 2600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("MaleLegL", 2800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 3000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("LowerLegR", 3200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("UpperLegR", 3400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("LowerLegL", 3600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("UpperLegL", 3800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 4000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 4200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Groin", 4400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Vulva", 4600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 4800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ClavicleR", 5000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ClavicleL", 5200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("BoobL", 5400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("BoobHighlightL", 5600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("AreolaL", 5800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("NippleL", 6000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("BehindEarLayer", 6200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("EarL", 6400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("EarR", 6600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("FrontEarLayer", 6800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Face", 7000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("RightEyeLayer", 7200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("LeftEyeLayer", 7400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("FrontHeadLayer", 7600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("EyebrowR", 7800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("EyebrowL", 8000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("Nose", 8200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("MouthLayer", 8400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ForearmR", 8600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("HandL", 8800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("ForearmL", 9000, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("BoobR", 9200, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("BoobHighlightR", 9400, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("AreolaR", 9600, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("NippleR", 9800, 0);
+dispInfo[dispInfo.length] = new DispObjInfo("FrontLayer", 10000, 0);*/
 			
-			//dispInfo[dispInfo.length] = new DispObjInfo("RosaLowerLegL", 1800, 0.0);
-			//dispInfo[dispInfo.length] = new DispObjInfo("RosaLowerLegR", 1600, 0.0);
-			//dispInfo[dispInfo.length] = new DispObjInfo("HandR", 300, 0.0);
-			//dispInfo[dispInfo.length] = new DispObjInfo("RosaPupilR", 1, 0.0, "", 1);
-			/*
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleLegR", 1, 0.0, "MaleLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 1, 0.0, "UpperLegL", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 0, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 1, 0.0, "ShaftMask", 2);
-			dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 1, 0.0, "MaleGroin", 1);
-			dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 1, 0.0, "Vulva", 1);*/
 			return dispInfo;
 		}
 		
@@ -247,16 +245,94 @@ package
 		
 		
 		
-		/*override protected function FirstFrame(e:Event):void
+		private function GetTimelineDataForEyeL():Vector.<Object>
 		{
-			
-			
-			
-			
-			
-			super.FirstFrame(e);
+			var dataForTimelineCreation:Vector.<Object> = new Vector.<Object>();
+			dataForTimelineCreation.push(new EyelashLTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new EyeMaskLTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new EyelidLTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new EyeballLTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new ScleraLTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new ClosedLashLTimelineData().GetTimelineData());
+			return dataForTimelineCreation;
+		}
+		
+		private function CreateDisplayInfoForEyeL():Vector.<DispObjInfo>
+		{
+			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashL", 200, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("ScleraL", 400, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeballL", 200, 0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelidL", 400, 0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskL", 600, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelashL", 800, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
 
-		}*/
+			return dispInfo;
+		}
+		
+		private function CreateShardModForEyeL():AnimateShardMod
+		{
+			var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
+			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Eye"]), timelineData, dispInfo, "Rosalina Left Eye", false, "Body animations changes for Rosalina (Cowgirl position)");
+			return bodyAnimateShard;
+		}
+		
+		private function GetTimelineDataForEyeR():Vector.<Object>
+		{
+			var dataForTimelineCreation:Vector.<Object> = new Vector.<Object>();
+			dataForTimelineCreation.push(new EyelashRTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new EyeMaskRTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new EyelidRTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new EyeballRTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new ScleraRTimelineData().GetTimelineData());
+dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
+			return dataForTimelineCreation;
+		}
+		
+		private function CreateDisplayInfoForEyeR():Vector.<DispObjInfo>
+		{
+			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 200, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("ScleraR", 400, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeballR", 200, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 400, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 600, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+
+			return dispInfo;
+		}
+		
+		private function CreateShardModForEyeR():AnimateShardMod
+		{
+			var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
+			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Eye"]), timelineData, dispInfo, "Rosalina Right Eye", false, "Body animations changes for Rosalina (Cowgirl position)");
+			return bodyAnimateShard;
+		}
+		
+		private function GetTimelineDataForMouth():Vector.<Object>
+		{
+			var dataForTimelineCreation:Vector.<Object> = new Vector.<Object>();
+			dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
+			return dataForTimelineCreation;
+		}
+		
+		private function CreateDisplayInfoForMouth():Vector.<DispObjInfo>
+		{
+			var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+dispInfo[dispInfo.length] = new DispObjInfo("ClosedSmile", 200, 0, "MouthLayer", DispObjInfo.FLAG_CHILD);
+
+			return dispInfo;
+		}		
+		
+		private function CreateShardModForMouth():AnimateShardMod
+		{
+			var timelineData:Vector.<Object> = GetTimelineDataForMouth();
+			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForMouth();
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Mouth"]), timelineData, dispInfo, "Rosalina Mouth", false, "Body animations changes for Rosalina (Cowgirl position)");
+			return bodyAnimateShard;
+		}
 	}
 
 }

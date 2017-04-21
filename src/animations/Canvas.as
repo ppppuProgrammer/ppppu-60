@@ -3,6 +3,7 @@ package animations
 	import animations.AnimateShardLibrary;
 	import animations.DispObjInfo;
 	import animations.TimelineLibrary;
+	import flash.geom.ColorTransform;
 	import org.libspark.betweenas3.BetweenAS3;
 	import org.libspark.betweenas3.core.tweens.ObjectTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
@@ -32,7 +33,6 @@ package animations
 	//import MouthContainer;
 	/**
 	 * Sprite subclass that handles manipulating sprites to compose an animation using tween data.
-	 * TODO: Need to remove the master template Sprite from the ppppu stage in ppppu60.fla as this class being so coupled to the fla is no longer necessary.
 	 * @author 
 	 */
 	public class Canvas extends Sprite
@@ -90,13 +90,15 @@ package animations
 		private var actorDict:Dictionary = new Dictionary();
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
-		public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
+		//public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
 		
-		private var disableActorsBasedOnGfxSetData:Vector.<DisableActorInfo> = new Vector.<DisableActorInfo>;
+		//private var disableActorsBasedOnGfxSetData:Vector.<DisableActorInfo> = new Vector.<DisableActorInfo>;
 		//Holds assets that couldn't be added due to a missing actor. Array holds 2 values, the actor name and the asset data.
 		private var assetsInStorage:Vector.<Array> = new Vector.<Array>;
 		
 		private var director:Director;
+		
+		//private var shardOverrideDataList:Vector.<Object> = new Vector.<Object>();
 		
 		/* Creation and Initialization */
 		//{
@@ -107,11 +109,20 @@ package animations
 			var layer2:Sprite = new Sprite();
 			var layer3:Sprite = new Sprite();
 			var layer4:Sprite = new Sprite();*/
-			AddNewSpriteInstance(new Sprite, "HairFrontLayer");
-			AddNewSpriteInstance(new Sprite, "HairBehindFaceLayer");
-			AddNewSpriteInstance(new Sprite, "HairBehindHeadwearLayer");
-			AddNewSpriteInstance(new Sprite, "HairBackLayer");
+			//Add the layers that are intended for hair sprite use.
+			AddNewSpriteInstance(new Sprite, "FrontLayer");
+			AddNewSpriteInstance(new Sprite, "FrontHeadLayer");
+			AddNewSpriteInstance(new Sprite, "FrontEarLayer");
+			AddNewSpriteInstance(new Sprite, "BehindEarLayer");
+			AddNewSpriteInstance(new Sprite, "BehindHeadLayer");
+			AddNewSpriteInstance(new Sprite, "BackLayer");
 			
+			//Add the layers for eyes
+			AddNewSpriteInstance(new Sprite, "LeftEyeLayer");
+			AddNewSpriteInstance(new Sprite, "RightEyeLayer");
+			
+			//Add the layer for Mouth usage
+			AddNewSpriteInstance(new Sprite, "MouthLayer");
 			
 			/*AddNewActor("HairFrontLayer");
 			AddNewActor("HairBehindFaceLayer");
@@ -152,17 +163,38 @@ package animations
 			return null;
 		}
 		
-		public function CreateTimelineFromData(timelineData:Object, displayObjContainingTarget:Sprite):SerialTween
+		public function CreateTimelineForActor(timelineData:Object):SerialTween
 		{
-			var tweenData:Vector.<Object> = timelineData.tweenProperties;
-			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
-			//Hacky but for now elements have higher prio
-			//var target:Sprite = elementDict[timelineData.targetName] as Sprite;
 			var target:Sprite = GetActorByName(timelineData.targetName);
 			if (target == null)
 			{
 				return null;
 			}
+			return CreateTimelineFromData(timelineData, target);
+		}
+		
+		public function CreateTimelineForSprite(timelineData:Object, displayObjContainingTarget:Sprite):SerialTween
+		{
+			//var targetName:String = timelineData.targetName;
+			var target:Sprite = displayObjContainingTarget.getChildByName(timelineData.targetName) as Sprite;
+			if (target == null)
+			{
+				return null;
+			}
+			return CreateTimelineFromData(timelineData, target);
+		}
+		
+		protected function CreateTimelineFromData(timelineData:Object, target:Sprite):SerialTween
+		{
+			var tweenData:Vector.<Object> = timelineData.tweenProperties;
+			var TIME_PER_FRAME:Number = timelineData.TIME_PER_FRAME;
+
+			if (target == null)
+			{
+				return null;
+			}
+			//var target:Sprite = targetSprite;
+			
 			var timeline:SerialTween = null;
 			var currentTweenData:Object, previousTweenData:Object;
 			if (target)
@@ -185,6 +217,18 @@ package animations
 						currentTweenData.transform.matrix.d = tweenData[i].transformMatrix.d;
 						currentTweenData.transform.matrix.tx = tweenData[i].transformMatrix.tx;
 						currentTweenData.transform.matrix.ty = tweenData[i].transformMatrix.ty;
+					}
+					if ("colorTransform" in tweenData[i])
+					{
+						if ("brightness" in tweenData[i].colorTransform)
+						{
+							//Not handling this yet. NYI.
+							delete tweenData[i].colorTransform;
+						}
+						else
+						{
+							currentTweenData.transform.colorTransform = tweenData[i].colorTransform;
+						}
 					}
 					//Visibility fallback check for first tween. Assume that it is to be visible if there was no visible property specified.
 					if (i == 0)
@@ -281,7 +325,7 @@ package animations
 					}
 					//Finally change the depths
 					ChangeElementDepths(frameLayout, true);
-					GraphicSetDisableActorCheck();
+					//GraphicSetDisableActorCheck();
 				}
 				else if (displayLayout.frameVector.length == 0 && masterTimeline != null)
 				{
@@ -298,7 +342,7 @@ package animations
 			return position;
 		}
 		
-		public function ClearGraphicsFromAllActorsOnCanvas():void
+		/*public function ClearGraphicsFromAllActorsOnCanvas():void
 		{
 			var actor:Actor;
 			for (var i:int = 0; i < this.numChildren; i++) 
@@ -311,8 +355,8 @@ package animations
 				}
 			}
 			disableActorsBasedOnGfxSetData = new Vector.<DisableActorInfo>();
-		}
-		[inline]
+		}*/
+		/*[inline]
 		public function ApplyCurrentGraphicSets():void
 		{
 			for (var i:int = 0, l:int = currentGraphicSets.length; i < l; i++) 
@@ -347,10 +391,10 @@ package animations
 				
 			}
 			//currentGraphicSets
-		}
+		}*/
 		
 		//Checks to see if an actor needs to be disabled (made invisible) due to a graphic set in use.
-		private function GraphicSetDisableActorCheck():void
+		/*private function GraphicSetDisableActorCheck():void
 		{
 			//Disable array expects to have a length that's a multiple of 3. Every 1st value is the name of the actor to disable, every 2nd value is the animation to disable it for (can specify "_ALL" to disable the actor for all animations) and the 3rd is to disable the actor based on it's depth relative to the current actor, with -1 for when it's [the actor to disable] depth is lower, 0 to disable regardless of depth and 1 if the depth is higher.
 			var targetActor:Actor;
@@ -392,7 +436,7 @@ package animations
 					
 				}
 			}
-		}
+		}*/
 		
 		public function AddNewActor(actorName:String):Boolean
 		{
@@ -430,7 +474,7 @@ package animations
 		public function AddAssetToActor(actorName:String, data:AssetData):void
 		{
 			var actor:Actor = actorDict[actorName];
-			
+
 			if (actor)
 			{
 				actor.AddAsset(data);
@@ -452,6 +496,7 @@ package animations
 			}
 		}
 		
+		//Adds a new sprite to the canvas. This is typically called to add layers, which actors will be added to in order to simplify depth ordrering by grouping them together within the layer.
 		public function AddNewSpriteInstance(sprite:Sprite, spriteName:String):Boolean
 		{
 			var result:Boolean;
@@ -469,6 +514,30 @@ package animations
 			}
 			return result;
 		}
+		
+		public function ChangeGraphicSets(gfxSetList:Array):void
+		{
+			if (gfxSetList)
+			{
+				for (var i:int = 0, l:int = gfxSetList.length; i < l; i++) 
+				{
+					director.ChangeAssetForAllActorsBySetName(gfxSetList[i], true); 
+				}
+			}
+			
+		}
+		
+		/*public function ApplyShardOverrides():void
+		{
+			for (var i:int = 0,l:int = shardOverrideDataList.length; i < l; i++) 
+			{
+				var data:Object = shardOverrideDataList[i];
+				if ("Color" in data)
+				{
+					director.ChangeColorsForAssets(data.Color);
+				}
+			}
+		}*/
 		
 		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
 		/*public function ChangeAnimation(displayLayout:AnimationLayout, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
@@ -540,6 +609,7 @@ package animations
 				containers[i].removeChildren();
 			}
 			var layoutVector:Vector.<DispObjInfo> = depthLayout.dispInfo;// .layoutVector;
+			if (layoutVector == null) { return;}
 			var latestElement:Sprite = null;
 			var latestMaskedContainer:Sprite = null;
 			
@@ -599,6 +669,10 @@ package animations
 								
 							}
 						}
+						else
+						{
+							trace(element.name + " could not find dependent Actor: " + layoutVector[vecIndex].GetTargetObjName());
+						}
 					}
 				}
 			}			
@@ -653,17 +727,18 @@ package animations
 			}
 		}
 		
-		public function ChangeGraphicSetsUsed(sets:Vector.<GraphicSet>):void
+		/*public function ChangeGraphicSetsUsed(sets:Vector.<GraphicSet>):void
 		{
 			currentGraphicSets = sets;
 			ClearGraphicsFromAllActorsOnCanvas();
 			ApplyCurrentGraphicSets();
-		}
+		}*/
 		
 		/* Animation Creation Functions */
 		//{
 		public function CompileAnimation(shards:Vector.<AnimateShard>, animationName:String):void
 		{
+			//shardOverrideDataList = new Vector.<Object>();
 			if (currentAnimationName != animationName)
 			{
 				//Tell the director that the animation name has changed.
@@ -690,6 +765,12 @@ package animations
 						timelines[timelines.length] = shardTimelines[j];
 					}
 				}
+				
+				/*var overwriteData:Object = shards[i].GetOverrideData();
+				if (overwriteData)
+				{
+					shardOverrideDataList[shardOverrideDataList.length] = overwriteData;
+				}*/
 				
 				//Cache the disp obj info vector
 				shardDispObjInfoVector = shards[i].GetDispObjData();
@@ -737,18 +818,102 @@ package animations
 			
 			//ClearGraphicsFromAllActorsOnCanvas();
 			//ApplyCurrentGraphicSets();
+			//ApplyShardOverrides();
 			
 			masterTimeline = compiledAnimation;	
 			//Reset the latest and next times for depth changes. -1 is used to indicate that the animation is being ran for the first time and should be checked.
 			latestDepthChangeTime = nextDepthChangeTime = -1;
 			//GraphicSetDisableActorCheck();
 			//For testing purposes.
-			director.ChangeAssetForAllActorsBySetName("Standard");
+			//director.ChangeAssetForAllActorsBySetName("Standard");
 			
-			masterTimeline.gotoAndPlay(0.0);
+			masterTimeline.gotoAndStop(0.0);
 		}
 		
 		private function ProcessDisplayObjects(dispObjContainer:Object):void
+		{
+			//Received an object with vectors of dispobjinfo instances. There are possibly multiple instances that will overwrite each other. 
+			for (var time:String in dispObjContainer) 
+			{
+				//The raw vector of dispObjInfo objects for a particular time of the animation.
+				var dispObjDataForTimePoint:Vector.<DispObjInfo> = dispObjContainer[time];
+				
+				//The vector with the end result, which will be sorted by depth. Any dispobjinfo that are to have its controlDispObj be masked or added as a child will be spliced into the main vector, sortedDispObjInfo
+				var sortedDispObjInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+				//var deferredDispObjInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+				var overwriteTracker:Dictionary = new Dictionary();
+				
+				//Temporary work vector used to remove dispObjInfo that will control the same display object.
+				var duplicateWorkVector:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+				for (var i:int = 0, l:int = dispObjDataForTimePoint.length; i < l; i++) 
+				{
+					var controlName:String = dispObjDataForTimePoint[i].GetControlObjectName();
+					var dispInfoIndex:int = 0;
+					if (controlName in overwriteTracker)
+					{
+						//replace the old index that had the dispobjinfo for the control object.
+						duplicateWorkVector[overwriteTracker[controlName]] = dispObjDataForTimePoint[i];
+						
+					}
+					else
+					{
+						dispInfoIndex = duplicateWorkVector.length;
+						duplicateWorkVector[dispInfoIndex] = dispObjDataForTimePoint[i];
+					}
+					overwriteTracker[controlName] = dispInfoIndex;
+				}
+				
+				//All duplicates dispobjinfo have been removed. Now to sort the dispobjinfo, which will be put into a vector depending on what their target name is.
+				var unsortedVectorDict:Dictionary = new Dictionary();
+				
+				for (var j:int = 0, k:int = duplicateWorkVector.length; j < k; j++) 
+				{
+					var targetName:String = duplicateWorkVector[j].GetTargetObjName();
+					//There is no target for this dispobjinfo.
+					if (targetName == null || targetName == "")
+					{
+						targetName = "_TOPLEVEL";	
+					}
+					
+					if (unsortedVectorDict[targetName] == null)
+					{
+						unsortedVectorDict[targetName] = new Vector.<DispObjInfo>();
+					}
+					
+					var vector:Vector.<DispObjInfo> = unsortedVectorDict[targetName] as Vector.<DispObjInfo>;
+					vector[vector.length] = duplicateWorkVector[j];
+				}
+				
+				//Sort all the vectors
+				for (var name:String in unsortedVectorDict) 
+				{
+					var unsortedVector:Vector.<DispObjInfo> = unsortedVectorDict[name] as Vector.<DispObjInfo>;
+					SortDispObjInfoVector(unsortedVector);
+				}
+				
+				//Combine all the now sorted vectors into one. Start off with the top level one and then splice in the others
+				var finalSortedVector:Vector.<DispObjInfo> = unsortedVectorDict["_TOPLEVEL"] as Vector.<DispObjInfo>;
+				delete unsortedVectorDict["_TOPLEVEL"];
+
+				for (var m:int = 0,n:int = finalSortedVector != null ? finalSortedVector.length : -1; m < n; m++) 
+				{
+					var controlName:String = finalSortedVector[m].GetControlObjectName();
+					if (controlName in unsortedVectorDict)
+					{
+						var childVector:Vector.<DispObjInfo> = unsortedVectorDict[controlName];
+						//delete unsortedVectorDict[controlName];
+						for (var o:int = childVector.length-1; o >=0 ; o--) 
+						{
+							finalSortedVector.splice(m + 1, 0, childVector[o]);
+						}
+						n = finalSortedVector.length;
+					}
+				}
+				dispObjContainer[time] = finalSortedVector;	
+			}
+		}
+		
+		/*private function ProcessDisplayObjects(dispObjContainer:Object):void
 		{
 			//Received an object with vectors of dispobjinfo instances. There are possibly multiple instances that will overwrite each other. 
 			for (var time:String in dispObjContainer) 
@@ -797,6 +962,7 @@ package animations
 						deferredDispObjInfo[j].SetTargetDepth(sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
 						sortedDispObjInfo[sortedDispObjInfo.length] = deferredDispObjInfo[j];
 					}
+
 					//deferredDispObjInfo[j] = null;
 				}
 				
@@ -804,7 +970,7 @@ package animations
 				SortDispObjInfoVector(sortedDispObjInfo);
 				dispObjContainer[time] = sortedDispObjInfo;				
 			}
-		}
+		}*/
 		
 		//Sorts a vector containing DispObjInfo by depth using the bottom-up merge sorting algorithm.
 		private function SortDispObjInfoVector(vector:Vector.<DispObjInfo>):void
@@ -830,7 +996,8 @@ package animations
 			var i:int = begin, j:int = mid;
 			for (var k:int = begin; k < end; k++) 
 			{ 
-				if (i < mid && (j >= end || CompareDispObjInfoDepths(A[i], A[j]) == 0))
+				//if (i < mid && (j >= end || CompareDispObjInfoDepths(A[i], A[j]) == 0))
+				if (i < mid && (j >= end || A[i].GetDepth() <= A[j].GetDepth()))
 				{
 					B[k] = A[i];
 					i = i + 1;
@@ -845,7 +1012,7 @@ package animations
 		
 		
 		//Compares 2 dispObjInfo instances and returns an int to indicate which info object should be moved for the merge sort. Returns 0 when info1 should be moved and returns 1 when info 2 should be moved.
-		private function CompareDispObjInfoDepths(info1:DispObjInfo, info2:DispObjInfo):int
+		/*private function CompareDispObjInfoDepths(info1:DispObjInfo, info2:DispObjInfo):int
 		{
 			if (info1.GetTargetFlag() > 0 || info2.GetTargetFlag() > 0) //Target is to be masked or be a child
 			{
@@ -895,7 +1062,7 @@ package animations
 				else
 					{return 1;}
 			}
-		}
+		}*/
 		//}
 		/* End of Animation Creation Functions */
 		

@@ -3,9 +3,9 @@
 	<Window id="mainWindow" title="NX developer menu" width="480" height="300" hasMinimizeButton="true">
 		<!-- Section 1 -->
 		<Label id="animationLabel" x="10" y="10" text="Animation:"/>
-		<ComboBox id="animationSelector"  x="60" y="10" width="90"/>
-		<Label id="shardTypeLabel" x="160" y="10" text="Type:"/>
-		<ComboBox id="shardTypeSelector"  x="190" y="10" width="70"/>
+		<ComboBox id="animationSelector"  x="60" y="10" width="120"/>
+		<Label id="shardTypeLabel" x="190" y="10" text="Type:"/>
+		<ComboBox id="shardTypeSelector"  x="220" y="10" width="70"/>
 		<Label id="characterLabel" x="305" y="10" text="Character:"/>
 		<ComboBox id="characterSelector"  x="360" y="10" width="110"/>
 		<Label id="shardLabel" x="10" y="40" text="Shard:"/>
@@ -62,16 +62,16 @@
 	</Window>
 	
 	<!-- Section 5 Actor window -->
-	 <Window id="actorWindow" title="Actor edit window" x="0" y="420" width="480" height="160" hasMinimizeButton="true" minimized="false">
+	 <Window id="actorWindow" title="Actor edit window" x="0" y="420" width="480" height="170" hasMinimizeButton="true" minimized="false">
 		<ComboBox id="actorSelector" x="0" y="00" width="140" height="20"/>
-		<HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="0" value="0" maximum="0" labelPrecision="0" tick="1.0" />
+		<HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="0" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
 		<TextArea id="assetInformation" x="219" y="15" width="250" height="50" editable="false"/>
-		<PushButton id="applySetToActor" x="260" y="70" label="Apply graphic to selected actor" width="160"/>
+		<PushButton id="applyAssetToActorButton" x="250" y="70" label="Set/Unset graphic for selected actor" width="180"/>
 		 
 		<Label id="graphicSetLabel" x="145" y="100" text="Graphic Set"/>
 		<ComboBox id="gfxSetSelector" x="145" y="120" width="140" height="20" openPosition="top"/>
-		<PushButton id="applySetToAllButton" x="300" y="120" label="Apply set to all actors"  width="160"/>
-		
+		<PushButton id="applySetToAllActorsButton" x="300" y="120" label="Apply set"  width="60"/>
+		<PushButton id="removeSetToAllActorsButton" x="380" y="120" label="Remove set" width="60"/>
 		<!-- <TextArea id="tweenEditor" x="200" y="35" width="260" height="100" editable="true"/> -->
 	</Window>
 	

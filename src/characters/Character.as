@@ -17,10 +17,12 @@
 		//private var m_defInDiaMC:Boolean = true;
 		//private var m_defTransDiaMC:Boolean = true;
 		
+		//Data and properties to reset to for a character
 		public var data:Object;
-		
+		//Data and properties used by the program.
+		public var currentData:Object;
 		//Flag that determines if the id number of the character can be set.
-		protected var idSet:Boolean = false;
+		//protected var idSet:Boolean = false;
 		
 		protected var m_Id:int = -1; //The id number of the character. Can change depending on the order that characters
 		protected var m_name:String;
@@ -33,20 +35,23 @@
 		//The music to play for this specific character
 		protected var selectedMusicId:int = -1;
 		//private var m_numOfLockedAnimations:int = 0;
+		//Indicates if the various properties for the character can be changed. Characters created from a Character Mod can never have their data changed once created.
+		protected var characterPropertiesAreFinal:Boolean = false;
 		
-		public function Character(name:String, charData:Object)
+		public function Character(name:String, charData:Object, fixedCharacter:Boolean = true)
 		{
 			m_name = name;
 			data = charData;
+			characterPropertiesAreFinal = fixedCharacter;
 			
 		}
 		
 		public function SetID(idNumber:int):void
 		{
-			if (!idSet)
+			if (m_Id == -1)
 			{
 				m_Id = idNumber;
-				idSet = true;
+				//idSet = true;
 			}
 		}
 		public function GetID():int { return m_Id;}

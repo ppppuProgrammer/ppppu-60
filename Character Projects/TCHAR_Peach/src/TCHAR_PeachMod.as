@@ -35,6 +35,9 @@ package
 			
 			characterData.skinGradient_Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
 			
+			characterData.GraphicSets = ["Standard", "Headwear_Peach", "Earring_Peach", "Hair_Peach"];
+			
+			//characterData.ChangeableGfxSets = false;
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;
 			//characterData.DiamondCenterColor = 0x000000;

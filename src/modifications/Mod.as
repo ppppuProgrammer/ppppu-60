@@ -20,20 +20,19 @@ package modifications
 		//The mod will add animations for a specified animated character.  Prefix is "ANIM"
 		public static const MOD_ANIMATION:int = 2;
 		//The mod will add in music.  Prefix is "M"
-		public static const MOD_MUSIC:int = 3;
-		//The mod will add in new graphics, such as background, character parts, clothing, and more. Sprites added as an assetmod are added straight to the canvas as is (meaning, no reliance on an Actor) and is thus the preferred way of adding mouth graphics for expressions.  Prefix is "ASSET"
-		public static const MOD_ASSETS:int = 4;
+		public static const MOD_MUSIC:int = 3;		
 		/*The mod will add in a character that has no fixed animations and instead relies on a template animation where character graphics
 		 * are swapped around (used for NX versions).  Prefix is "TCHAR"*/
-		public static const MOD_TEMPLATECHARACTER:int = 5;
-		//The mod will add in an animation template. Prefix is "TANIM"
-		public static const MOD_TEMPLATEANIMATION:int = 6;
+		public static const MOD_TEMPLATECHARACTER:int = 4;
 		//The mod will add in an animate shard. Prefix is "ANMSHD"
-		public static const MOD_ANIMATESHARD:int = 7;
-		//The mod will add multiple assets as part of a set. Sprites added as part of a graphic set are not added directly to the canvas but instead are added to an Actor, which makes them useful for customizing various body parts or adding new graphics onto existing actors.
-		public static const MOD_GRAPHICSET:int = 8;
+		public static const MOD_ANIMATESHARD:int = 5;
+		//The mod will add in new graphics for an Actor, such as character parts, clothing, accessories, and more. Sprites added as an assetmod are added straight to the canvas as is (meaning, no reliance on an Actor) and is thus the preferred way of adding mouth graphics for expressions.  Prefix is "ASSET"
+		public static const MOD_ASSET:int = 6
+		public static const MOD_BACKGROUNDASSET:int = 7;
+		public static const MOD_SOUNDASSET:int = 8;
+
 		//Used when the mod is loaded standalone to tell the user what type of mod was loaded.
-		private static const modTypeStringDictionary:Vector.<String> = Vector.<String>(["Archive", "AnimatedCharacter", "Animation", "Music", "Assets", "TemplateCharacter", "TemplateAnimation", "AnimateShard", "GraphicSet" ]);
+		private static const modTypeStringDictionary:Vector.<String> = Vector.<String>(["Archive", "AnimatedCharacter", "Animation", "Music",  "TemplateCharacter", "AnimateShard", "Asset", "BackgroundAsset", "SoundAsset" ]);
 		protected var modType:int = MOD_UNDEFINED;
 		
 		//For holding any extra mod-inspecific information.

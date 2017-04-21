@@ -32,6 +32,8 @@ package
 			characterData.Color.Breast = [0xFFDCC6FF,0xFFDCC6FF, skinGradientEndPoint.CreateLinkedColorHolder()];//3
 			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
 			characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159, 255), 0xFFDCC6FF];//2
+			
+			characterData.GraphicSets = ["Standard", "Headwear_Rosalina", "Earring_Rosalina", "Hair_Rosalina"];
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;
 			//characterData.DiamondCenterColor = 0x000000;

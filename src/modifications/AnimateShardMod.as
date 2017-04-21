@@ -22,7 +22,9 @@ package modifications
 		protected var isBaseShard:Boolean = false;
 		//A optional description of what the AnimateShard is for and what it will affect or add.
 		protected var shardDescription:String;
-		public function AnimateShardMod(animationName:String, shardCategories:Vector.<String>, timelineInstructions:Vector.<Object>, dispObjData:Vector.<DispObjInfo>, animShardName:String, baseShard:Boolean, description:String) 
+		//Data that supersedes settings from other types, such as Colorize data of a character.
+		//protected var overrideData:Object;
+		public function AnimateShardMod(animationName:String, shardCategories:Vector.<String>, timelineInstructions:Vector.<Object>, dispObjData:Vector.<DispObjInfo>, animShardName:String, baseShard:Boolean, description:String/*, additionalData:Object=null*/) 
 		{
 			modType = MOD_ANIMATESHARD;
 			targetAnimationName = animationName;
@@ -32,6 +34,7 @@ package modifications
 			shardName = animShardName;
 			isBaseShard = baseShard;
 			shardDescription = description;
+			//overrideData = additionalData;
 		}
 		
 		public function GetTargetAnimationName():String { return targetAnimationName; }
@@ -52,6 +55,7 @@ package modifications
 		public function GetShardName():String { return shardName; }
 		public function GetIfBaseShard():Boolean { return isBaseShard; }
 		public function GetDescription():String { return shardDescription; }
+		//public function GetOverrideData():Object { return overrideData; }
 		/* INTERFACE modifications.IModdable */
 		
 		public function OutputModDetails():String 
