@@ -32,6 +32,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import com.jacksondunstan.signals.*;
 	import flash.system.System;
 	import menu.DeveloperMenu;
+	import menu.MainMenu;
 	import modifications.AnimateShardMod;
 	import modifications.AnimationMod;
 	import animations.background.*;
@@ -158,6 +159,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		//private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
 		private var colorizer:Colorizer = new Colorizer();
+		
+		private var mainMenu:MainMenu;
 		
 		CONFIG::debug
 		private var devMenu:DeveloperMenu;// = new menu.DeveloperMenu();
@@ -301,7 +304,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mainStage.InnerDiamond.SelectBackgroundAsset(0);
 			mainStage.OuterDiamond.SelectBackgroundAsset(0);
 			mainStage.TransitionDiamond.SelectBackgroundAsset(0);
-			mainStage.Background.SelectBackgroundAsset(0);
+			//mainStage.Background.SelectBackgroundAsset(0);
 			mainStage.Backlight.SelectBackgroundAsset(0);
 			/*var backlightTLDef:TimelineDefinition = new BacklightTimelineData();
 			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(backlightTLDef.GetTimelineData(), mainStage);
@@ -331,6 +334,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			registerClassAlias("AnimationList", animations.AnimationList);
 			
+			
+			
 			CONFIG::debug
 			{
 				devMenu = new DeveloperMenu(this, director);
@@ -340,6 +345,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				SetupDevMenuHooks();
 				
 			}
+			mainMenu = new MainMenu(this);
+			mainMenu.x = 480;
+			addChild(mainMenu);
 			
 			modsLoadedAtStartUp = startupMods;
 		}
@@ -376,18 +384,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//The "heart beat" of the flash. Ran every frame to monitor and react to certain, often frame sensitive, events
 		private function RunLoop(e:Event):void
 		{
-			//Checks if the timeline lib has a valid base animation set. If it doesn't, return until there is one loaded in.
-			/*CONFIG::debug
-			{
-			if (devMenu.ReadyCheck() == false)
-			{
-				return;
-			}
-			}*/
-			/*if (!timelineLib.HasValidBaseAnimation())
-			{
-				return;
-			}*/
 
 			if (firstTimeInLoop)
 			{
