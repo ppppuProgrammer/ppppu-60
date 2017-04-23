@@ -30,6 +30,7 @@ package com.bit101.utils
 {
 	// usually don't use * but we really are importing everything here.
 	import com.bit101.components.*;
+	import flash.events.IOErrorEvent;
 	
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -65,6 +66,7 @@ package com.bit101.utils
 		{
 			loader = new URLLoader();
 			loader.addEventListener(Event.COMPLETE, onLoadComplete);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, onLoadFail);
 			loader.load(new URLRequest(url));
 		}
 		
@@ -74,6 +76,15 @@ package com.bit101.utils
 		private function onLoadComplete(event:Event):void
 		{
 			parseXMLString(loader.data as String);
+			loader.removeEventListener(Event.COMPLETE, onLoadComplete);
+			loader.removeEventListener(IOErrorEvent.IO_ERROR, onLoadFail);
+		}
+		
+		private function onLoadFail(event:IOErrorEvent):void
+		{
+			loader.removeEventListener(Event.COMPLETE, onLoadComplete);
+			loader.removeEventListener(IOErrorEvent.IO_ERROR, onLoadFail);
+			dispatchEvent(event);
 		}
 		
 		/**

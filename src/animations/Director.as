@@ -27,7 +27,7 @@ package animations
 			signal2.dispatch("AnimationChanged", currentAnimationName);
 		}
 		
-		//Used for nothing.
+		
 		public function onSignal2(command:*, value:*): void
 		{
 			var commandStr:String = command as String;

@@ -165,8 +165,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		CONFIG::debug
 		private var devMenu:DeveloperMenu;// = new menu.DeveloperMenu();
 
-		private var devMenuSignaller1:Signal1 = new Signal1();
-		private var devMenuSignaller2:Signal2 = new Signal2();
+		private var menuSignal1:Signal1 = new Signal1();
+		private var menuSignal2:Signal2 = new Signal2();
 		
 		private var modsLoadedAtStartUp:Array;
 		
@@ -336,18 +336,18 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			
 			
-			CONFIG::debug
-			{
-				devMenu = new DeveloperMenu(this, director);
-				devMenu.x = 480;
-				addChild(devMenu);
-				//devMenu.SetupHooksToApp(this);
-				SetupDevMenuHooks();
+			//CONFIG::debug
+			//{
+				//devMenu = new DeveloperMenu(this, director);
+				//devMenu.x = 480;
+				//addChild(devMenu);
+				////devMenu.SetupHooksToApp(this);
+				//SetupDevMenuHooks();
 				
-			}
-			mainMenu = new MainMenu(this);
+			//}
+			mainMenu = new MainMenu(this, director);
 			mainMenu.x = 480;
-			addChild(mainMenu);
+			//addChild(mainMenu);
 			
 			modsLoadedAtStartUp = startupMods;
 		}
@@ -411,8 +411,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var animationPosition:Number = canvas.Update();
 				CONFIG::debug
 				{
-					devMenuSignaller2.dispatch("timeText", animationPosition);
-					devMenuSignaller2.dispatch("updatedAnimation", canvas);
+					menuSignal2.dispatch("timeText", animationPosition);
+					menuSignal2.dispatch("updatedAnimation", canvas);
 				}
 
 			/*else
@@ -661,10 +661,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var charName:String = tcharacter.GetCharacterName();
 					var character:Character = new Character(charName, tcharacter.GetCharacterData());
 					characterList[characterList.length] = character;
-					CONFIG::debug
-					{
-					devMenu.AddNewCharacter(charName);
-					}
+					//CONFIG::debug
+					//{
+						menuSignal2.dispatch("AddNewCharacter", animationName);
+					//devMenu.AddNewCharacter(charName);
+					//}
 				}
 				
 			}
@@ -680,10 +681,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						animationIndex = animationNameIndexes.length;
 						animationNameIndexes[animationIndex] = animationName;
 						
-						CONFIG::debug
-						{
-						devMenu.AddNewAnimation(animationName);
-						}
+						//CONFIG::debug
+						//{
+						menuSignal2.dispatch("AddNewAnimation", animationName);
+						//devMenu.AddNewAnimation(animationName);
+						//}
 					}
 					
 					var timelines:Vector.<SerialTween> = new Vector.<SerialTween>();
@@ -695,7 +697,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						{
 							CONFIG::debug
 							{
-							devMenuSignaller1.dispatch("Animation " + animationName + ": Could not create timeline for element " + data[i].targetName);
+							menuSignal1.dispatch("Animation " + animationName + ": Could not create timeline for element " + data[i].targetName);
 							}
 						}
 					}
@@ -739,7 +741,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					canvas.AddAssetToActor(assetMod.targetActorName, assetData);
 					CONFIG::debug
 					{
-						devMenu.AddNewGraphicSet(assetMod.setName);
+						//devMenu.AddNewGraphicSet(assetMod.setName);
 					}
 					//Handle colorable data now <- scratch that, Actors should send a command to have assets with Colorable data be added for colorization.
 					/*if (assetData.properties != null)
@@ -836,7 +838,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						graphicSets[graphicSet.setName] = gfxSet;
 						CONFIG::debug
 						{
-							devMenu.AddNewGraphicSet(graphicSet.setName);
+							//devMenu.AddNewGraphicSet(graphicSet.setName);
 						}
 					}
 					
@@ -881,19 +883,25 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			return animLayout;
 		}*/
-		CONFIG::debug
+		//CONFIG::debug
+		//{
+		public function SetupMenuHooks(target1:Slot1=null, target2:Slot2=null):void
 		{
-		private function SetupDevMenuHooks():void
-		{
-			devMenuSignaller1.addSlot(devMenu);
-			devMenuSignaller2.addSlot(devMenu);
+			if (target1 != null)
+			{
+				menuSignal1.addSlot(target1);
+			}
+			if (target2 != null)
+			{
+				menuSignal2.addSlot(target2);
+			}
 		}
 		
-		private function AddNewLineToDevOutputWindow(message:String):void
+		/*private function AddNewLineToDevOutputWindow(message:String):void
 		{
 			devMenuSignaller1.dispatch(message);
 		}
-		}
+		}*/
 		
 		public function onSignal1(targetName:*):void
 		{
@@ -918,7 +926,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				position +=  (sign * frameAmount)*(1.0 / stage.frameRate);
 				canvas.JumpToPosition(position);
 				backgroundMasterTimeline.gotoAndStop(position);
-				devMenuSignaller2.dispatch("timeText",canvas.GetTimeInCurrentAnimation());
+				menuSignal2.dispatch("timeText",canvas.GetTimeInCurrentAnimation());
 			}
 			else if (target == "MenuFinishedInitializing")
 			{
@@ -962,17 +970,20 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
-				CONFIG::debug
-				{
-				devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0] as int, value[1] as Boolean));
-				}
+				//CONFIG::debug
+				//{
+					menuSignal2.dispatch("UpdateShardsCombobox", shardLib.GetListOfShardNames(value[0] as int, value[1] as Boolean));
+				//devMenu.UpdateShardsCombobox(shardLib.GetListOfShardNames(value[0] as int, value[1] as Boolean));
+				//}
 			}
 			else if (targetName == "shardSelector")
 			{
 				var shard:AnimateShard = shardLib.GetShard(value[0] as int, value[1] as Boolean, value[2] as String);
-				devMenuSignaller2.dispatch("SetShardDescription", /*[shard,*/ shardLib.GetInformationOnShard(shard)/*]*/);
-				//devMenu.SetSelectedShard(shard);
-				//devMenu.set
+				//menuSignal2.dispatch("SetSelectedShard", shard);
+				menuSignal2.dispatch("SetShardDescription", /*[shard,*/ shardLib.GetInformationOnShard(shard)/*]*/);
+				
+				////devMenu.SetSelectedShard(shard);
+				////devMenu.set
 			}
 			else if (targetName == "CompileAnimationFromAnimationList")
 			{
@@ -987,10 +998,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					canvas.CompileAnimation(shardsForAnimation, animList.TargetAnimationName);
 					backgroundMasterTimeline.gotoAndStop(canvas.GetTimeInCurrentAnimation());
 					var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
-					CONFIG::debug
-					{
-						devMenuSignaller2.dispatch("animationDuration", animationDuration);
-					}
+					//CONFIG::debug
+					//{
+						menuSignal2.dispatch("animationDuration", animationDuration);
+					//}
 				}
 			}
 			/*else if (targetName == "UpdateGraphicSetsUsed")
@@ -1032,7 +1043,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 							shardsData[shardsData.length] = [names[i], types[i]/*, shard*/];
 						}
 					}
-					devMenuSignaller2.dispatch("SetupShardsList", shardsData);
+					menuSignal2.dispatch("SetupShardsList", shardsData);
 				}
 			}
 			else if (targetName == "FileLoaded")
