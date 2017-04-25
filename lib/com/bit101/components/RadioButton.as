@@ -32,6 +32,7 @@ package com.bit101.components
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.utils.Dictionary;
 	
 	public class RadioButton extends Component
 	{
@@ -43,7 +44,7 @@ package com.bit101.components
 		protected var _groupName:String = "defaultRadioGroup";
 		
 		protected static var buttons:Array;
-		
+		//protected static var buttons:Dictionary = new Dictionary();
 		
 		/**
 		 * Constructor
@@ -69,6 +70,28 @@ package com.bit101.components
 		 * Static method to add the newly created RadioButton to the list of buttons in the group.
 		 * @param rb The RadioButton to add.
 		 */
+		/*protected static function addButton(rb:RadioButton):void
+		{
+			if (!(rb.groupName in buttons))
+			{
+				buttons[rb.groupName] = new Vector.<RadioButton>;
+			}
+			var groupButtons:Vector.<RadioButton> = buttons[rb.groupName];
+			for (var i:int = 0,l:int = groupButtons.length; i < l; i++) 
+			{
+				if (groupButtons[i] == null)
+				{
+					groupButtons[i] = rb;
+					return;
+				}
+			}
+			groupButtons[groupButtons.length] = rb;
+		}*/
+		
+		/**
+		 * Static method to add the newly created RadioButton to the list of buttons in the group.
+		 * @param rb The RadioButton to add.
+		 */
 		protected static function addButton(rb:RadioButton):void
 		{
 			if(buttons == null)
@@ -77,6 +100,25 @@ package com.bit101.components
 			}
 			buttons.push(rb);
 		}
+		
+		/**
+		 * Unselects all RadioButtons in the group, except the one passed.
+		 * This could use some rethinking or better naming.
+		 * @param rb The RadioButton to remain selected.
+		 */
+		/*protected static function clear(rb:RadioButton):void
+		{
+			var groupButtons:Vector.<RadioButton> = buttons[rb.groupName];
+			if (!groupButtons) { return; }
+			
+			for(var i:uint = 0; i < groupButtons.length; i++)
+			{
+				if(groupButtons[i] != rb)
+				{
+					groupButtons[i].selected = false;
+				}
+			}
+		}*/
 		
 		/**
 		 * Unselects all RadioButtons in the group, except the one passed.
@@ -219,6 +261,28 @@ package com.bit101.components
 			return _groupName;
 		}
 
+		//Incomplete version for when radiobuttons are in a dictionary.
+		/*public function set groupName(value:String):void
+		{
+			//Remove button from old group
+			if (groupName in buttons)
+			{
+				(buttons[groupName] as Vector.<RadioButton>).indexOf(this) = null;
+			}
+			
+			var groupButtons:Vector.<RadioButton> = buttons[rb.groupName];
+			for (var i:int = 0,l:int = groupButtons.length; i < l; i++) 
+			{
+				if (groupButtons[i] == null)
+				{
+					groupButtons[i] = rb;
+					return;
+				}
+			}
+			groupButtons[groupButtons.length] = rb;
+			_groupName = value;
+		}*/
+		
 		public function set groupName(value:String):void
 		{
 			_groupName = value;

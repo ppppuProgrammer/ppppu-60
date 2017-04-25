@@ -118,6 +118,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//Contains the names of the various animations that the master template can switch between. The names are indexed by their position in the vector.
 		private var animationNameIndexes:Vector.<String> = new Vector.< String > ();// ["Cowgirl", "LeanBack", "LeanForward", "Grind", "ReverseCowgirl", "Paizuri", "Blowjob", "SideRide", "Swivel", "Anal"];
 		//private var basisBodyTypes:Vector.<String> = new Vector.<String>();
+		private var characterManager:CharacterManager;
+		
 		private var characterList:Vector.<Character> = new Vector.<Character>();//[new PeachCharacter, new RosalinaCharacter];
 		private var currentCharacter:Character;// = defaultCharacter;
 		//private var currentAnimationIndex:int = -1;
@@ -220,6 +222,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//Sets up the various aspects of the flash to get it ready for performing.
 		public function Initialize(startupMods:Array = null):void
 		{
+			characterManager = new CharacterManager();
 			var director:Director = new Director(colorizer);
 			canvas.Initialize(shardLib, director);
 			//Add the key listeners
@@ -659,11 +662,16 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (tcharacter)
 				{
 					var charName:String = tcharacter.GetCharacterName();
-					var character:Character = new Character(charName, tcharacter.GetCharacterData());
-					characterList[characterList.length] = character;
+					var character:Character = new Character(charName, tcharacter.GetCharacterData(), true);
+					if (characterManager.CheckIfCharacterCanBeAdded(character))
+					{
+						characterManager.AddCharacter(character);
+						menuSignal2.dispatch("AddNewCharacter", character.GetName());
+					}
+					//characterList[characterList.length] = character;
 					//CONFIG::debug
 					//{
-						menuSignal2.dispatch("AddNewCharacter", animationName);
+						
 					//devMenu.AddNewCharacter(charName);
 					//}
 				}
@@ -1045,6 +1053,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					}
 					menuSignal2.dispatch("SetupShardsList", shardsData);
 				}
+			}
+			else if (targetName == "CharMenu_SwitchCharacterRequest")
+			{
+				characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(value as String), true);
+				colorizer.ChangeColorsUsingCharacterData(characterManager.GetCurrentCharacterColorData());
+				canvas.ChangeActorAssetsUsingCharacterData(characterManager.GetCurrentCharacterGraphicSets());
+				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(value as String));
 			}
 			else if (targetName == "FileLoaded")
 			{

@@ -200,7 +200,7 @@ package menu
 		
 		private function InitializeAllSubmenus(app:AppCore, director:Director):void
 		{
-			if (characterMenu != null) { characterMenu.InitializeMenu(app); /*signal2.addSlot(characterMenu);*/ ++submenuCreated; }
+			if (characterMenu != null) { characterMenu.InitializeMenu(app); signal2.addSlot(characterMenu); ++submenuCreated; }
 			if (musicMenu != null) { musicMenu.InitializeMenu(app); ++submenuCreated; }
 			if (developerMenu != null) {developerMenu.InitializeMenu(app, director); signal2.addSlot(developerMenu); ++submenuCreated;} 
 			if (animationMenu != null) {animationMenu.InitializeMenu(app); signal2.addSlot(animationMenu); ++submenuCreated;}

@@ -727,6 +727,18 @@ package animations
 			}
 		}
 		
+		public function ChangeActorAssetsUsingCharacterData(data:Object)
+		{
+			var setList:Array = data as Array;
+			if (setList)
+			{
+				for (var i:int = 0, l:int = setList.length; i < l; i++) 
+				{
+					director.ChangeAssetForAllActorsBySetName(setList[i] as String, true);
+				}
+			}
+		}
+		
 		/*public function ChangeGraphicSetsUsed(sets:Vector.<GraphicSet>):void
 		{
 			currentGraphicSets = sets;

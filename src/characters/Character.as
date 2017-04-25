@@ -4,6 +4,7 @@
 	import flash.geom.ColorTransform;
 	import flash.display.MovieClip;
 	import flash.media.Sound;
+	import flash.utils.ByteArray;
 	
 	public class Character 
 	{
@@ -20,7 +21,7 @@
 		//Data and properties to reset to for a character
 		public var data:Object;
 		//Data and properties used by the program.
-		public var currentData:Object;
+		//public var currentData:Object;
 		//Flag that determines if the id number of the character can be set.
 		//protected var idSet:Boolean = false;
 		
@@ -36,13 +37,18 @@
 		protected var selectedMusicId:int = -1;
 		//private var m_numOfLockedAnimations:int = 0;
 		//Indicates if the various properties for the character can be changed. Characters created from a Character Mod can never have their data changed once created.
-		protected var characterPropertiesAreFinal:Boolean = false;
+		protected var defaultSettings:ByteArray = null;
 		
-		public function Character(name:String, charData:Object, fixedCharacter:Boolean = true)
+		public function Character(name:String, charData:Object, isPresetCharacter:Boolean = false)
 		{
 			m_name = name;
 			data = charData;
-			characterPropertiesAreFinal = fixedCharacter;
+			if (isPresetCharacter)
+			{
+				var charByteArray:ByteArray = new ByteArray();
+				charByteArray.writeObject(this);
+				defaultSettings = charByteArray;
+			}
 			
 		}
 		
@@ -56,7 +62,8 @@
 		}
 		public function GetID():int { return m_Id;}
 		public function GetName():String { return m_name; }
-		public function GetDefaultMusicName():String { return m_defaultMusicName;}
+		public function GetDefaultMusicName():String { return m_defaultMusicName; }
+		//public function GetIf
 		/*public function GetDiamondColor1():uint { return m_innerDiamondColor1;}
 		public function GetDiamondColor2():uint{ return m_innerDiamondColor2;}
 		public function GetDiamondColor3():uint { return m_innerDiamondColor3;}
