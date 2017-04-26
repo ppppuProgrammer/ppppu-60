@@ -1,5 +1,6 @@
 package characters 
 {
+	import animations.AnimationList;
 	import flash.utils.Dictionary;
 	/**
 	 * ...
@@ -17,6 +18,9 @@ package characters
 		private var m_currentCharacter:Character = null;
 		//The character that is being displayed on the stage.
 		//private var m_latestCharacter:AnimatedCharacter = null;
+		
+		//0 is in order, 1 is random, 2 is one character
+		private var m_characterSelectMode:int = 0;
 		
 		//Controls whether the user wants character switching to be allowed or not.
 		private var m_allowCharSwitches:Boolean = true;
@@ -64,6 +68,70 @@ package characters
 
 		}
 		
+		//Returns true if it actually deleted the character, returns false if the character was reset (which happens when the character was created from a template character mod)
+		public function DeleteCurrentCharacter():Boolean
+		{
+			var charId:int = m_currentCharacter.GetID();
+			if (charId >= 0 && charId < m_Characters.length)
+			{
+				//var character:Character = m_Characters[charId];
+				if (m_currentCharacter.CheckIfPresetDataExists())
+				{
+					return false;
+				}
+				else
+				{
+					m_Characters[charId] = null;
+					m_characterLocks[charId] = null;
+					m_Characters = m_Characters.splice(charId, 1);
+					m_characterLocks = m_characterLocks.splice(charId, 1);
+					delete m_charNamesDict[m_currentCharacter.GetName()];
+					m_currentCharacter = null;
+					return true;
+				}
+				
+			}
+			return false;
+		}
+		
+		public function AddAnimationSlotToCurrentCharacter():Boolean
+		{
+			if (m_currentCharacter)
+			{
+				m_currentCharacter.AddAnimationSlot();
+				return true;
+			}
+			return false;
+		}
+		
+		public function RemoveAnimationSlotOfCurrentCharacter(index:int):Boolean
+		{
+			if (m_currentCharacter)
+			{
+				return m_currentCharacter.RemoveAnimationSlot(index);
+			}
+			return false;
+		}
+		
+		public function SaveAnimationForCurrentAnimation(index:int, animateList:AnimationList):Boolean
+		{
+			if (m_currentCharacter)
+			{
+				m_currentCharacter.SaveAnimationToSlot(index, animateList);
+				return true;
+			}
+			return false;
+		}
+		
+		public function GetAnimationListForCurrentCharacter(animId:int):AnimationList
+		{
+			if (m_currentCharacter)
+			{
+				return m_currentCharacter.GetAnimationList(animId);
+			}
+			return null;
+		}
+		
 		public function SwitchToCharacter(charIndex:int=-1, instantSwitch:Boolean=false):int
 		{
 			//Undefined index, fall back to the first character
@@ -84,6 +152,18 @@ package characters
 				
 			}
 			return m_nextCharacterId;
+		}
+		
+		public function SetSelectMode(mode:int):int
+		{
+			if (mode > 2 || mode < 0) { mode = 0;}
+			m_characterSelectMode = mode;
+			return m_characterSelectMode;
+		}
+		
+		public function GetSelectMode():int
+		{
+			return m_characterSelectMode;
 		}
 		
 		public function GetCharacterInfo(name:String):Array
@@ -131,6 +211,29 @@ package characters
 				return characterData.GraphicSets;
 			}
 			return null;
+		}
+		
+		public function SetLockOnCurrentCharacter(locked:Boolean):Boolean
+		{
+			var charIndex:int = m_currentCharacter.GetID();
+			//Test if setting this character to be unselectable will result in all characters being unselectable
+			if (m_characterLocks[charIndex] == false && m_unswitchableCharactersNum + 1 >= m_Characters.length)
+			{
+				//logger.debug("Could not lock character {0}", GetCharacterNameById(charIndex));
+				return false; //Need to exit the function immediantly, 1 character must always be selectable.
+			}
+			m_characterLocks[charIndex] = !m_characterLocks[charIndex];
+			//userSettings.characterSettings[m_Characters[charIndex].GetName()].canSwitchTo = m_canSwitchToCharacter[charIndex];
+			if (m_characterLocks[charIndex] == true)
+			{
+				++m_unswitchableCharactersNum;
+			}
+			else
+			{
+				--m_unswitchableCharactersNum;
+			}
+			//logger.debug("Character {0} is {1}", GetCharacterNameById(charIndex), m_characterLocks[charIndex] ? "Locked" : "Unlocked");
+			return m_characterLocks[charIndex];
 		}
 	}
 

@@ -98,6 +98,10 @@ package
 			var clone:Object = byteArray.readObject();
 			return clone;
 		}
+		
+		public static function RoundToNearest(roundTo:Number, value:Number):Number{
+			return Math.round(value/roundTo)*roundTo;
+		}
 	}
 
 }

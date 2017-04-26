@@ -208,10 +208,9 @@ package menu
 			else if (command == "SetupShardsList")
 			{
 				var shardsData:Vector.<Array> = value as Vector.<Array>;
+				var animateList:List = config.getCompById("animList") as List;	
 				if (shardsData)
 				{
-					var animateList:List = config.getCompById("animList") as List;	
-					
 					if (animateList)
 					{
 						animateList.removeAll();
@@ -224,13 +223,55 @@ package menu
 						}
 					}
 				}
+				else
+				{
+					if (animateList)	{animateList.removeAll();}
+				}
 			}
 			else if (command == "AddNewAnimation")
 			{
 				AddNewAnimation(value as String);
 			}
+			else if (command == "CharMenu_CharacterInfoDelivery")
+			{
+				//Used to update the title of the animation selection window
+				var animSelectWindow:Window = config.getCompById("charAnimationsWindow") as Window;
+				if (animSelectWindow)
+				{
+					animSelectWindow.title = (value[0] as String) + "'s animations";
+				}
+			}
+			else if (command == "AnimMenu_AddAnimationSlotResult")
+			{
+				var result:Boolean = value as Boolean;
+				if (result)
+				{
+					var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+					if (charAnimationList)
+					{
+						charAnimationList.addItem( { label: "Empty" } );
+					}
+				}
+			}
+			else if (command == "AnimMenu_RemoveAnimationSlotResult")
+			{
+				var result:Boolean = value as Boolean;
+				if (result)
+				{
+					var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+					if (charAnimationList)
+					{
+						charAnimationList.removeItemAt(charAnimationList.selectedIndex);
+					}
+				}
+			}
 			else if (command == "FileLoaded")
 			{
+				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+				if (charAnimationList.selectedItem < 0)
+				{
+					return;
+				}
 				//value is an array, index 0 is the data from the file, index 1 is the name of the file
 				//signal2.dispatch(command, value);
 				var bytes:ByteArray = value[0] as ByteArray;
@@ -290,10 +331,34 @@ package menu
 			{
 				SaveAnimationListToFile();
 			}
+			else if (targetName == "addAnimationSlotBtn")
+			{
+				//Need to know if there is a character selected.
+				signal1.dispatch("AnimMenu_AddAnimationSlotRequest");
+			}
+			else if (targetName == "removeAnimationSlotBtn")
+			{
+				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+				if (charAnimationList)
+				{
+					//Need to know if there is a character selected.
+					signal2.dispatch("AnimMenu_RemoveAnimationSlotRequest", charAnimationList.selectedIndex);
+				}
+			}
+			else if (targetName == "saveAnimationListBtn")
+			{
+				var animateList:AnimationList = CreateAnimationList();
+				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+				if (animateList && charAnimationList)
+				{
+					//Need to know if there is a character selected.
+					signal2.dispatch("AnimMenu_SaveAnimationForCharacterRequest", [charAnimationList.selectedIndex, animateList]);
+				}
+			}
 			else if (targetName != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
 				signal1.dispatch(targetName);
-			}		
+			}	
 			else
 			{
 				//setFrameButton needs to also send data on what frame to go to.
@@ -415,6 +480,11 @@ package menu
 				
 				
 			}
+			else if (target.name == "charAnimationsSelector")
+			{
+				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+				signal2.dispatch("AnimMenu_ChangeSelectedAnimationOfCurrentCharacter", charAnimationList.selectedIndex);
+			}
 			else
 			{
 				try
@@ -447,6 +517,12 @@ package menu
 			var animList:List = config.getCompById("animList") as List;
 			animList.listItemClass = ShardItem;
 			dispatchEvent(e);
+			
+			var charAnimList:List = config.getCompById("charAnimationsSelector") as List;
+			if (charAnimList)
+			{
+				charAnimList.listItemClass = HorizontalListItem;
+			}
 		}
 		
 	}

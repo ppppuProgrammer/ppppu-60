@@ -1,10 +1,12 @@
 ﻿package characters
 {
+	import animations.AnimationList;
 	import flash.filters.ColorMatrixFilter;
 	import flash.geom.ColorTransform;
 	import flash.display.MovieClip;
 	import flash.media.Sound;
 	import flash.utils.ByteArray;
+	import flash.net.registerClassAlias;
 	
 	public class Character 
 	{
@@ -39,16 +41,26 @@
 		//Indicates if the various properties for the character can be changed. Characters created from a Character Mod can never have their data changed once created.
 		protected var defaultSettings:ByteArray = null;
 		
+		protected var animationLists:Vector.<AnimationList>;
+		
 		public function Character(name:String, charData:Object, isPresetCharacter:Boolean = false)
 		{
+			registerClassAlias("AnimationList", AnimationList);
 			m_name = name;
 			data = charData;
+			animationLists = new Vector.<AnimationList>();
+			animationLists[animationLists.length] = new AnimationList();
+			animationLists[animationLists.length] = new AnimationList();
 			if (isPresetCharacter)
 			{
 				var charByteArray:ByteArray = new ByteArray();
 				charByteArray.writeObject(this);
-				defaultSettings = charByteArray;
+				defaultSettings = ExportCharacterDataForStorage();
+				var character:Character = new Character("temp", null);
+				character.ImportCharacterDataFromStorage(defaultSettings);
+				var bp:int = 5;
 			}
+			
 			
 		}
 		
@@ -60,9 +72,63 @@
 				//idSet = true;
 			}
 		}
+		
+		public function AddAnimationSlot():void
+		{
+			animationLists[animationLists.length] = new AnimationList();
+		}
+		
+		public function RemoveAnimationSlot(index:int):Boolean
+		{
+			if (index >= 0 && index < animationLists.length)
+			{
+				animationLists = animationLists.splice(index, 1);
+				return true;
+			}
+			return false;
+		}
+		
+		public function SaveAnimationToSlot(index:int, animateList:AnimationList):void
+		{
+			if (index >= 0 && index < animationLists.length)
+			{
+				animationLists[index] = animateList;
+			}
+		}
+		public function CheckIfPresetDataExists():Boolean { return defaultSettings != null;}
 		public function GetID():int { return m_Id;}
 		public function GetName():String { return m_name; }
 		public function GetDefaultMusicName():String { return m_defaultMusicName; }
+		public function GetAnimationList(animId:int):AnimationList
+		{
+			if (animId >= 0 && animId < animationLists.length)
+			{
+				return animationLists[animId];
+			}
+			return null;
+		}
+		
+		public function ExportCharacterDataForStorage():ByteArray
+		{
+			var characterByteArray:ByteArray = new ByteArray();
+			characterByteArray.writeObject(data);
+			characterByteArray.writeObject(m_defaultMusicName);
+			characterByteArray.writeBoolean(m_randomizePlayAnim);
+			characterByteArray.writeObject(m_lockedAnimation);
+			characterByteArray.writeObject(animationLists);
+			return characterByteArray;
+		}
+		
+		public function ImportCharacterDataFromStorage(charStorageData:ByteArray)
+		{
+			charStorageData.position = 0;
+			data = charStorageData.readObject();
+			m_defaultMusicName = charStorageData.readObject();
+			m_randomizePlayAnim = charStorageData.readBoolean();
+			m_lockedAnimation = charStorageData.readObject();
+			animationLists = charStorageData.readObject();
+			
+		}
 		//public function GetIf
 		/*public function GetDiamondColor1():uint { return m_innerDiamondColor1;}
 		public function GetDiamondColor2():uint{ return m_innerDiamondColor2;}

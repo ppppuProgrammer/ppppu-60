@@ -40,6 +40,12 @@ package menu
 			config.removeEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.removeEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
 			dispatchEvent(e);
+			
+			var charList:List = config.getCompById("charSelectList") as List;
+			if (charList)
+			{
+				charList.listItemClass = HorizontalListItem;
+			}
 		}
 		
 		private function FailedLoadingXML(e:IOErrorEvent):void
@@ -92,8 +98,8 @@ package menu
 				var charInfo:Array = value as Array;
 				var charNameTextArea:TextArea = config.getCompById("selectedCharText") as TextArea;
 				var musicNameTextArea:TextArea = config.getCompById("charMusicText") as TextArea;
-				var lockRadioBtn:RadioButton = config.getCompById("lockBtn") as RadioButton;
-				var unlockRadioBtn:RadioButton = config.getCompById("unlockBtn") as RadioButton;
+				var lockRadioBtn:RadioButton = config.getCompById("lockRBtn") as RadioButton;
+				var unlockRadioBtn:RadioButton = config.getCompById("unlockRBtn") as RadioButton;
 				if (charInfo)
 				{
 					charNameTextArea.text = charInfo[0] as String;
@@ -114,11 +120,99 @@ package menu
 					lockRadioBtn.selected = unlockRadioBtn.selected = false;
 				}
 			}
+			else if (command == "CharMenu_CharacterHasChanged")
+			{
+				var charList:List = config.getCompById("charSelectList") as List;
+				if (charList)
+				{
+					charList.selectedIndex = value as int;
+				}
+			}
+			else if (command == "CharMenu_UpdateSwitchMode")
+			{
+				var mode:int = value as int;
+				var modeRadioButton:RadioButton;
+				switch(mode)
+				{
+					case 0:
+						modeRadioButton = config.getCompById("SequentialCharRBtn") as RadioButton;
+						break;
+					case 1:
+						modeRadioButton = config.getCompById("RandomCharRBtn") as RadioButton;
+						break;
+					case 2:
+						modeRadioButton = config.getCompById("OneCharRBtn") as RadioButton;
+						break;
+				}
+				if (modeRadioButton)
+				{
+					modeRadioButton.selected = true;
+				}
+			}
+			else if (command == "CharMenu_CharacterWasDeleted")
+			{
+				var wasReallyDeleted:Boolean = value as Boolean;
+				var charList:List = config.getCompById("charSelectList") as List;
+				if (wasReallyDeleted)
+				{
+					
+					charList.removeItemAt(charList.selectedIndex);
+					//signal2.dispatch("CharMenu_SwitchCharacterRequest", null);
+					//charList.selectedIndex = -1;
+				}
+				else
+				{
+					//"Switch" characters to update various data
+					signal2.dispatch("CharMenu_SwitchCharacterRequest", charList.selectedItem);
+				}
+			}
 		}
 		
 		public function ClickEventHandler(target:String):void
 		{
-			
+			if (target == "SequentialCharRBtn" || "RandomCharRBtn" || "OneCharRBtn")
+			{
+				//var mode:int = value as int;
+				//var modeRadioButton:RadioButton;
+				switch(target)
+				{
+					case "SequentialCharRBtn":
+						//modeRadioButton = config.getCompById("SequentialCharRBtn") as RadioButton;
+						signal2.dispatch("CharMenu_ChangeSwitchModeRequest", 0);
+						break;
+					case "RandomCharRBtn":
+						//modeRadioButton = config.getCompById("RandomCharRBtn") as RadioButton;
+						signal2.dispatch("CharMenu_ChangeSwitchModeRequest", 1);
+						break;
+					case "OneCharRBtn":
+						//modeRadioButton = config.getCompById("OneCharRBtn") as RadioButton;
+						signal2.dispatch("CharMenu_ChangeSwitchModeRequest", 2);
+						break;
+				}
+			}
+			else if (target == "lockRBtn" || "unlockRBtn")
+			{
+				
+				switch(target)
+				{
+					case "lockRBtn":
+						//modeRadioButton = config.getCompById("SequentialCharRBtn") as RadioButton;
+						signal2.dispatch("CharMenu_ChangeCharacterLockRequest", true);
+						break;
+					case "unlockRBtn":
+						//modeRadioButton = config.getCompById("RandomCharRBtn") as RadioButton;
+						signal2.dispatch("CharMenu_ChangeCharacterLockRequest", false);
+						break;
+				}
+			}
+			else if (target == "deleteCharButton")
+			{
+				var charList:List = config.getCompById("charSelectList") as List;
+				if (charList.selectedItem > -1)
+				{
+					signal2.dispatch("CharMenu_DeleteCharacterRequest", false);
+				}
+			}
 		}
 		public function ChangeEventHandler(target:Object):void
 		{

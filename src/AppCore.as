@@ -86,6 +86,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.Canvas;
 	import flash.ui.Keyboard;
 	import flash.utils.*;
+	import flash.net.SharedObject;
 	
 	/**
 	 * Responsible for all the various aspects of ppppuNX. 
@@ -141,6 +142,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//private var mainStageLoopStartFrame:int;
 		
 		//Settings related
+		//Settings related
+		public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX_Settings", "/");
+		
+		public var userSettings:UserSettings = new UserSettings();
 		//public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX");
 		//public var userSettings:ppppuUserSettings = new ppppuUserSettings();
 		
@@ -353,6 +358,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//addChild(mainMenu);
 			
 			modsLoadedAtStartUp = startupMods;
+			LoadUserSettings();
 		}
 		
 		private function ProcessStartupMods():void
@@ -555,6 +561,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			if (charId >= 0 && charId < characterList.length)
 			{
 				currentCharacter = characterList[charId];
+				userSettings.currentCharacterName = currentCharacter.GetName();
 				var charData:Object = currentCharacter.data;
 				if ("Color" in charData)
 				{
@@ -930,15 +937,23 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				target = target.substring(1, target.length -1);
 				var frameAmount:int = int(target);
 				var position:Number = canvas.GetTimeInCurrentAnimation();
-				position = roundToNearest(1.0 / stage.frameRate, position);
+				position = UtilityFunctions.roundToNearest(1.0 / stage.frameRate, position);
 				position +=  (sign * frameAmount)*(1.0 / stage.frameRate);
 				canvas.JumpToPosition(position);
 				backgroundMasterTimeline.gotoAndStop(position);
 				menuSignal2.dispatch("timeText",canvas.GetTimeInCurrentAnimation());
 			}
+			else if (target == "AnimMenu_AddAnimationSlotRequest")
+			{
+				menuSignal2.dispatch("AnimMenu_AddAnimationSlotResult", characterManager.AddAnimationSlotToCurrentCharacter());
+			}
 			else if (target == "MenuFinishedInitializing")
 			{
 				this.ProcessStartupMods();
+				//Change menu to reflect the loaded settings
+				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
+				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(userSettings.currentCharacterName), true));
+				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(userSettings.currentCharacterName));
 			}
 		}
 		
@@ -974,7 +989,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (targetName == "characterSelector")
 			{
 				SwitchCharacter(value as int);
-				
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
@@ -1029,30 +1043,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				//Used when an animation list is loaded from file to populate the list of set shards in the developer/edit menu.
 				var list:AnimationList = value as AnimationList;
-				if (list)
-				{
-					//Check if the animation list is a version compatible with the latest project build. Refuse to process it if it isn't.
-					if (list.version != AnimationList.ANIMATION_LIST_VERSION) { return; }
-					
-					var names:Vector.<String> = list.ShardNameList;
-					var types:Vector.<Boolean> = list.ShardTypeList;
-					var animationId:int = animationNameIndexes.indexOf(list.TargetAnimationName);
-					if (animationId == -1) { return; }
-					
-					//Arrays hold the following in order: shard name, shard type, shard
-					var shardsData:Vector.<Array> = new Vector.<Array>();
-					var shard:AnimateShard;
-					for (var i:int = 0, l:int = Math.min(names.length, types.length); i < l; i++) 
-					{
-						//Verify that the shard exists
-						shard = shardLib.GetShard(animationId, (types[i] as Boolean/* == "Base"*/)/* ? true : false*/, names[i]);
-						if (shard)
-						{
-							shardsData[shardsData.length] = [names[i], types[i]/*, shard*/];
-						}
-					}
-					menuSignal2.dispatch("SetupShardsList", shardsData);
-				}
+				UpdateAnimationMenuShardsList(list);
 			}
 			else if (targetName == "CharMenu_SwitchCharacterRequest")
 			{
@@ -1060,6 +1051,39 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				colorizer.ChangeColorsUsingCharacterData(characterManager.GetCurrentCharacterColorData());
 				canvas.ChangeActorAssetsUsingCharacterData(characterManager.GetCurrentCharacterGraphicSets());
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(value as String));
+				userSettings.UpdateCurrentCharacterName(value as String);
+			}
+			else if (targetName == "CharMenu_ChangeSwitchModeRequest")
+			{
+				var result:int = characterManager.SetSelectMode(value as int);
+				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", result);
+				userSettings.UpdateCharacterSwitchMode(result);
+			}
+			else if (targetName == "CharMenu_ChangeCharacterLockRequest")
+			{
+				characterManager.SetLockOnCurrentCharacter(value as Boolean);
+				//characterManager.SetLockOnCharacter(value[0] as int, value[1] as Boolean);
+			}
+			else if (targetName == "CharMenu_DeleteCharacterRequest")
+			{
+				//;
+				menuSignal2.dispatch("CharMenu_CharacterWasDeleted", characterManager.DeleteCurrentCharacter());
+			}
+			else if (targetName == "AnimMenu_RemoveAnimationSlotRequest")
+			{
+				menuSignal2.dispatch("AnimMenu_RemoveAnimationSlotResult",characterManager.RemoveAnimationSlotOfCurrentCharacter(value as int));
+			}
+			else if (targetName == "AnimMenu_SaveAnimationForCharacterRequest")
+			{
+				characterManager.SaveAnimationForCurrentAnimation(value[0] as int, value[1] as AnimationList);
+			}
+			else if (targetName == "AnimMenu_ChangeSelectedAnimationOfCurrentCharacter")
+			{
+				var charAnimationList:AnimationList = characterManager.GetAnimationListForCurrentCharacter(value as int);
+				if (charAnimationList)
+				{
+					UpdateAnimationMenuShardsList(charAnimationList);
+				}
 			}
 			else if (targetName == "FileLoaded")
 			{
@@ -1067,9 +1091,95 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				
 			}
 		}
-		function roundToNearest(roundTo:Number, value:Number):Number{
-			return Math.round(value/roundTo)*roundTo;
+		
+		
+		/*SETTINGS RELATED FUNCTIONS*/
+		public function SaveSettingsToDisk():void
+		{
+			/*if (helpScreenMC.visible)
+			{
+				UpdateKeyBindsForHelpScreen();
+			}*/
+			settingsSaveFile.flush();
+			//NYI
+			//Need to update the key function lookup table for the new keycodes
+			//SetupKeyFunctionLookupTable();
 		}
+		
+		private function LoadUserSettings():void
+		{
+			//logger.info("Loading user settings");
+			if (settingsSaveFile.data.ppppuSettings != null)
+			{
+				if (userSettings.SAVE_VERSION == settingsSaveFile.data.ppppuSettings.version)
+				{
+					userSettings.ConvertFromObject(settingsSaveFile.data.ppppuSettings);
+					//Something went terribly wrong, recreate the user settings
+					
+					if (userSettings == null) 
+					{ 
+						//logger.warn("Settings were not loaded correctly. Recreating user settings.");
+						userSettings = new UserSettings(); 
+					}
+					else
+					{
+						//logger.info("User Settings were loaded successfully.");
+					}
+				}
+				else
+				{
+					//logger.warn("Out of date settings version found, settings have been reset to their default values.");
+					settingsSaveFile.clear();
+				}
+				settingsSaveFile.data.ppppuSettings = userSettings;
+			}
+			
+			if (userSettings.firstTimeRun == true)
+			{
+				//logger.info("A new save file for settings is being used.");
+				//UpdateKeyBindsForHelpScreen();
+				//ToggleHelpScreen(); //Show the help screen
+				//ShowMenu(true);
+				userSettings.firstTimeRun = false;
+				settingsSaveFile.data.ppppuSettings = userSettings;
+				settingsSaveFile.flush();
+			}
+			
+			characterManager.SetSelectMode(userSettings.characterSwitchMode);
+			//NYI
+			//musicPlayer.SetIfMusicIsEnabled(userSettings.playMusic);
+			//var chosenMusicId:int = musicPlayer.GetMusicIdByName(userSettings.globalSongTitle);
+			//if (chosenMusicId > -1) { musicPlayer.SetInitialMusicToPlay(chosenMusicId);}			
+		}
+		
+		private function UpdateAnimationMenuShardsList(list:AnimationList):void
+		{
+			if (list)
+			{
+				//Check if the animation list is a version compatible with the latest project build. Refuse to process it if it isn't.
+				if (list.version != AnimationList.ANIMATION_LIST_VERSION) { menuSignal2.dispatch("SetupShardsList", null); return; }
+				
+				var names:Vector.<String> = list.ShardNameList;
+				var types:Vector.<Boolean> = list.ShardTypeList;
+				var animationId:int = animationNameIndexes.indexOf(list.TargetAnimationName);
+				if (animationId == -1) 	{ menuSignal2.dispatch("SetupShardsList", null); return; }
+				
+				//Arrays hold the following in order: shard name, shard type, shard
+				var shardsData:Vector.<Array> = new Vector.<Array>();
+				var shard:AnimateShard;
+				for (var i:int = 0, l:int = Math.min(names.length, types.length); i < l; i++) 
+				{
+					//Verify that the shard exists
+					shard = shardLib.GetShard(animationId, (types[i] as Boolean/* == "Base"*/)/* ? true : false*/, names[i]);
+					if (shard)
+					{
+						shardsData[shardsData.length] = [names[i], types[i]/*, shard*/];
+					}
+				}
+				menuSignal2.dispatch("SetupShardsList", shardsData);
+			}
+		}
+		
 	}
 
 }
