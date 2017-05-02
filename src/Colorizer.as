@@ -139,9 +139,9 @@ package
 				color = colorValue as uint;
 				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
 			}
-			else if (colorValue is ColorValueHolder)
+			else if ("Color" in colorValue)
 			{
-				color = (colorValue as ColorValueHolder).GetColor();
+				color = (colorValue as Object).Color;
 				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
 			}
 			else if (colorValue is ColorMatrixFilter)
@@ -180,9 +180,9 @@ package
 						
 						if (x < colorUIntValues.length)
 						{
-							if (colorUIntValues[x] is ColorValueHolder)
+							if ("Color" in colorUIntValues[x])
 							{
-								color = (colorUIntValues[x] as ColorValueHolder).GetColor();
+								color = (colorUIntValues[x] as Object).Color;
 							}
 							else
 							{
@@ -192,9 +192,9 @@ package
 						}
 						else //Ran out of value in colorUIntValues, keep feeding the gradientFill with the last value in colorUIntValues.
 						{
-							if (colorUIntValues[colorUIntValues.length] is ColorValueHolder)
+							if ("Color" in colorUIntValues[colorUIntValues.length])
 							{
-								color = (colorUIntValues[colorUIntValues.length] as ColorValueHolder).GetColor();
+								color = (colorUIntValues[colorUIntValues.length] as Object).Color;
 							}
 							else
 							{

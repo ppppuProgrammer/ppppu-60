@@ -66,6 +66,7 @@ package animations
 				if (assetData.layer != LAYER_MAIN)
 				{
 					RemoveAssetFromUse(assetData);
+					//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", assetData.layer]);
 				}
 			}
 			else //An unused asset was selected to be used
@@ -73,6 +74,7 @@ package animations
 				//Remove the currently used asset
 				RemoveAssetFromUse(assetCurrentlyUsed);
 				SetAssetForUse(assetData);
+				//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, assetData.setName, assetData.layer]);
 			}
 			
 		}
@@ -105,6 +107,7 @@ package animations
 			}
 			//Removes the graphic from the layer
 			ChangeGraphicInLayer(assetData.layer, null);
+			signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", assetData.layer]);
 		}
 		
 		public function SetAssetForUse(assetData:AssetData):void
@@ -133,6 +136,7 @@ package animations
 			}
 			//Add the graphic to the layer
 			ChangeGraphicInLayer(assetData.layer, assetData.asset);
+			signal2.dispatch("Actor_ReportingAssetChanged", [this.name, assetData.setName, assetData.layer]);
 		}
 		
 		[inline]
@@ -189,7 +193,7 @@ package animations
 						this.addChildAt(layerSprite, Math.min(layer, this.numChildren));
 					}
 				}
-			}	
+			}
 		}
 		
 		//Changes the visibility of the children display objects in the actor. Done this way as a tween may control the visibility of the actor itself, there by undoing any direct visibility changes done to the actor.
@@ -214,6 +218,7 @@ package animations
 			if (conflict == false)
 			{
 				assetList[assetList.length] = assetData;
+				signal2.dispatch("SetNameOfAddedAsset", assetData.setName);
 				if (assetData.properties != null && "Colorable" in assetData.properties)
 				{
 					signal3.dispatch("RegisterColorables", assetData.asset, assetData.properties.Colorable);
@@ -279,6 +284,12 @@ package animations
 					signal2.dispatch("AssetListDelivery", assetPayload);
 				}
 			}
+			else if (commandStr == "ClearAllAssets")
+			{
+				RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(0));
+				RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(1));
+				RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(2));
+			}
 			
 		}
 		
@@ -291,6 +302,30 @@ package animations
 				if (this.name == targetedActor)
 				{
 					SelectAssetToUse(value2 as int);
+				}
+			}
+			else if (commandStr == "ChangeAssetByName")
+			{
+				var targetedActor:String = value as String;
+				if (this.name == targetedActor)
+				{
+					var setName:String = value2[0];					
+					var layer:int = value2[1];
+					if (setName == "")
+					{
+						
+						RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(layer));
+					}
+					for (var j:int = 0, k:int = assetList.length; j < k; j++) 
+					{
+						if (assetList[j].layer == layer && assetList[j].setName == setName)
+						{
+							SetAssetForUse(assetList[j]);
+							//SelectAssetToUse(j);
+							break;
+						}
+					}
+					
 				}
 			}
 			else if (commandStr == "ChangeAssetForAllActors")
@@ -308,6 +343,7 @@ package animations
 						{
 							RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(asset.layer));
 							SetAssetForUse(asset);
+							//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, asset.setName, asset.layer]);
 						}
 						else
 						{
@@ -316,6 +352,7 @@ package animations
 							if (asset.layer != LAYER_MAIN)
 							{
 								RemoveAssetFromUse(asset);
+								//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", asset.layer]);
 							}
 							
 						}

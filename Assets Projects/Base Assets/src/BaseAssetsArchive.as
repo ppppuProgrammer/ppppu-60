@@ -67,7 +67,7 @@ package
 			
 			/*Head related*/
 			modsList[modsList.length] = new AssetsMod(new Neck, "Neck", "Standard", 1, { Colorable: skinColorProperties } );
-			var faceColorProperties:Object = { Group: "Face", Target: "Color" };
+			var faceColorProperties:Object = { Group: ["Face", "Hair"], Target: ["Color", "Hair" ]};
 			var faceWithHairColorProperties:Object = { Group: ["Skin","Hair"], Target: ["Skin", "Hair"] };
 			modsList[modsList.length] = new AssetsMod(new Face, "Face", "Standard", 1, { Colorable: faceColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new FaceAngled, "FaceAngled", "Standard", 1, { Colorable: faceWithHairColorProperties } );
@@ -86,6 +86,7 @@ package
 			modsList[modsList.length] = new AssetsMod(new TeardropMouth, "TeardropMouth", "Standard", 1, { Colorable: lipColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new WideMouth, "WideMouth", "Standard", 1, { Colorable: lipColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Grin, "Grin", "Standard", 1);
+			modsList[modsList.length] = new AssetsMod(new Tongue, "Tongue", "Standard", 1);
 			
 			/* Hair */
 			modsList[modsList.length] = new AssetsMod(new PchHair1, "Hair1R", "Hair_Peach", 1);
@@ -141,6 +142,8 @@ package
 			var breastGradientColorProperties:Object  = { Group: ["Breast", "SkinHighlight"], Target: ["Color", "Highlight"] };
 			modsList[modsList.length] = new AssetsMod(new Boob2, "Boob2L", "Standard", 1, { Colorable: breastGradientColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Boob2, "Boob2R", "Standard", 1, { Colorable: breastGradientColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Boob3, "Boob3L", "Standard", 1, { Colorable: breastGradientColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Boob3, "Boob3R", "Standard", 1, { Colorable: breastGradientColorProperties } );
 			
 			var nippleColorProperties:Object  = { Group: "Nipple", Target: "Color" };
 			modsList[modsList.length] = new AssetsMod(new Nipple, "NippleL", "Standard", 1, { Colorable: nippleColorProperties } );

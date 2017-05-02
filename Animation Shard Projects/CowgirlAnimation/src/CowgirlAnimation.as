@@ -32,6 +32,7 @@ package
 			vector.push(new MalePenisHeadTimelineData().GetTimelineData());
 			vector.push(new MaleShaftTimelineData().GetTimelineData());
 			vector.push(new ShaftMaskTimelineData().GetTimelineData());
+			vector.push(new PenisHighlightTimelineData().GetTimelineData());
 			return vector;
 		}
 		
@@ -67,6 +68,8 @@ dispInfo[dispInfo.length] = new DispObjInfo("PenisHighlight", 800, 0, "ShaftMask
 			vector.push(new ArmRTimelineData().GetTimelineData());
 			vector.push(new BoobLTimelineData().GetTimelineData());
 			vector.push(new BoobRTimelineData().GetTimelineData());
+			vector.push(new BoobHighlightLTimelineData().GetTimelineData());
+			vector.push(new BoobHighlightRTimelineData().GetTimelineData());
 			vector.push(new ChestTimelineData().GetTimelineData());
 			vector.push(new ClavicleLTimelineData().GetTimelineData());
 			vector.push(new ClavicleRTimelineData().GetTimelineData());	
@@ -113,10 +116,10 @@ dispInfo[dispInfo.length] = new DispObjInfo("PenisHighlight", 800, 0, "ShaftMask
 			dispInfo[dispInfo.length] = new DispObjInfo("ForearmR", 1200, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("ShoulderL", 1400, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("ShoulderR", 1600, 0);
-			dispInfo[dispInfo.length] = new DispObjInfo("Neck", 1800, 0);
+			dispInfo[dispInfo.length] = new DispObjInfo("Chest", 1800, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("FrontButtR", 2000, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("FrontButtL", 2200, 0);
-			dispInfo[dispInfo.length] = new DispObjInfo("Chest", 2400, 0);
+			dispInfo[dispInfo.length] = new DispObjInfo("Neck", 2400, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("Hips", 2600, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("Navel", 2800, 0);
 			

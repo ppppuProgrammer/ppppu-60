@@ -1,6 +1,7 @@
 package menu 
 {
 	import com.bit101.components.List;
+	import com.bit101.components.PushButton;
 	import com.bit101.components.RadioButton;
 	import com.bit101.components.TextArea;
 	import com.jacksondunstan.signals.Slot2;
@@ -64,16 +65,16 @@ package menu
 			if (command == "ClickEvent")
 			{
 				if (!value) { return;}
-				var compName:String = (value as Sprite).name;
+				var compName:String = (value as Object)["name"];
 				if (config.getCompById(compName) != null)
 				{
-					ClickEventHandler(compName);
+					ClickEventHandler(value as Object);
 				}
 			}
 			else if (command == "ChangeEvent")
 			{
 				if (!value) { return;}
-				var compName:String = (value as Sprite).name;
+				var compName:String = (value as Object)["name"];
 				if (config.getCompById(compName) != null)
 				{
 					ChangeEventHandler(value as Object);
@@ -82,7 +83,7 @@ package menu
 			else if (command == "SelectEvent")
 			{
 				if (!value) { return;}
-				var compName:String = (value as Sprite).name;
+				var compName:String = (value as Object)["name"];
 				if (config.getCompById(compName) != null)
 				{
 					SelectEventHandler(value as Object);
@@ -100,24 +101,29 @@ package menu
 				var musicNameTextArea:TextArea = config.getCompById("charMusicText") as TextArea;
 				var lockRadioBtn:RadioButton = config.getCompById("lockRBtn") as RadioButton;
 				var unlockRadioBtn:RadioButton = config.getCompById("unlockRBtn") as RadioButton;
+				var deleteAndResetBtn:PushButton = config.getCompById("deleteCharButton") as PushButton;
 				if (charInfo)
 				{
 					charNameTextArea.text = charInfo[0] as String;
 					musicNameTextArea.text = charInfo[1] as String;
+					
 					if ((charInfo[2] as Boolean) == true)
-					{
-						lockRadioBtn.selected = true;
-					}
+					{ lockRadioBtn.selected = true;}
 					else
-					{
-						unlockRadioBtn.selected = true;
-					}
+					{ unlockRadioBtn.selected = true; }
+					
+					deleteAndResetBtn.enabled = true;
+					if ((charInfo[3] as Boolean) == true)
+					{ deleteAndResetBtn.label = "Reset current character";}
+					else
+					{ deleteAndResetBtn.label = "Delete current character";}
 				}
 				else
 				{
 					charNameTextArea.text = "No Character Selected";
 					musicNameTextArea.text = "Not Available";
 					lockRadioBtn.selected = unlockRadioBtn.selected = false;
+					deleteAndResetBtn.enabled = false;
 				}
 			}
 			else if (command == "CharMenu_CharacterHasChanged")
@@ -149,32 +155,50 @@ package menu
 					modeRadioButton.selected = true;
 				}
 			}
-			else if (command == "CharMenu_CharacterWasDeleted")
+			else if (command == "CharMenu_DeleteCharacterResult")
 			{
-				var wasReallyDeleted:Boolean = value as Boolean;
+				var charId:int = value[0] as int;
+				var result:int = value[1] as int;
 				var charList:List = config.getCompById("charSelectList") as List;
-				if (wasReallyDeleted)
+				if (charId < 0 || charId  >= charList.items.length) { return; }
+			
+				//Was deleted
+				if (result == 1)
 				{
-					
 					charList.removeItemAt(charList.selectedIndex);
-					//signal2.dispatch("CharMenu_SwitchCharacterRequest", null);
+					charList.selectedIndex = charList.selectedIndex - 1;
+					signal2.dispatch("CharMenu_SwitchCharacterRequest", charList.selectedItem);
 					//charList.selectedIndex = -1;
 				}
-				else
+				else if(result == 0) //Was reset
 				{
 					//"Switch" characters to update various data
 					signal2.dispatch("CharMenu_SwitchCharacterRequest", charList.selectedItem);
 				}
 			}
+			else if (command == "CharMenu_CharacterLockResult")
+			{
+				var lockRadioBtn:RadioButton = config.getCompById("lockRBtn") as RadioButton;
+				var unlockRadioBtn:RadioButton = config.getCompById("unlockRBtn") as RadioButton;
+				if ((value as Boolean) == true)
+				{
+					lockRadioBtn.selected = true;
+				}
+				else
+				{
+					unlockRadioBtn.selected = true;
+				}
+			}
 		}
 		
-		public function ClickEventHandler(target:String):void
+		public function ClickEventHandler(target:Object):void
 		{
-			if (target == "SequentialCharRBtn" || "RandomCharRBtn" || "OneCharRBtn")
+			var targetName:String = target["name"];
+			if (targetName.search(/SequentialCharRBtn|RandomCharRBtn|OneCharRBtn/) > -1)
 			{
 				//var mode:int = value as int;
 				//var modeRadioButton:RadioButton;
-				switch(target)
+				switch(targetName)
 				{
 					case "SequentialCharRBtn":
 						//modeRadioButton = config.getCompById("SequentialCharRBtn") as RadioButton;
@@ -190,10 +214,10 @@ package menu
 						break;
 				}
 			}
-			else if (target == "lockRBtn" || "unlockRBtn")
+			else if (targetName.search(/lockRBtn|unlockRBtn/) > -1)
 			{
 				
-				switch(target)
+				switch(targetName)
 				{
 					case "lockRBtn":
 						//modeRadioButton = config.getCompById("SequentialCharRBtn") as RadioButton;
@@ -205,15 +229,37 @@ package menu
 						break;
 				}
 			}
-			else if (target == "deleteCharButton")
+			else if (targetName == "createCharButton")
 			{
-				var charList:List = config.getCompById("charSelectList") as List;
-				if (charList.selectedItem > -1)
+				var charNameEdit:TextArea = config.getCompById("charNameEntry") as TextArea;
+				if (charNameEdit && charNameEdit.text.length > 0)
 				{
-					signal2.dispatch("CharMenu_DeleteCharacterRequest", false);
+					signal2.dispatch("CharMenu_CreateNewCharacterRequest", charNameEdit.text);
 				}
 			}
+			else if (targetName == "deleteCharButton")
+			{
+				var charList:List = config.getCompById("charSelectList") as List;
+				if (charList.selectedItem != null)
+				{
+					signal2.dispatch("CharMenu_DeleteCharacterRequest", charList.selectedIndex);
+				}
+			}			
+			else if (targetName == "copyCharButton")
+			{
+				var charNameEdit:TextArea = config.getCompById("charNameEntry") as TextArea;
+				var charList:List = config.getCompById("charSelectList") as List;
+				if (charList && charNameEdit && charNameEdit.text.length > 0)
+				{
+					signal2.dispatch("CharMenu_CopyCharacterRequest", [charList.selectedItem, charNameEdit.text]);
+				}
+			}
+			else if (targetName == "saveCharButton")
+			{
+				
+			}
 		}
+		
 		public function ChangeEventHandler(target:Object):void
 		{
 			

@@ -727,7 +727,27 @@ package animations
 			}
 		}
 		
-		public function ChangeActorAssetsUsingCharacterData(data:Object)
+		public function ChangeActorAssetsUsingCharacterData(data:Object):void
+		{
+			if (data)
+			{
+				for (var name:String in data ) 
+				{
+					for (var i:int = 0; i < 3; i++) 
+					{
+						director.ChangeAssetForActorByName(name, i, data[name][i]);
+					}
+					
+				}
+			}
+		}
+		
+		public function ClearAllActors():void
+		{
+			director.ClearAllActors();
+		}
+		
+		public function ChangeActorAssetsUsingSetNames(data:Object):void
 		{
 			var setList:Array = data as Array;
 			if (setList)

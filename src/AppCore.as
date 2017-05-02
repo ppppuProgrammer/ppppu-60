@@ -20,7 +20,6 @@ how to accomplish base + rosa body parts + peach hair (char is peach)
 * Can't have timelines tied to character.
 Need to set base. Need to add/replace with rosa body parts timelines. Need to then add peach hair timelines.*/
 	//import AnimationSettings.CowgirlInfo;
-	import adobe.utils.CustomActions;
 	import animations.AnimateShard;
 	import animations.AnimateShardLibrary;
 	import animations.AnimationLayout;
@@ -87,26 +86,18 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import flash.ui.Keyboard;
 	import flash.utils.*;
 	import flash.net.SharedObject;
+	import flash.display.StageScaleMode
 	
 	/**
 	 * Responsible for all the various aspects of ppppuNX. 
 	 * @author ppppuProgrammer
 	 */
 	public class AppCore extends Sprite implements Slot1, Slot2
-	{
-		//Holds all the timelines to be used in the program.
-		//private var timelineLib:TimelineLibrary = new TimelineLibrary();
-		
-		
+	{		
 		private var shardLib:AnimateShardLibrary = new AnimateShardLibrary();
-		
 		
 		//A movie clip that holds all the body elements used to create an animation. This is to be a reference to a canvas instance created in the main stage (this is done for performance reasons, performance tanks if the canvas was created in as3.)
 		private var canvas:Canvas;// = new MasterTemplate();
-		//
-		//private var director:Director;
-		//Responsible for holding the various timelines that will be added to a template. This dictionary is 3 levels deep, which is expressed by: timelineDict[Animation][Character][Part]
-		//private var timelinesDict:Dictionary = new Dictionary();
 		
 		
 		
@@ -121,10 +112,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//private var basisBodyTypes:Vector.<String> = new Vector.<String>();
 		private var characterManager:CharacterManager;
 		
-		private var characterList:Vector.<Character> = new Vector.<Character>();//[new PeachCharacter, new RosalinaCharacter];
-		private var currentCharacter:Character;// = defaultCharacter;
+		//private var characterList:Vector.<Character> = new Vector.<Character>();//[new PeachCharacter, new RosalinaCharacter];
+		//private var currentCharacter:Character;// = defaultCharacter;
 		//private var currentAnimationIndex:int = -1;
-		public var currentAnimationName:String = "None";
+		//public var currentAnimationName:String = "None";
 		//private var embedTweenDataConverter:TweenDataParser = new TweenDataParser();
 		
 		//private var musicPlayer:ppppu.MusicPlayer = new ppppu.MusicPlayer();
@@ -164,20 +155,19 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		public var DEBUG_playSpeed:Number = 1.0;
 		
-		//private var startupLoader:LoaderMax = new LoaderMax( { name:"Startup", onComplete:StartupLoadsComplete, onChildComplete:FinishedLoadingSWF } );
 		private var colorizer:Colorizer = new Colorizer();
 		
 		private var mainMenu:MainMenu;
 		
-		CONFIG::debug
-		private var devMenu:DeveloperMenu;// = new menu.DeveloperMenu();
-
 		private var menuSignal1:Signal1 = new Signal1();
 		private var menuSignal2:Signal2 = new Signal2();
 		
 		private var modsLoadedAtStartUp:Array;
 		
 		private var graphicSets:Dictionary = new Dictionary();
+		
+		//Indicates whether the program is in edit mode or play mode. Edit mode has the menus on screen. 
+		private var menuModeActive:Boolean = false;
 		
 		//Constructor
 		public function AppCore() 
@@ -187,31 +177,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mainStage.Backlight.visible = mainStage.OuterDiamond.visible = mainStage.InnerDiamond.visible = 
 			mainStage.TransitionDiamond.visible = mainStage.DisplayArea.visible = mainStage.Compositor.visible = false;
 			
-			//mainStage.stop();
 			//Hide the master template until everything is initialized
-			//mainStage.Compositor.visible = false;
 			addChild(mainStage);
 			mainStage.stopAllMovieClips();
-			//masterTemplate = //mainStage.DisplayArea.MasterTemplateInstance;
-			//Add an event listener that'll allow for frame checking.
-			//mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
-			//this.cacheAsBitmap = true;
-			//this.scrollRect = new Rectangle(0, 0, 480, 720);
-			/*var test:CustomElementContainer = new CustomElementContainer();
-			test.AddSprites(null, new DaisyHairBack(), null, new RosalinaHairBack());
-			test.x = test.y = 200; 
-			addChild(test);*/
 			canvas = mainStage.Compositor;
-			//canvas = new Canvas;
-			
-			//mainStage.addChild(canvas);
-			
-			
-			//director = new Director(colorizer);
-			//startupLoader.autoLoad = true;
-			//masterTemplate.visible = false;
-			//characterList[0].SetID(0);
-			//masterTemplate.
+
 			
 			/*A description of the parts of the ppppu stage
 			 * DisplayArea - used to help center the flash. Indicates the intended view area that should be used
@@ -227,26 +197,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		//Sets up the various aspects of the flash to get it ready for performing.
 		public function Initialize(startupMods:Array = null):void
 		{
+			//stage.scaleMode = StageScaleMode.NO_BORDER; 
 			characterManager = new CharacterManager();
-			var director:Director = new Director(colorizer);
+			var director:Director = new Director(this, colorizer);
 			canvas.Initialize(shardLib, director);
 			//Add the key listeners
-			//TODO: Re-enable when done testing menus
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyPressCheck);
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyReleaseCheck);
-			
-			//Add the characters
-			//AddCharacter(PeachCharacter);
-			//AddCharacter(RosalinaCharacter);
-			
-			/*CONFIG::TweenLib == "GSAP"
-			{
-			//Initializing plugins for the GSAP library
-			TweenPlugin.activate([FramePlugin, FrameLabelPlugin, TransformMatrixPlugin, VisiblePlugin, ColorTransformPlugin]);
-			//Set the default Ease for the tweens
-			TweenLite.defaultEase = Linear.ease;
-			TweenLite.defaultOverwrite = "none";
-			}*/
+
 			//Disable mouse interaction for various objects
 			////mainStage.MenuLayer.mouseEnabled = true;
 			//Disable mouse interaction for various objects
@@ -268,24 +226,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			canvas.mouseChildren = false;
 			canvas.mouseEnabled = false;
 			
-			//AddCharacter(PeachCharacter);
-			
-			//masterTemplate.currentCharacter = defaultCharacter;
-			
 			mainStage.x = (stage.stageWidth - mainStage.DisplayArea.width) / 2;	
-			CONFIG::debug
-			{
-				mainStage.x = 0;	
-			}
-			//animInfoDict["Cowgirl"] = new CowgirlInfo();
-			
-			//Switch the first animation.
-			//SwitchTemplateAnimation(0);
-			//SwitchTemplateAnimation(8);
-			
-			//menu = new ppppuMenu(masterTemplate);
-			//menu.ChangeSlidersToCharacterValues(currentCharacter);
-			//addChild(menu);
 			
 			//charVoiceSystem = new SoundEffectSystem();
 			
@@ -312,50 +253,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mainStage.InnerDiamond.SelectBackgroundAsset(0);
 			mainStage.OuterDiamond.SelectBackgroundAsset(0);
 			mainStage.TransitionDiamond.SelectBackgroundAsset(0);
-			//mainStage.Background.SelectBackgroundAsset(0);
+			mainStage.Background.SelectBackgroundAsset(0);
 			mainStage.Backlight.SelectBackgroundAsset(0);
-			/*var backlightTLDef:TimelineDefinition = new BacklightTimelineData();
-			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(backlightTLDef.GetTimelineData(), mainStage);
-			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
-			var outerDiaTLDef:TimelineDefinition = new OuterDiamondTimelineData();
-			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(outerDiaTLDef.GetTimelineData(), mainStage);
-			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
-			var innerDiaTLDef:TimelineDefinition = new InnerDiamondTimelineData();
-			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(innerDiaTLDef.GetTimelineData(), mainStage);
-			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
-			var transitDiaTLDef:TimelineDefinition = new TransitionDiamondTimelineData();
-			bgMasterTimelineChildren[bgMasterTimelineChildren.length] = masterTemplate.CreateTimelineFromData(transitDiaTLDef.GetTimelineData(), mainStage);
-			//backgroundMasterTimeline.add(bgMasterTimelineChildren[bgMasterTimelineChildren.length-1], 0);
-			
-			backgroundMasterTimeline = BetweenAS3.parallelTweens(bgMasterTimelineChildren) as ParallelTween;
-			backgroundMasterTimeline.stopOnComplete = false;*/
-			//musicPlayer.SetUpdateRate(stage.frameRate);
-			
-			//(loader as AnimationInfo).GetDataForTimelinesCreation();
-			//var animation:AnimationInfo = (loader as AnimationInfo);
-			//animation.GetDataForTimelinesCreation();
-			//Test purposes
-			
-			//
-			//masterTemplate.PlayAnimation(0);
-			//mainStage.play();
 			
 			registerClassAlias("AnimationList", animations.AnimationList);
-			
-			
-			
-			//CONFIG::debug
-			//{
-				//devMenu = new DeveloperMenu(this, director);
-				//devMenu.x = 480;
-				//addChild(devMenu);
-				////devMenu.SetupHooksToApp(this);
-				//SetupDevMenuHooks();
-				
-			//}
+
 			mainMenu = new MainMenu(this, director);
 			mainMenu.x = 480;
-			//addChild(mainMenu);
 			
 			modsLoadedAtStartUp = startupMods;
 			LoadUserSettings();
@@ -465,23 +369,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				//}*/
 		}
 		
-		/*private function StartupLoadsComplete(e:LoaderEvent):void
-		{
-			//Add an event listener that'll allow for frame checking.
-			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
-			
-			
-			//mainStage.play();
-			//lastRecordedTime = getTimer();
-			
-			//TweenLite.ticker.addEventListener("tick", RunLoop,false,0,true);
-			//runTimer = new Timer(1000.0 / stage.frameRate);
-			//runTimer.addEventListener(TimerEvent.TIMER, this.RunLoop);
-			//runTimer.start();
-			e.currentTarget.unload();
-			e.currentTarget.dispose();
-		}*/
-		
 		//Activated if a key is detected to be released. Sets the keys "down" status to false
 		private function KeyReleaseCheck(keyEvent:KeyboardEvent):void
 		{
@@ -513,29 +400,19 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					{
 						keyPressed = keyPressed - 48;
 					}
-					/*if (timelineLib.DoesBaseTimelinesForAnimationExist(keyPressed - 49))
-					{
-					//SwitchTemplateAnimation(keyPressed - 49);
-					}*/
 					canvas.PlayAnimation(0);
 				}
 				
-				if (keyPressed == Keyboard.UP)
+				if (keyPressed == Keyboard.SPACE)
 				{
-					DEBUG_playSpeed += .05;
-					canvas.ChangePlaySpeed(DEBUG_playSpeed);
-				}
-				else if (keyPressed == Keyboard.DOWN)
-				{
-					DEBUG_playSpeed -= .05;
-					canvas.ChangePlaySpeed(DEBUG_playSpeed);
-					//ScaleFromCenter(//mainStage.DisplayArea, //mainStage.DisplayArea.scaleX - .05, //mainStage.DisplayArea.scaleY - .05);
+					ToggleMenuMode();
+					
 				}
 				
 				
 				
 				//Debugger
-				if (keyPressed == Keyboard.S)
+				/*if (keyPressed == Keyboard.S)
 				{
 					//mainStage.stop();
 					backgroundMasterTimeline.stop();
@@ -550,12 +427,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						tl.play(0);
 					}
 					canvas.ResumePlayingAnimation();
-				}
+				}*/
 				keyDownStatus[keyEvent.keyCode] = true;
 			}
 		}
 		
-		[Inline]
+		/*[Inline]
 		final public function SwitchCharacter(charId:int):void
 		{
 			if (charId >= 0 && charId < characterList.length)
@@ -571,16 +448,27 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					canvas.ChangeGraphicSets(charData.GraphicSets);
 				}
-				//canvas.ApplyShardOverrides();
-				/*charVoiceSystem.ChangeCharacterVoiceSet(currentCharacter.GetVoiceSet());
-				charVoiceSystem.ChangeCharacterVoiceChance(currentCharacter.GetVoicePlayChance());
-				charVoiceSystem.ChangeCharacterVoiceCooldown(currentCharacter.GetVoiceCooldown());
-				charVoiceSystem.ChangeCharacterVoiceRate(currentCharacter.GetVoicePlayRate());
-				menu.ChangeSlidersToCharacterValues(currentCharacter);*/
+			}
+		}*/
+		
+		private function ToggleMenuMode():void
+		{
+			menuModeActive = !menuModeActive;
+			if (menuModeActive)
+			{
+				mainStage.x = 0;	
+				addChild(mainMenu);
+				//stage.focus = mainMenu;
+			}
+			else
+			{
+				mainStage.x = (stage.stageWidth - mainStage.DisplayArea.width) / 2;	
+				removeChild(mainMenu);
+				stage.focus = null;
 			}
 		}
 		
-		public function GetListOfCharacterNames():Vector.<String>
+		/*public function GetListOfCharacterNames():Vector.<String>
 		{
 			var charNameVector:Vector.<String> = new Vector.<String>();
 			for (var i:int = 0, l:int = characterList.length; i < l; ++i)
@@ -588,66 +476,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				charNameVector[i] = characterList[i].GetName();
 			}
 			return charNameVector;
-		}
+		}*/
 		
 		public function GetListOfAnimationNames():Vector.<String>
 		{
 			return animationNameIndexes;
 		}
-		
-		public function AddCharacter(characterClass:Class):void
-		{
-			var character:Character = new characterClass;
-			character.SetID(characterList.length);
-			/*if (characterList.length == 0)
-			{
-				defaultCharacter = character;
-				defaultCharacterName = character.GetName();
-			}*/
-			characterList[characterList.length] = character;
-		}
-		
-		private function ScaleFromCenter(dis:DisplayObjectContainer,sX:Number,sY:Number):void
-		{
-			var posX:Number = dis.x;
-			var posY:Number = dis.y;
-			var oldDisBounds:Rectangle = dis.getBounds(dis.parent);
-			//dis.x =dis.y = 0;
-			dis.scaleX = sX;
-			dis.scaleY = sY;
-			
-			var newDisBounds:Rectangle = dis.getBounds(dis.parent);
-			var xDisplacement:Number = newDisBounds.left - oldDisBounds.left;
-			var yDisplacement:Number = newDisBounds.top - oldDisBounds.top;
-			dis.x += xDisplacement;
-			dis.y += yDisplacement;
-		}
-		
-		private function mouthLoadTest(e:Event):void
-		{
-			/*var parser:ExpressionParser = new ExpressionParser();
-			var expr:TimelineMax = parser.Parse(masterTemplate, masterTemplate.Mouth.ExpressionContainer, e.target.data as String);
-			//var expr:TimelineMax = ExpressionParser.ParseExpression(masterTemplate, masterTemplate.Mouth.ExpressionContainer, e.target.data);
-			masterTemplate.SetExpression(expr);*/
-		}
-		
-		private function loadFail(e:IOErrorEvent):void
-		{
-			trace("Was unable to load file \"MouthTest.txt\"");
-		}
-		
-		/*private function FinishedLoadingSWF(e:LoaderEvent):void
-		{
-			var mod:Mod = (e.target.content.rawContent as Mod);
-			//Add the mod to the stage so the first frame function can get started, allowing the content to be ready to be used.
-			addChild(mod);
-			ProcessMod(mod);
-			//remove the mod file.
-			removeChild(mod);
-			mod = null;
-			//e.target.unload();
-			//e.target.dispose();
-		}*/
+
 		
 		/*Processes a mod and then adds it into ppppu. Returns true if mod was successfully added and false if a problem was encounter
 		and the mod could not be added.*/
@@ -669,12 +504,43 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (tcharacter)
 				{
 					var charName:String = tcharacter.GetCharacterName();
-					var character:Character = new Character(charName, tcharacter.GetCharacterData(), true);
-					if (characterManager.CheckIfCharacterCanBeAdded(character))
+					
+					var presetAnimationData:Vector.<Array> = tcharacter.GetPresetAnimations();
+					var charPresetAnimations:Vector.<AnimationList> = new Vector.<AnimationList>();
+					for (var j:int = 0, k:int = presetAnimationData.length; j < k; j++) 
+					{
+						var dataArray:Array = presetAnimationData[j];
+						if (dataArray.length >= 3)
+						{
+							var animationFor:String = dataArray[0] as String;
+							var shardTypes:Vector.<Boolean> = new Vector.<Boolean>;
+							var shardNames:Vector.<String> = new Vector.<String>;
+							for (var m:int = 1, n:int = dataArray.length; m < n; m+=2) 
+							{
+								shardTypes[shardTypes.length] = dataArray[m] as Boolean;
+								shardNames[shardNames.length] = dataArray[m + 1] as String;
+							}
+							var animList:AnimationList = new AnimationList();
+							animList.TargetAnimationName = animationFor;
+							animList.ShardNameList = shardNames;
+							animList.ShardTypeList = shardTypes;
+							charPresetAnimations[charPresetAnimations.length] = animList;
+						}
+					}
+					//character.SetAnimationLists(charPresetAnimations);
+					
+					//var character:Character = new Character(charName, tcharacter.GetCharacterData(), true, charPresetAnimations);
+					var newCharacterId:int = characterManager.AddNewCharacter(charName, tcharacter.GetCharacterData(), true, charPresetAnimations);
+					if (newCharacterId > -1)
+					{
+						menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(newCharacterId));
+					}
+					/*if (characterManager.CheckIfCharacterCanBeAdded(character))
 					{
 						characterManager.AddCharacter(character);
+						
 						menuSignal2.dispatch("AddNewCharacter", character.GetName());
-					}
+					}*/
 					//characterList[characterList.length] = character;
 					//CONFIG::debug
 					//{
@@ -754,40 +620,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					var assetData:AssetData = new AssetData(assetMod.setName, assetMod.asset, assetMod.layer, assetMod.data);
 					canvas.AddAssetToActor(assetMod.targetActorName, assetData);
-					CONFIG::debug
-					{
-						//devMenu.AddNewGraphicSet(assetMod.setName);
-					}
-					//Handle colorable data now <- scratch that, Actors should send a command to have assets with Colorable data be added for colorization.
-					/*if (assetData.properties != null)
-					{
-						if ("Colorable" in assetData.properties)
-						{
-							var colorableData:Object = assetData.properties.Colorable;
-							if (colorableData != null)
-							{
-								colorizer.AddColorizeData(assetData.asset,colorableData);
-							}
-						}
-					}*/
-					
-					//For graphic sets this needs to be changed. Assets should be added to a graphic set. To be used the Actor necessary for the asset needs to be added and that will be handled when a timeline is created.
-					/*if (canvas.AddNewSpriteInstance(assetMod.asset, assetMod.assetName))
-					{
-						addedMod = true;
-						//Asset was added, so can see if it had additional data and make use of it
-						if (assetMod.data != null)
-						{
-							if ("Colorable" in assetMod.data)
-							{
-								var colorableData:Object = assetMod.data.Colorable;
-								if (colorableData != null)
-								{
-									colorizer.AddColorizeData(assetMod.asset,colorableData);
-								}
-							}
-						}
-					}*/
 				}
 				
 				else
@@ -821,44 +653,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				
 			}
-			/*else if (modType == Mod.MOD_GRAPHICSET)
-			{
-				var graphicSet:GraphicSetMod = mod as GraphicSetMod;
-				if (graphicSet)
-				{
-					var gfxSet:GraphicSet = new GraphicSet();
-					var assetData:Array;
-					for (var j:int = 0, k:int = graphicSet.setData.length; j < k; j++) 
-					{
-						assetData = graphicSet.setData[j];
-						var assetProperties:Object = assetData[3] as Object;
-						if (gfxSet.AddAssetToSet(assetData[0] as Sprite, assetData[1] as String, assetData[2] as int, assetProperties))
-						{
-							//New graphic asset was added to the set, now can see if there was colorable data.
-							if (assetProperties != null)
-							{
-								if ("Colorable" in assetProperties)
-								{
-									var colorableData:Object = assetProperties.Colorable;
-									if (colorableData != null)
-									{
-										colorizer.AddColorizeData(assetData[0] as Sprite, colorableData);
-									}
-								}
-							}
-						}
-					}
-					if (!(graphicSet.setName in graphicSets))
-					{
-						graphicSets[graphicSet.setName] = gfxSet;
-						CONFIG::debug
-						{
-							//devMenu.AddNewGraphicSet(graphicSet.setName);
-						}
-					}
-					
-				}
-			}*/
 			//If the mod type is an archive we'll need to iterate through the mod list it has and process them seperately
 			else if (modType == Mod.MOD_ARCHIVE)
 			{
@@ -931,10 +725,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				canvas.StopAnimation();
 				backgroundMasterTimeline.stop();
 			}
-			else if (target.search(RegExp(/[+-]\d*.F/)) > -1)
+			else if (target.search(RegExp(/[+-]\d*.FrameChange/)) > -1)
 			{
 				var sign:int = target.charAt(0) == "-"? -1:1;
-				target = target.substring(1, target.length -1);
+				target = target.substring(1, target.indexOf("F"));
 				var frameAmount:int = int(target);
 				var position:Number = canvas.GetTimeInCurrentAnimation();
 				position = UtilityFunctions.roundToNearest(1.0 / stage.frameRate, position);
@@ -950,10 +744,15 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else if (target == "MenuFinishedInitializing")
 			{
 				this.ProcessStartupMods();
+				InitializeSettingsForCharactersLoadedAtStartup();
+				removeChild(mainMenu);
+				ToggleMenuMode();
 				//Change menu to reflect the loaded settings
 				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
-				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(userSettings.currentCharacterName), true));
-				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(userSettings.currentCharacterName));
+				ChangeCharacter(userSettings.currentCharacterName);
+				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
+				//menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(userSettings.currentCharacterName), true));
+				//menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(userSettings.currentCharacterName));
 			}
 		}
 		
@@ -988,7 +787,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (targetName == "characterSelector")
 			{
-				SwitchCharacter(value as int);
+				//SwitchCharacter(value as int);
+				ChangeCharacter(characterManager.GetCharacterNameById(value as int));
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
@@ -1047,11 +847,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (targetName == "CharMenu_SwitchCharacterRequest")
 			{
-				characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(value as String), true);
+				ChangeCharacter(value as String);
+				/*characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(value as String), true);
 				colorizer.ChangeColorsUsingCharacterData(characterManager.GetCurrentCharacterColorData());
 				canvas.ChangeActorAssetsUsingCharacterData(characterManager.GetCurrentCharacterGraphicSets());
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(value as String));
-				userSettings.UpdateCurrentCharacterName(value as String);
+				userSettings.UpdateCurrentCharacterName(value as String);*/
 			}
 			else if (targetName == "CharMenu_ChangeSwitchModeRequest")
 			{
@@ -1061,21 +862,64 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (targetName == "CharMenu_ChangeCharacterLockRequest")
 			{
-				characterManager.SetLockOnCurrentCharacter(value as Boolean);
+				var charLock:Boolean = characterManager.SetLockOnCurrentCharacter(value as Boolean);
+				menuSignal2.dispatch("CharMenu_CharacterLockResult", charLock);
+				userSettings.UpdateSettingForCharacter_Lock(characterManager.GetCurrentCharacterName(), charLock);
 				//characterManager.SetLockOnCharacter(value[0] as int, value[1] as Boolean);
 			}
-			else if (targetName == "CharMenu_DeleteCharacterRequest")
+			else if (targetName == "CharMenu_CreateNewCharacterRequest")
 			{
-				//;
-				menuSignal2.dispatch("CharMenu_CharacterWasDeleted", characterManager.DeleteCurrentCharacter());
+				//var newCharacter:Character = new Character(value as String, null);
+				var addedCharId:int = characterManager.AddNewCharacter(value as String, null);
+				if (addedCharId > -1)
+				{
+					var characterName:String = characterManager.GetCharacterNameById(addedCharId);
+					userSettings.CreateSettingsForNewCharacter(characterName);
+					userSettings.UpdateSettingForCharacter_AnimationLists(characterName, characterManager.GetAnimationListsForCharacterInBinaryFormat(addedCharId));
+					menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(addedCharId));
+				}
+			}
+			else if (targetName == "CharMenu_CopyCharacterRequest")
+			{
+				var addedCharId:int = characterManager.DuplicateCharacter(value[0] as String, value[1] as String);
+				//var addedCharId:int = ;
+				if (addedCharId > -1)
+				{
+					var characterName:String = characterManager.GetCharacterNameById(addedCharId);
+					userSettings.CreateSettingsForNewCharacter(characterName);
+					userSettings.UpdateSettingForCharacter_AnimationLists(characterName, characterManager.GetAnimationListsForCharacterInBinaryFormat(addedCharId));
+					menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(addedCharId));
+				}
+			}
+			else if (targetName == "CharMenu_DeleteCharacterRequest")
+			{				
+				var delResetResult:Array = characterManager.DeleteOrResetCharacter(value as int);
+				var result:int = delResetResult[1] as int;
+				var charName:String = delResetResult[0] as String;
+				if (result == 1)
+				{
+					userSettings.DeleteSettingsForCharacter(delResetResult[0] as String);
+				}
+				else if (result == 0)
+				{
+					userSettings.UpdateSettingForCharacter_AnimationLists(charName, characterManager.GetAnimationListsForCharacterInBinaryFormat(characterManager.GetCharacterIdByName(charName)));
+				}
+				menuSignal2.dispatch("CharMenu_DeleteCharacterResult", delResetResult);
 			}
 			else if (targetName == "AnimMenu_RemoveAnimationSlotRequest")
 			{
-				menuSignal2.dispatch("AnimMenu_RemoveAnimationSlotResult",characterManager.RemoveAnimationSlotOfCurrentCharacter(value as int));
+				
+				menuSignal2.dispatch("AnimMenu_RemoveAnimationSlotResult", characterManager.RemoveAnimationSlotOfCurrentCharacter(value as int));
+				var charName:String = characterManager.GetCurrentCharacterName();
+				userSettings.UpdateSettingForCharacter_AnimationLists(charName, characterManager.GetAnimationListsForCharacterInBinaryFormat(characterManager.GetCharacterIdByName(charName)));
 			}
 			else if (targetName == "AnimMenu_SaveAnimationForCharacterRequest")
 			{
-				characterManager.SaveAnimationForCurrentAnimation(value[0] as int, value[1] as AnimationList);
+				//characterManager.SaveAnimationForCurrentAnimation(value[0] as int, value[1] as AnimationList);
+				menuSignal2.dispatch("AnimMenu_SaveAnimationResult", characterManager.SaveAnimationForCurrentAnimation(value[0] as int, value[1] as AnimationList));
+				var charName:String = characterManager.GetCurrentCharacterName();
+				userSettings.UpdateSettingForCharacter_AnimationLists(charName, characterManager.GetAnimationListsForCharacterInBinaryFormat(characterManager.GetCharacterIdByName(charName)));
+				
 			}
 			else if (targetName == "AnimMenu_ChangeSelectedAnimationOfCurrentCharacter")
 			{
@@ -1089,6 +933,42 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				//Things may happen here but for now they don't.
 				
+			}
+			else if (targetName == "Actor_ReportingAssetChanged")
+			{
+				var nameOfActor:String = value[0] as String;
+				var nameOfSet:String = value[1] as String;
+				var layer:int = value[2] as int;
+				if (characterManager.IsACharacterSelected())
+				{
+					characterManager.UpdateGraphicSettingForCurrentCharacter(nameOfActor, nameOfSet, layer);
+					userSettings.UpdateGraphicSettingsForCharacter(characterManager.GetCurrentCharacterName(), nameOfActor, nameOfSet, layer);
+					
+				}
+			}
+		}
+		
+		private function ChangeCharacter(characterName:String):void
+		{
+			var charId:int = characterManager.GetCharacterIdByName(characterName);
+			if (charId > -1)
+			{
+			characterManager.SwitchToCharacter(charId, true);
+			colorizer.ChangeColorsUsingCharacterData(characterManager.GetCurrentCharacterColorData());
+			var charGraphicSettings:Object = characterManager.GetCurrentCharacterGraphicSettings();
+			if (charGraphicSettings )
+			{
+				//canvas.ClearAllActors();
+				canvas.ChangeActorAssetsUsingCharacterData(charGraphicSettings);
+			}
+			else
+			{
+				canvas.ClearAllActors();
+				canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCurrentCharacterGraphicSets());
+			}
+			menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(characterName));
+			menuSignal2.dispatch("AnimMenu_UpdateAnimationListing", characterManager.GetCurrentCharacterAnimationStates());
+			userSettings.UpdateCurrentCharacterName(characterName);
 			}
 		}
 		
@@ -1176,7 +1056,73 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						shardsData[shardsData.length] = [names[i], types[i]/*, shard*/];
 					}
 				}
+				menuSignal2.dispatch("AnimMenu_ChangeAnimationSelected", list.TargetAnimationName);
 				menuSignal2.dispatch("SetupShardsList", shardsData);
+			}
+		}
+		
+		//[inline]
+		/*private function AddNewCharacter(name:String, charData:Object, isPresetCharacter:Boolean = false, presetAnimationLists:Vector.<AnimationList>=null):int
+		{
+			if (characterManager.CheckIfCharacterCanBeAdded(character))
+			{
+				var newCharId:int = characterManager.AddNewCharacter(name, charData, isPresetCharacter, presetAnimationLists);
+				
+				menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(newCharId));
+				return newCharId;
+			}
+			return -1;
+		}*/
+		
+		private function InitializeSettingsForCharactersLoadedAtStartup():void
+		{
+			//var charSettings:Object;
+			//For any characters added due to mods
+			var numChars:int = characterManager.GetTotalNumOfCharacters();	// SMLSE OPTIMIZE ATTEMPT
+			for (var i:int = 0; i < numChars; i++) 
+			{
+				TryToLoadCharacterSettings(characterManager.GetCharacterNameById(i));
+			}
+			//For characters created by other means and settings overrides for the mod created characters
+			var characterName:String;
+			for (characterName in userSettings.characterSettings) 
+			{
+				TryToLoadCharacterSettings(characterName);
+			}
+			
+		}
+		
+		private function TryToLoadCharacterSettings(characterName:String):void
+		{
+			//if (characterId < 0 || characterId >= characterManager.GetTotalNumOfCharacters()) { return; }
+			
+			//var characterName:String = characterManager.GetCharacterNameById(characterId);
+			if (userSettings.CheckIfCharacterHasSettings(characterName) == false)
+			{
+				userSettings.CreateSettingsForNewCharacter(characterName);
+			}
+
+			var charId:int = characterManager.GetCharacterIdByName(characterName);
+			//processing of character settings
+			var charSettings:Object = userSettings.GetSettingsForCharacter(characterName);
+			
+			//Character wasn't added by a template character mod but was saved from a prior session. Create a new character and try to add them.
+			if (charId == -1)
+			{
+				//var newCharacter:Character = new Character(characterName, null);
+				charId = characterManager.AddNewCharacter(characterName, null);
+				if (charId > -1)
+				{
+					menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(charId));
+				}
+			}
+			if (charId > -1)
+			{
+				//NYI
+				//Set up character to use those settings.
+				characterManager.InitializeSettingsForCharacter(charId, charSettings);
+				//Insert something here for menu to update
+				//mainMenu.SetupMenusForCharacter(charId, charSettings);
 			}
 		}
 		

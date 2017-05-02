@@ -9,7 +9,8 @@ package modifications
 	public class TemplateCharacterMod extends Mod implements IModdable
 	{
 		protected var characterName:String;
-		protected var characterData:Object = {Color:{}};
+		protected var characterData:Object = { Color: { }};
+		protected var animationPresets:Vector.<Array> = new Vector.<Array>;
 		public function TemplateCharacterMod() 
 		{
 			modType = Mod.MOD_TEMPLATECHARACTER;
@@ -27,6 +28,11 @@ package modifications
 		public function GetCharacterData():Object
 		{
 			return characterData;
+		}
+		
+		public function GetPresetAnimations():Vector.<Array>
+		{
+			return animationPresets;
 		}
 		
 		public function OutputModDetails():String

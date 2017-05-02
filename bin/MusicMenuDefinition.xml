@@ -1,0 +1,8 @@
+<comps>
+	<Window id="musicPlayerWindow" title="Music Player" x="0" y="0" width="480" height="200" enabled="false">
+	</Window>
+	
+	<Window id="charAudioWindow" title="Character Sounds" x="0" y="200" width="480" height="200" enabled="false">
+	</Window>
+	
+</comps>

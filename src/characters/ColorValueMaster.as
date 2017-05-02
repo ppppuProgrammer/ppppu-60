@@ -31,7 +31,7 @@ package characters
 			return linkIsActive;
 		}
 		
-		public function CreateLinkedColorHolder():ColorValueHolder
+		public function CreateLinkedColorHolder(colorObj:Object):ColorValueHolder
 		{
 			var cvh:ColorValueHolder = new ColorValueHolder(color, this);
 			linkedColorHolders[linkedColorHolders.length] = cvh;

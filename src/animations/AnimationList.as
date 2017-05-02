@@ -40,6 +40,15 @@ package animations
 			shardTypeList = value;
 		}
 		
+		public function IsAnimListEmpty():Boolean
+		{
+			if (ShardNameList == null || targetAnimationName == null || shardTypeList == null ||ShardNameList.length == 0 || shardTypeList.length == 0 || targetAnimationName == "")
+			{
+				return true;
+			}
+			return false;
+		}
+		
 	}
 
 }

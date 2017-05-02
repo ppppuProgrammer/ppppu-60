@@ -1,0 +1,73 @@
+<comps>
+	<!-- Window 1 -->
+		<Window id="animCompileWindow" title="Animation creation menu" width="480" height="300" y="0" hasMinimizeButton="true">
+			<!-- Section 1 -->
+			<Label id="animationLabel" x="10" y="10" text="Animation:"/>
+			<ComboBox id="animationSelector"  x="60" y="10" width="170"/>
+			<Label id="shardTypeLabel" x="245" y="10" text="Type:"/>
+			<ComboBox id="shardTypeSelector"  x="275" y="10" width="70"/>
+			<!---<Label id="characterLabel" x="305" y="10" text="Character:"/>
+			<ComboBox id="characterSelector"  x="360" y="10" width="110"/>--->
+			<Label id="shardLabel" x="10" y="40" text="Shard:"/>
+			<ComboBox id="shardSelector"  x="45" y="40" width="300"/>
+			<PushButton id="addShardButton" x="355" y="40" width="80" label="Add Shard to list" />
+			<Label id="ShardInfoLabel" x="10" y="60" text="Shard information"/>
+			<TextArea id="shardInfoText" x="0" y="80" width="480" height="35" editable="false"/>
+			<Label id="animListLabel" x="10" y="120" text="Animation list"/>
+			<List id="animList" x="0" y="140" width="480" height="100"/>
+			<HBox id="animationListButtonGroup" x="15" spacing="10">
+				<PushButton id="removeShardButton" x="5" y="250" width="80" label="Remove shard" />
+				<PushButton id="finalizeButton" x="165" y="250" width="60" label="Preview" />
+				<PushButton id="loadAnimationListButton" x="265" y="250" width="80" label="Load List File" />
+				<PushButton id="saveAnimationListButton" x="375" y="250" width="80" label="Save List File" />	
+				<PushButton id="copyListToClipboardButton" x="375" y="250" width="110" label="Copy List to clipboard" />	
+			</HBox>
+		</Window>
+		
+		<!-- Window 2 Animation Playback -->
+		<Window id="animPlayWindow" title="Animation playback window" x="0" y="305" width="480" height="100" hasMinimizeButton="true" minimized="false">
+			<!-- Section 1 Animation play progress -->
+			<PushButton id="animPlayButton" x="10" y="10" label="Play" width="50" toggle="false"/>
+			<PushButton id="animPauseButton" x="70" y="10" label="Pause" width="50" toggle="false"/>
+			<Label id="timeLabel" x="130" y="10" text="Time:"/>
+			<Label id="timeText" x="160" y="10" text=""/>
+			<Label id="frameLabel" x="220" y="10" text="Keyframe:"/>
+			<Label id="frameText" x="270" y="10" text=""/>
+			
+			<!-- Section 2 Changing frame for animation-->
+			<Label id="frameSettingLabel" x="10" y="30" text="Frame Settings"/>
+			<PushButton id="-1FrameChange" x="10" y="50" label="-1F" width="30"/>
+			<PushButton id="-5FrameChange" x="40" y="50" label="-5F" width="30"/>
+			<PushButton id="-10FrameChange" x="70" y="50" label="-10F" width="30"/>
+			<PushButton id="+1FrameChange" x="110" y="50" label="+1F" width="30"/>
+			<PushButton id="+5FrameChange" x="140" y="50" label="+5F" width="30"/>
+			<PushButton id="+10FrameChange" x="170" y="50" label="+10F" width="30"/>
+			<PushButton id="setFrameButton" x="210" y="50" label="Set to frame" width="80"/>
+			<HUISlider id="frameSlider" x="300" y="50" label="" minimum="1" value="1" labelPrecision="0"/>
+		</Window>
+	
+	<Window id="charAnimationsWindow" title="Character animations" x="0" y="410" width="480" height="300" hasMinimizeButton="false" minimized="false">
+		<List id="charAnimationsSelector" x="0" width="48" height="480" scaleX="-1" rotation="270" listItemHeight="48"/>
+		<VBox y = "60" spacing="10">
+			<!---<HBox>
+				<Label x="10" text="Animation: "/>
+				<TextArea id="animationForText" x="10"  width="200" height="20" autoHideScrollBar="true"/>
+			</HBox>--->
+			<HBox x="20" spacing="20">
+				<PushButton id="saveAnimationListBtn" x="10"  label="Save Animation" width="100"/>
+				<PushButton id="addAnimationSlotBtn" x="10"  label="Add New Animation Slot" width="130"/>
+				<PushButton id="removeAnimationSlotBtn" x="100" label="Remove Animation Slot" width="130"/>
+			</HBox>
+			<Label id="charAnimWarningLabel" x="10" text=""/>
+		</VBox>
+	</Window>
+	<!---<Panel x ="0" y="0" width="480" height="70">
+		<PushButton id="CharacterTab" x="10" y="0" width="60" label="Characters" />
+		<PushButton id="GraphicsTab" x="80" y="0" width="60" label="Customization" />
+		<PushButton id="MusicTab" x="150" y="0" width="60" label="Music" />
+		<PushButton id="LoadTab" x="220" y="0" width="60" label="Load" />
+		<PushButton id="AnimationTab" x="290" y="0" width="60" label="Animations" />
+		<PushButton id="DeveloperTab" x="360" y="0" width="60" label="Development" />
+	</Panel>--->
+	
+</comps>

@@ -16,8 +16,9 @@ package animations
 		private var signal2:Signal2 = new Signal2;
 		private var signal3:Signal3 = new Signal3;
 		private var currentAnimationName:String;
-		public function Director(assetColorizer:Colorizer) 
+		public function Director(appCore:Slot2, assetColorizer:Colorizer) 
 		{
+			signal2.addSlot(appCore);
 			colorizer = assetColorizer;
 		}
 		
@@ -87,6 +88,14 @@ package animations
 			{
 				ChangeAssetForAllActorsBySetName(value[0] as String, value[1] as Boolean);
 			}
+			else if (commandStr == "SetNameOfAddedAsset")
+			{
+				signal2.dispatch(command, value);
+			}
+			else if (commandStr == "Actor_ReportingAssetChanged")
+			{
+				signal2.dispatch(command, value);
+			}
 		}
 		
 		//Used when a signal is received from an Actor to change visibility of other actors or for registering assets with colorable data.
@@ -129,10 +138,21 @@ package animations
 		}
 
 		[inline]
+		public function ChangeAssetForActorByName(actorName:String, layer:int, setName:String):void
+		{
+			signal3.dispatch("ChangeAssetByName", actorName, [setName, layer]);
+		}	
+		
+		[inline]
 		public function ChangeAssetForActor(actorName:String, assetId:int):void
 		{
 			signal3.dispatch("ChangeAsset", actorName, assetId);
 		}		
+		
+		public function ClearAllActors():void
+		{
+			signal2.dispatch("ClearAllAssets", null);
+		}
 		
 		/*public function ChangeColorsForAssets(colorizeData:Object):void
 		{

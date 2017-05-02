@@ -21,7 +21,7 @@
 		//private var m_defTransDiaMC:Boolean = true;
 		
 		//Data and properties to reset to for a character
-		public var data:Object;
+		public var data:Object = new Object;
 		//Data and properties used by the program.
 		//public var currentData:Object;
 		//Flag that determines if the id number of the character can be set.
@@ -43,74 +43,138 @@
 		
 		protected var animationLists:Vector.<AnimationList>;
 		
-		public function Character(name:String, charData:Object, isPresetCharacter:Boolean = false)
+		public function Character(name:String, charData:Object, isPresetCharacter:Boolean = false, presetAnimationLists:Vector.<AnimationList>=null)
 		{
 			registerClassAlias("AnimationList", AnimationList);
+			m_lockedAnimation = new Vector.<Boolean>();
 			m_name = name;
-			data = charData;
-			animationLists = new Vector.<AnimationList>();
-			animationLists[animationLists.length] = new AnimationList();
-			animationLists[animationLists.length] = new AnimationList();
+			if (charData)
+			{
+				data = charData;
+			}
+			animationLists = presetAnimationLists;
 			if (isPresetCharacter)
 			{
-				var charByteArray:ByteArray = new ByteArray();
-				charByteArray.writeObject(this);
 				defaultSettings = ExportCharacterDataForStorage();
-				var character:Character = new Character("temp", null);
-				character.ImportCharacterDataFromStorage(defaultSettings);
-				var bp:int = 5;
 			}
 			
 			
+		}
+		
+		public function SetAnimationLists(animationPresets:Vector.<AnimationList>):void
+		{
+			animationLists = animationPresets;
+		}
+		
+		public function ChangeDefaultSettings(characterPreset:Character):void
+		{
+			if (characterPreset == null)
+			{
+				defaultSettings = null;
+			}
+			else
+			{
+				defaultSettings = characterPreset.ExportCharacterDataForStorage();
+			}
+		}
+		
+		public function SetName(name:String):void
+		{
+			m_name = name;
 		}
 		
 		public function SetID(idNumber:int):void
 		{
-			if (m_Id == -1)
-			{
+			//if (m_Id == -1)
+			//{
 				m_Id = idNumber;
 				//idSet = true;
-			}
+			//}
 		}
 		
 		public function AddAnimationSlot():void
 		{
+			if (animationLists == null)
+			{
+				animationLists = new Vector.<AnimationList>;
+			}
 			animationLists[animationLists.length] = new AnimationList();
+			m_lockedAnimation[m_lockedAnimation.length] = false;
 		}
 		
 		public function RemoveAnimationSlot(index:int):Boolean
 		{
-			if (index >= 0 && index < animationLists.length)
+			if (animationLists && index >= 0 && index < animationLists.length)
 			{
-				animationLists = animationLists.splice(index, 1);
+				/*animationLists = */animationLists.splice(index, 1);
+				/*m_lockedAnimation = */m_lockedAnimation.splice(index, 1);
 				return true;
 			}
 			return false;
 		}
 		
+		public function UpdateGraphicSetting(actorName:String, setName:String, layer:int):void
+		{
+			if (!("graphicSettings" in data))
+			{
+				data.graphicSettings = new Object();
+			}
+			if (!(actorName in data.graphicSettings))
+			{
+				data.graphicSettings[actorName] = ["", "", ""];
+			}
+			data.graphicSettings[actorName][layer] = setName;
+		}
+		
 		public function SaveAnimationToSlot(index:int, animateList:AnimationList):void
 		{
-			if (index >= 0 && index < animationLists.length)
+			if (animationLists && index >= 0 && index < animationLists.length)
 			{
 				animationLists[index] = animateList;
 			}
 		}
-		public function CheckIfPresetDataExists():Boolean { return defaultSettings != null;}
+		
+		public function GetAnimationStates():Vector.<Boolean>
+		{
+			if (!animationLists) { return null; }
+			
+			var animationStates:Vector.<Boolean> = new Vector.<Boolean>;
+			for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+			{
+				if (animationLists[i] == null)
+				{
+					animationStates[animationStates.length] = false;
+				}
+				else
+				{
+					animationStates[animationStates.length] = !(animationLists[i].IsAnimListEmpty());
+				}
+			}
+			return animationStates;
+		}
+		
+		public function IsResettable():Boolean { return defaultSettings != null;}
 		public function GetID():int { return m_Id;}
 		public function GetName():String { return m_name; }
 		public function GetDefaultMusicName():String { return m_defaultMusicName; }
 		public function GetAnimationList(animId:int):AnimationList
 		{
-			if (animId >= 0 && animId < animationLists.length)
+			if (animationLists && animId >= 0 && animId < animationLists.length)
 			{
 				return animationLists[animId];
 			}
 			return null;
 		}
 		
+		public function Reset():void
+		{
+			ImportCharacterDataFromStorage(defaultSettings);
+		}
+		
 		public function ExportCharacterDataForStorage():ByteArray
 		{
 			var characterByteArray:ByteArray = new ByteArray();
+			characterByteArray.writeObject(m_name);
 			characterByteArray.writeObject(data);
 			characterByteArray.writeObject(m_defaultMusicName);
 			characterByteArray.writeBoolean(m_randomizePlayAnim);
@@ -119,15 +183,49 @@
 			return characterByteArray;
 		}
 		
-		public function ImportCharacterDataFromStorage(charStorageData:ByteArray)
+		public function ImportCharacterDataFromStorage(charStorageData:ByteArray):void
 		{
 			charStorageData.position = 0;
+			m_name = charStorageData.readObject();
 			data = charStorageData.readObject();
 			m_defaultMusicName = charStorageData.readObject();
 			m_randomizePlayAnim = charStorageData.readBoolean();
 			m_lockedAnimation = charStorageData.readObject();
 			animationLists = charStorageData.readObject();
 			
+		}
+		
+		public function GetDefaultSettings():ByteArray
+		{
+			return defaultSettings;
+		}
+		
+		public function CloneCharacter(cloneName:String):Character
+		{
+			//Do some name swapping so the export and import functions can be used to create the new character.
+			var originalName:String = this.m_name;
+			m_name = cloneName;
+			var clonedCharacter:Character = new Character("_Clone", null);
+			clonedCharacter.ImportCharacterDataFromStorage(this.ExportCharacterDataForStorage());
+			//Restore this character's name.
+			this.m_name = originalName;
+			return clonedCharacter; 
+		}
+		
+		public function SerializeAnimationLists():ByteArray
+		{
+			var animationsByteArray:ByteArray = new ByteArray();
+			animationsByteArray.writeObject(animationLists);
+			return animationsByteArray;
+		}
+		
+		public function DeserializeAnimationLists(animationListsBinaryData:ByteArray):void
+		{
+			if (animationListsBinaryData)
+			{
+				animationListsBinaryData.position = 0;
+				animationLists = animationListsBinaryData.readObject() as Vector.<AnimationList>;
+			}
 		}
 		//public function GetIf
 		/*public function GetDiamondColor1():uint { return m_innerDiamondColor1;}

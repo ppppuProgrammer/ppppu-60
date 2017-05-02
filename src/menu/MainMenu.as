@@ -47,7 +47,7 @@ package menu
 			signal1.addSlot(app);
 			signal2 = new Signal2;
 			
-			var tabsList:Vector.<String> = Vector.<String>(["Characters", "Customization", "Music", "Load" , "Animations"]);
+			var tabsList:Vector.<String> = Vector.<String>(["Characters", "Customization", "Animations", "Music", "Load"]);
 			CONFIG::debug
 			{
 				tabsList[tabsList.length] = "Development";
@@ -68,10 +68,16 @@ package menu
 				var label:String = tabsList[i];
 				
 				var button:PushButton = new PushButton(panel, x, 0, label);
+				//These menus are NYI so don't allow their buttons to be enabled.
+				if (tabsList[i].search(/Music|Load/) > -1)
+				{
+					button.enabled = false;
+				}
 				button.toggle = true;
 				button.width = buttonWidth;
 				button.name = label + "Tab";
 				buttonGroup[buttonGroup.length] = button;
+				
 			}
 			panel.width = WIDTH; panel.height = HEIGHT;
 			
@@ -116,7 +122,7 @@ package menu
 		
 		private function ClickEventHandler(e:MouseEvent):void
 		{
-			var eventTarget:Sprite = e.target as Sprite;
+			var eventTarget:Object = e.target as Object;
 			if (buttonGroup.indexOf(eventTarget) > -1)
 			{
 				var eventButton:PushButton = eventTarget as PushButton;
@@ -200,12 +206,18 @@ package menu
 		
 		private function InitializeAllSubmenus(app:AppCore, director:Director):void
 		{
-			if (characterMenu != null) { characterMenu.InitializeMenu(app); signal2.addSlot(characterMenu); ++submenuCreated; }
-			if (musicMenu != null) { musicMenu.InitializeMenu(app); ++submenuCreated; }
-			if (developerMenu != null) {developerMenu.InitializeMenu(app, director); signal2.addSlot(developerMenu); ++submenuCreated;} 
-			if (animationMenu != null) {animationMenu.InitializeMenu(app); signal2.addSlot(animationMenu); ++submenuCreated;}
-			if (customizationMenu != null) {customizationMenu.InitializeMenu(app, director); ++submenuCreated;}
-			if (loadMenu != null) {loadMenu.InitializeMenu(app); ++submenuCreated;}
+			if (characterMenu != null) { characterMenu.InitializeMenu(app); RegisterSubmenu(characterMenu); ++submenuCreated; }
+			if (musicMenu != null) { musicMenu.InitializeMenu(app); RegisterSubmenu(musicMenu); ++submenuCreated; }
+			if (developerMenu != null) {developerMenu.InitializeMenu(app, director); RegisterSubmenu(developerMenu); ++submenuCreated;} 
+			if (animationMenu != null) {animationMenu.InitializeMenu(app); RegisterSubmenu(animationMenu); ++submenuCreated;}
+			if (customizationMenu != null) {customizationMenu.InitializeMenu(app, director); RegisterSubmenu(customizationMenu); ++submenuCreated;}
+			if (loadMenu != null) {loadMenu.InitializeMenu(app); RegisterSubmenu(loadMenu); ++submenuCreated;}
+		}
+		
+		[inline]
+		private function RegisterSubmenu(menu:Slot2):void
+		{
+			signal2.addSlot(menu);
 		}
 		
 		private function MenuLoadFailed(e:IOErrorEvent):void

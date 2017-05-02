@@ -1,6 +1,8 @@
 package menu 
 {
 	import com.jacksondunstan.signals.Slot2;
+	import flash.desktop.Clipboard;
+	import flash.desktop.ClipboardFormats;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import com.bit101.utils.MinimalConfigurator;
@@ -154,15 +156,15 @@ package menu
 			var command:String = targetName as String;
 			if (command == "ClickEvent")
 			{
-				var compName:String = (value as Sprite).name;
+				var compName:String = (value as Object)["name"];
 				if (config.getCompById(compName) != null)
 				{
-					ClickEventHandler(compName);
+					ClickEventHandler(value as Object);
 				}
 			}
 			else if (command == "ChangeEvent")
 			{
-				var compName:String = (value as Sprite).name;
+				var compName:String = (value as Object)["name"];
 				if (config.getCompById(compName) != null)
 				{
 					ChangeEventHandler(value as Object);
@@ -170,7 +172,7 @@ package menu
 			}
 			else if (command == "SelectEvent")
 			{
-				var compName:String = (value as Sprite).name;
+				var compName:String = (value as Object)["name"];
 				if (config.getCompById(compName) != null)
 				{
 					SelectEventHandler(value as Object);
@@ -228,6 +230,14 @@ package menu
 					if (animateList)	{animateList.removeAll();}
 				}
 			}
+			else if (command == "AnimMenu_ChangeAnimationSelected")
+			{
+				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+				if (cbox)
+				{
+					cbox.selectedIndex = cbox.items.indexOf(value as String);
+				}
+			}
 			else if (command == "AddNewAnimation")
 			{
 				AddNewAnimation(value as String);
@@ -239,6 +249,11 @@ package menu
 				if (animSelectWindow)
 				{
 					animSelectWindow.title = (value[0] as String) + "'s animations";
+				}
+				var animateList:List = config.getCompById("animList") as List;	
+				if (animateList)
+				{
+					animateList.removeAll();
 				}
 			}
 			else if (command == "AnimMenu_AddAnimationSlotResult")
@@ -262,8 +277,62 @@ package menu
 					if (charAnimationList)
 					{
 						charAnimationList.removeItemAt(charAnimationList.selectedIndex);
+						charAnimationList.selectedIndex = -1;
+						config.getCompById("animationListButtonGroup").enabled = config.getCompById("addShardButton").enabled = false;
+						var animateList:List = config.getCompById("animList") as List;	
+						if (animateList)
+						{
+							animateList.removeAll();
+						}
 					}
 				}
+			}
+			else if (command == "AnimMenu_UpdateAnimationListing")
+			{
+				var animationStates:Vector.<Boolean> = value as Vector.<Boolean>;
+				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+				if (charAnimationList)
+				{
+					charAnimationList.removeAll();
+					if (animationStates)
+					{
+						for (var i:int = 0, l:int = animationStates.length; i < l; i++) 
+						{
+							if (animationStates[i] == false)
+							{
+								charAnimationList.addItem( { label: "Empty" } );
+							}
+							else
+							{
+								charAnimationList.addItem( { label: String(i) } );
+							}
+						}
+					}
+				}
+			}
+			else if (command == "AnimMenu_SaveAnimationResult")
+			{
+				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
+				var animateList:List = config.getCompById("animList") as List;	
+				if (animateList && charAnimationList && charAnimationList.selectedIndex > -1)
+				{
+					if ((value as Boolean) == true)
+					{
+						if (animateList.items.length > 0)
+						{
+							charAnimationList.selectedItem.label = String(charAnimationList.selectedItem);
+						}
+						else
+						{
+							charAnimationList.selectedItem.label = "Empty";
+						}
+					}
+					else
+					{
+						charAnimationList.selectedItem.label = "";
+					}
+				}
+				
 			}
 			else if (command == "FileLoaded")
 			{
@@ -306,10 +375,12 @@ package menu
 					}*/
 				}
 			}
+			
 		}
 
-		private function ClickEventHandler(targetName:String/*e:MouseEvent*/):void
+		private function ClickEventHandler(target:Object/*e:MouseEvent*/):void
 		{
+			var targetName:String = target["name"];
 			if (targetName == "addShardButton")
 			{
 				AddSelectedShardToAnimationList();
@@ -355,15 +426,36 @@ package menu
 					signal2.dispatch("AnimMenu_SaveAnimationForCharacterRequest", [charAnimationList.selectedIndex, animateList]);
 				}
 			}
-			else if (targetName != "setFrameButton" /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
+			else if (targetName == "copyListToClipboardButton")
+			{
+				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+				if (cbox.selectedIndex == -1) { return; }
+				var shardList:List = config.getCompById("animList") as List;
+				var clipboardContents:Array = ["[\"" + cbox.selectedItem + "\""];
+				//clipboardContents[0] = cbox.selectedItem;
+				for (var i:int = 0, l:int = shardList.items.length; i < l; i++) 
+				{
+					clipboardContents[clipboardContents.length] = shardList.items[i].type.toString();
+					clipboardContents[clipboardContents.length] = "\"" +shardList.items[i].name + "\"";
+				}
+				clipboardContents[clipboardContents.length - 1] += "]";
+				
+				Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, clipboardContents, true);
+			}
+			else if (targetName.indexOf("FrameChange") > -1 /*&& (config.getCompById("elementSelector") as ComboBox).selectedIndex > -1*/)
 			{
 				signal1.dispatch(targetName);
 			}	
+			else if (targetName.search(/animPauseButton|animPlayButton/) > -1)
+			{
+				signal1.dispatch(targetName);
+			}
 			else
 			{
 				//setFrameButton needs to also send data on what frame to go to.
 				signal2.dispatch(targetName, int((config.getCompById("frameSlider") as HUISlider).value));
 			}
+
 			
 		}
 		
@@ -468,22 +560,19 @@ package menu
 				signal2.dispatch(target.name, [currentSelectedAnimationId, currentSelectedShardTypeIsBase, currentSelectedShardName]);
 				//UpdateShardComboBox();
 			}
-			else if(target.name == "actorSelector")
-			{
-				
-				var actorName:String = (config.getCompById("actorSelector") as ComboBox).selectedItem as String;
-				if (actorName && actorName.length > 0)
-				{
-					signal2.dispatch("ActorAssetListRequest", actorName);
-				}
-				//var tweenSlider:HUISlider = (config.getCompById("tweenSelectSlider") as HUISlider);
-				
-				
-			}
+			
 			else if (target.name == "charAnimationsSelector")
 			{
 				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
 				signal2.dispatch("AnimMenu_ChangeSelectedAnimationOfCurrentCharacter", charAnimationList.selectedIndex);
+				if (charAnimationList.selectedItem == null)
+				{
+					config.getCompById("animationListButtonGroup").enabled = config.getCompById("addShardButton").enabled = false;
+				}
+				else
+				{
+					config.getCompById("animationListButtonGroup").enabled = config.getCompById("addShardButton").enabled = true;
+				}
 			}
 			else
 			{
@@ -523,6 +612,10 @@ package menu
 			{
 				charAnimList.listItemClass = HorizontalListItem;
 			}
+			
+			//Disable certain buttons
+			config.getCompById("animationListButtonGroup").enabled = false;
+			config.getCompById("addShardButton").enabled = false;
 		}
 		
 	}

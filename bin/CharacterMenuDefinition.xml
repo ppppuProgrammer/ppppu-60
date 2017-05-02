@@ -1,0 +1,54 @@
+<comps>
+	<Window id="charSelectWindow" title="Character Select" x="0" y="0" width="480" height="230">
+		<List id ="charSelectList" x="0" y="0" width="48" listItemHeight="48" height="480" rotation="270" scaleX="-1" />
+		<!---<HGUISlider id ="CharSelectSlider" x="0" y="0" width="300" />--->
+		
+		<HBox spacing="20" x="10" y="60" enabled="false">
+			<Label text="Character Select Mode: "  />
+			<RadioButton id="SequentialCharRBtn"  y="5" groupName = "charSelectGruop" label="In order" />
+			<RadioButton id="RandomCharRBtn" y="5" groupName = "charSelectGruop" label="Random"/>
+			<RadioButton id="OneCharRBtn" y="5" groupName = "charSelectGruop" label="Single"/>
+		</HBox>
+		<VBox id="SelectCharSection" x="10" y="110" spacing="10">
+			<HBox y="40">
+				<Label text="Character: "/>
+				<TextArea id="selectedCharText" editable="false" height="20" autoHideScrollBar="true"/>
+			</HBox>
+			<HBox>
+				<Label text="Preferred Music: "/>
+				<TextArea id="charMusicText"  editable="false" height="20" autoHideScrollBar="true" />
+			</HBox>
+			<HBox spacing="20" enabled="false">
+				<Label text="Status: "  />
+				<RadioButton id="lockRBtn" y="5" groupName = "charLockGroup" label="Locked" />
+				<RadioButton id="unlockRBtn" y="5" groupName = "charLockGroup" label="Unlocked"/>
+			</HBox>
+			
+		</VBox>	
+	</Window>
+	
+	<Window id="charEditorWindow" title="Character Editor" x="0" y="300" width="480" height="200">
+		<VBox y="10" spacing="10">
+			<HBox x="20" spacing="20">
+				<PushButton id="createCharButton" width="110" label="Create new character" />
+				<PushButton id="copyCharButton" width="140" label="Duplicate current character" />
+				<PushButton id="deleteCharButton" width="140" label="Delete current character" />
+			</HBox>
+			<HBox x="10">
+				<Label text="Character Name: "/>
+				<TextArea id="charNameEntry" editable="true" height="20" autoHideScrollBar="true"/>
+			</HBox>
+			<HBox x="10" spacing="10" enabled="false">
+				<Label text="Preferred Music: "/>
+				<TextArea id="charMusicEntry"  editable="true" height="20" autoHideScrollBar="true" />
+				<ComboBox id="charMusicRefCBox" width="140" />
+			</HBox>
+			<HBox x="190">
+				<PushButton id="saveCharButton"  width="70" label="Save changes" enabled="false" />
+			</HBox>
+			<HBox x="10">
+				<Label id="charEditorWarning" width="460" label="" />
+			</HBox>
+		</VBox>
+	</Window>
+</comps>

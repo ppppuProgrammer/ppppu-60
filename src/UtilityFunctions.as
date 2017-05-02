@@ -6,6 +6,7 @@ package
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
+	import flash.display.DisplayObjectContainer;
 	/**
 	 * Holds various static functions that can be useful for various parts of the program. Due to their static nature, the use of
 	 * these functions in performance critical code and used within functions called multiple times within a short period is discouraged.
@@ -102,6 +103,22 @@ package
 		public static function RoundToNearest(roundTo:Number, value:Number):Number{
 			return Math.round(value/roundTo)*roundTo;
 		}
+		
+		public static function ScaleFromCenter(dis:DisplayObjectContainer,sX:Number,sY:Number):void
+		{
+			var posX:Number = dis.x;
+			var posY:Number = dis.y;
+			var oldDisBounds:Rectangle = dis.getBounds(dis.parent);
+			//dis.x =dis.y = 0;
+			dis.scaleX = sX;
+			dis.scaleY = sY;
+			
+			var newDisBounds:Rectangle = dis.getBounds(dis.parent);
+			var xDisplacement:Number = newDisBounds.left - oldDisBounds.left;
+			var yDisplacement:Number = newDisBounds.top - oldDisBounds.top;
+			dis.x += xDisplacement;
+			dis.y += yDisplacement;
+		}		
 	}
 
 }

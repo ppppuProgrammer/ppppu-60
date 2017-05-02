@@ -1,6 +1,7 @@
 package  
 {
 	import flash.ui.Keyboard;
+	import flash.utils.ByteArray;
 	import mx.logging.*;
 	/**
 	 * ...
@@ -127,8 +128,10 @@ package
 			//logger.debug("Created settings for new character {0}", charName);
 			characterSettings[charName].locked = false;
 			characterSettings[charName].animationLocked = new Object();
+			characterSettings[charName].graphicSettings = new Object();
 			//characterSettings[charName].playMusicTitle = globalSongTitle;
 			characterSettings[charName].animationSelect = "RANDOM"; //String of the class name for the animation. "RANDOM" is used when an animation is being randomly selected. //0 is randomly choose, value > 0 is a specific animation
+			characterSettings[charName].animationLists = null;
 		} 
 		
 		public function UpdateSettingForCharacter_Lock(characterName:String, value:Boolean):void
@@ -141,6 +144,20 @@ package
 		{
 			characterSettings[characterName].animationLocked[animationName] = value;
 			//logger.debug("Animation {0} for {1} is {2}", animationName, characterName, value ? "Locked" : "Unlocked");
+		}
+		
+		public function UpdateGraphicSettingsForCharacter(characterName:String, actorName:String, setName:String, layer:int):void
+		{
+			if (!(actorName in characterSettings[characterName].graphicSettings))
+			{
+				characterSettings[characterName].graphicSettings[actorName] = ["","",""];
+			}
+			characterSettings[characterName].graphicSettings[actorName][layer] = setName;
+		}
+		
+		public function UpdateSettingForCharacter_AnimationLists(characterName:String, value:ByteArray):void
+		{
+			characterSettings[characterName].animationLists = value;
 		}
 		
 		/*public function UpdateSettingForCharacter_Music(characterName:String, value:String):void
@@ -195,6 +212,14 @@ package
 		public function CheckIfCharacterHasSettings(name:String ):Boolean
 		{
 			return (characterSettings[name] != null);
+		}
+		
+		public function DeleteSettingsForCharacter(name:String ):void 
+		{
+			if (characterSettings[name] != null)
+			{
+				delete characterSettings[name];
+			}
 		}
 	}
 
