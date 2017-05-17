@@ -21,7 +21,10 @@ package
 			characterData.Color.Lip =  UtilityFunctions.CreateColorTransformFromHex(0xFF99CC, 51);
 			characterData.Color.Legging = [0xFFFFFFFF, 0xC5F7EBFF];	
 			characterData.Color.SkinHighlight = 0xFFFFFFFF;
-			characterData.Color.Hair = 0xFEA972FF;
+			//characterData.Color.Hair = 0xF3B69AFF;
+			//characterData.Color.HairAngled = 0xFEA972FF;//UtilityFunctions.GetColorUintValue(243, 182, 154, 255);
+			characterData.Color.Hair = 0xfffc7dFF;
+			characterData.Color.HairAngled = 0xfea972FF;//UtilityFunctions.GetColorUintValue(243, 182, 154, 255);
 			//var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243, 182, 154, 255));
 			
 			//var standardGradientEndPoint:uint = UtilityFunctions.GetColorUintFromRGB(243,182,154);
@@ -36,11 +39,14 @@ package
 			
 			characterData.GraphicSets = ["Standard", "Headwear_Rosalina", "Earring_Rosalina", "Hair_Rosalina"];
 			
-			animationPresets[animationPresets.length] = ["Cowgirl", true, "Female_Taker", true, "Male_Giver", false, "Rosalina Earring R", false, "Rosalina Hair", false, "Rosalina Body", false, "Rosalina Crown", false, "Rosalina Earring Left", false, "Rosalina Right Eye", false, "Rosalina Mouth", false, "Rosalina Left Eye"];
+			animationPresets[animationPresets.length] = ["Cowgirl",true,"Female_Taker",true,"Male_Giver",false,"Rosalina Body",false,"Rosalina Right Eye",false,"Rosalina Mouth",false,"Rosalina Left Eye",false,"Crown",false,"Right Earring ",false,"Left Earring",false,"Rosalina Hair"];
 			//animationPresets[animationPresets.length] =
 			animationPresets[animationPresets.length] = ["anim3", true, "Male", true, "Female", true, "EyebrowL2", true, "EyebrowR2", false, "Rosalina Headwear", false, "Rosalina EyeL", false, "Rosalina EarringR", false, "Rosalina EarringL", false, "Rosalina Mouth", false, "Rosalina Face", false, "Rosalina Hair", false, "Rosalina EyeR"];
 			//animationPresets[animationPresets.length] = 
 			animationPresets[animationPresets.length] = ["Reverse Cowgirl", true, "Male", true, "Female", false, "Rosalina Mouth", false, "Rosalina EarringL", false, "Rosalina EyeL", false, "Rosalina Hair", false, "Rosalina Headwear", false, "Rosalina EarringR", false, "Rosalina EyeR", true, "Left Eye"];
+			animationPresets[animationPresets.length] = ["Paizuri",true,"Female",true,"Mouth",true,"Male",false,"Rosalina EyeR",false,"EarringL",false,"Rosalina EyeL",false,"Crown",false,"EarringR",false,"Rosalina Hair"];
+			//animationPresets[animationPresets.length] = 
+			//animationPresets[animationPresets.length] = 
 			//animationPresets[animationPresets.length] = 
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;

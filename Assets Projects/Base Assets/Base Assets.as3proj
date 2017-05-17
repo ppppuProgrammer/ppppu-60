@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="..\..\bin\ARCH_BaseAssets.swf" />
+    <movie path="..\..\bin\Assets\ARCH_BaseAssets.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />

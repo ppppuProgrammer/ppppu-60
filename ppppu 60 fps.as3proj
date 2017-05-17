@@ -45,7 +45,7 @@
     <option loadExterns="" />
     <option staticLinkRSL="True" />
     <option additional="-use-gpu=true&#xA;-use-direct-blit=true" />
-    <option compilerConstants="CONFIG::TweenLib,&quot;BAS3&quot;" />
+    <option compilerConstants="CONFIG::BuildMenu, true" />
     <option minorVersion="" />
   </build>
   <!-- SWC Include Libraries -->

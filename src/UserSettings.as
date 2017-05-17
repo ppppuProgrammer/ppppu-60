@@ -129,6 +129,7 @@ package
 			characterSettings[charName].locked = false;
 			characterSettings[charName].animationLocked = new Object();
 			characterSettings[charName].graphicSettings = new Object();
+			characterSettings[charName].colors = new Object();
 			//characterSettings[charName].playMusicTitle = globalSongTitle;
 			characterSettings[charName].animationSelect = "RANDOM"; //String of the class name for the animation. "RANDOM" is used when an animation is being randomly selected. //0 is randomly choose, value > 0 is a specific animation
 			characterSettings[charName].animationLists = null;
@@ -146,6 +147,15 @@ package
 			//logger.debug("Animation {0} for {1} is {2}", animationName, characterName, value ? "Locked" : "Unlocked");
 		}
 		
+		/*public function UpdateAllGraphicSettingsForCharacter(characterName:String, allGraphicSettings:Object):void
+		{
+			if (characterSettings[characterName].graphicSettings))
+			{
+				characterSettings[characterName].graphicSettings[actorName] = ["","",""];
+			}
+			characterSettings[characterName].graphicSettings[actorName][layer] = setName;
+		}*/
+		
 		public function UpdateGraphicSettingsForCharacter(characterName:String, actorName:String, setName:String, layer:int):void
 		{
 			if (!(actorName in characterSettings[characterName].graphicSettings))
@@ -153,6 +163,11 @@ package
 				characterSettings[characterName].graphicSettings[actorName] = ["","",""];
 			}
 			characterSettings[characterName].graphicSettings[actorName][layer] = setName;
+		}
+		
+		public function UpdateColorSettingsForCharacter(characterName:String, colorSettings:Object):void
+		{
+			characterSettings[characterName].colors = colorSettings;
 		}
 		
 		public function UpdateSettingForCharacter_AnimationLists(characterName:String, value:ByteArray):void

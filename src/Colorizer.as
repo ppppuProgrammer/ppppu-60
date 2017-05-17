@@ -130,7 +130,7 @@ package
 			{
 				GradientChange(sprite, colorValue as Array);
 			}
-			else if (colorValue is ColorTransform)
+			else if ((colorValue as ColorTransform) != null)
 			{
 				sprite.transform.colorTransform = colorValue as ColorTransform;
 			}

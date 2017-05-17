@@ -5,10 +5,11 @@ package animations
 	import animations.TimelineLibrary;
 	import flash.geom.ColorTransform;
 	import org.libspark.betweenas3.BetweenAS3;
+	import org.libspark.betweenas3.core.easing.IEasing;
 	import org.libspark.betweenas3.core.tweens.ObjectTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
-	import org.libspark.betweenas3.easing.Linear;
+	import org.libspark.betweenas3.easing.*;
 	import org.libspark.betweenas3.events.TweenEvent;
 	import org.libspark.betweenas3.tweens.IObjectTween;
 	import org.libspark.betweenas3.tweens.ITween;
@@ -29,6 +30,7 @@ package animations
 	import animations.LayoutFrameVector;
 	import animations.LayoutRecord;
 	import animations.AnimateShard;
+	import flash.utils.getDefinitionByName;
 	//import EyeContainer;
 	//import MouthContainer;
 	/**
@@ -124,6 +126,8 @@ package animations
 			//Add the layer for Mouth usage
 			AddNewSpriteInstance(new Sprite, "MouthLayer");
 			
+			//Force the compilation of the easing classes so they can be used at runtime.
+			Linear; Quadratic; Quad; Quart; Quartic; Custom; Back; Bounce; Circ; Circular;  Cubic; Elastic; Expo; Exponential; Physical; Quint; Quintic; Sine;
 			/*AddNewActor("HairFrontLayer");
 			AddNewActor("HairBehindFaceLayer");
 			AddNewActor("HairBehindHeadwearLayer");
@@ -197,6 +201,7 @@ package animations
 			
 			var timeline:SerialTween = null;
 			var currentTweenData:Object, previousTweenData:Object;
+			var currentEasing:IEasing;
 			if (target)
 			{
 				var tweens:Array = new Array();
@@ -207,6 +212,7 @@ package animations
 				for (var i:int = 0, l:int = tweenData.length; i < l; ++i)
 				{
 					currentTweenData = { };
+					currentEasing = null;
 					//currentTweenData = tweenData[i];
 					if ("transformMatrix" in tweenData[i])
 					{						
@@ -230,13 +236,36 @@ package animations
 							currentTweenData.transform.colorTransform = tweenData[i].colorTransform;
 						}
 					}
+					
+					if ("easing" in tweenData[i])
+					{
+						var easeType:String = tweenData[i].easing["type"];
+						var easeSubType:String = tweenData[i].easing["subtype"];
+						
+						var easeClass:Class;
+						try
+						{easeClass = getDefinitionByName("org.libspark.betweenas3.easing." + easeType) as Class;}
+						catch (e:ReferenceError)
+						{easeClass = null; }
+						
+						if (easeClass)
+						{
+							currentEasing = easeClass[easeSubType] as IEasing;
+						}
+					}
+					
+					if(currentEasing == null)
+					{
+						currentEasing = Linear.linear;
+					}
+					
 					//Visibility fallback check for first tween. Assume that it is to be visible if there was no visible property specified.
 					if (i == 0)
 					{
 						if (!("visible" in tweenData[i]))
 						{
 							currentTweenData.visible = 1.0;
-							var tween:IObjectTween = BetweenAS3.to(target, { visible: 1.0 }, 0, Linear.linear);
+							var tween:IObjectTween = BetweenAS3.to(target, { visible: 1.0 }, 0, currentEasing);
 							tweens[tweens.length] = tween;
 							previousTweenData = currentTweenData;
 						}
@@ -257,6 +286,8 @@ package animations
 					}
 					
 					
+					
+					
 					if (!("transformMatrix" in tweenData[i]))
 					{
 						currentTweenData["$x"] = 0;
@@ -265,7 +296,7 @@ package animations
 					if (duration)
 					{
 						//timeline.to(target, duration * TIME_PER_FRAME, currentTweenData);
-						var tween:IObjectTween = BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, Linear.linear);
+						var tween:IObjectTween = BetweenAS3.tween(target, currentTweenData, previousTweenData, duration * TIME_PER_FRAME, currentEasing);
 						tweens[tweens.length] = tween;
 					}
 					else //duration is 0, so tween is to be set instantly.
@@ -341,102 +372,6 @@ package animations
 			}
 			return position;
 		}
-		
-		/*public function ClearGraphicsFromAllActorsOnCanvas():void
-		{
-			var actor:Actor;
-			for (var i:int = 0; i < this.numChildren; i++) 
-			{
-				actor = this.getChildAt(i) as Actor;
-				if (actor)
-				{
-					actor.ClearAllGraphics();
-					actor.ChangeVisibility(true);
-				}
-			}
-			disableActorsBasedOnGfxSetData = new Vector.<DisableActorInfo>();
-		}*/
-		/*[inline]
-		public function ApplyCurrentGraphicSets():void
-		{
-			for (var i:int = 0, l:int = currentGraphicSets.length; i < l; i++) 
-			{
-				var gfxSet:GraphicSet = currentGraphicSets[i];
-				var assetData:GraphicSetData;
-				for (var j:int = 0, k:int = gfxSet.collection.length; j < k; j++) 
-				{
-					assetData = gfxSet.collection[j];
-					var actor:Actor = actorDict[assetData.targetActor];
-					if (actor)
-					{
-						actor.ChangeGraphicInLayer(assetData.layer, assetData.asset);
-						if (assetData.properties && "DisableActor" in assetData.properties)
-						{
-							
-							var disableArray:Array = assetData.properties.DisableActor as Array;
-							var actorToDisable:Actor;
-							//var animationName:String;
-							//var depthFlag:int;
-							for (var m:int = 0, n:int = disableArray.length; m < n && n % 3 == 0; m+=3) 
-							{
-								actorToDisable = actorDict[disableArray[m] as String];
-								if (actorToDisable)
-								{
-									disableActorsBasedOnGfxSetData[disableActorsBasedOnGfxSetData.length] = new DisableActorInfo(actor, actorToDisable, disableArray[m + 1] as String, disableArray[m + 2] as int);
-								}
-							}							
-						}
-					}
-				}
-				
-			}
-			//currentGraphicSets
-		}*/
-		
-		//Checks to see if an actor needs to be disabled (made invisible) due to a graphic set in use.
-		/*private function GraphicSetDisableActorCheck():void
-		{
-			//Disable array expects to have a length that's a multiple of 3. Every 1st value is the name of the actor to disable, every 2nd value is the animation to disable it for (can specify "_ALL" to disable the actor for all animations) and the 3rd is to disable the actor based on it's depth relative to the current actor, with -1 for when it's [the actor to disable] depth is lower, 0 to disable regardless of depth and 1 if the depth is higher.
-			var targetActor:Actor;
-			var actorToDisable:Actor;
-			var animationName:String;
-			var depthFlag:int;
-			var disableArray:Vector.<DisableActorInfo> = disableActorsBasedOnGfxSetData;
-			for (var i:int = 0, l:int = disableArray.length; i < l; ++i) 
-			{
-				targetActor = disableActorsBasedOnGfxSetData[i].targetActor;
-				actorToDisable = disableActorsBasedOnGfxSetData[i].disableActor;
-				animationName = disableActorsBasedOnGfxSetData[i].animationName;
-				//For testing purposes depth flag is forced to 0
-				depthFlag = 0;// disableActorsBasedOnGfxSetData[i].depthFlag;
-				
-				if (actorToDisable && (animationName == "_ALL" || currentAnimationName))
-				{
-					if (depthFlag == 0)
-					{
-						actorToDisable.ChangeVisibility(false);
-					}
-					else
-					{
-						var currentActorDepth:int = this.getChildIndex(targetActor);
-						var disableActorDepth:int = this.getChildIndex(actorToDisable);
-						if (depthFlag == 1 && disableActorDepth > currentActorDepth)
-						{
-							actorToDisable.ChangeVisibility(false);
-						}
-						else if (depthFlag == -1 && disableActorDepth < currentActorDepth)
-						{
-							actorToDisable.ChangeVisibility(false);
-						}
-						else
-						{
-							actorToDisable.ChangeVisibility(true);
-						}
-					}
-					
-				}
-			}
-		}*/
 		
 		public function AddNewActor(actorName:String):Boolean
 		{
@@ -526,51 +461,6 @@ package animations
 			}
 			
 		}
-		
-		/*public function ApplyShardOverrides():void
-		{
-			for (var i:int = 0,l:int = shardOverrideDataList.length; i < l; i++) 
-			{
-				var data:Object = shardOverrideDataList[i];
-				if ("Color" in data)
-				{
-					director.ChangeColorsForAssets(data.Color);
-				}
-			}
-		}*/
-		
-		//public function ChangeAnimation(displayLayout:Object, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
-		/*public function ChangeAnimation(displayLayout:AnimationLayout, animationId:int, charId:int=-1, replaceSetName:String="Standard"):void
-		{
-			//var timer:int = getTimer();
-			//set the element depth layout for the animation
-			elementLayoutChangeTimes.length = 0;
-
-			for (var index:int = 0, l:int = displayLayout.frameVector.length; i < l; ++i)
-			{
-				elementLayoutChangeTimes[elementLayoutChangeTimes.length] = displayLayout.frameVector[index].changeTime;
-			}
-			currentAnimationElementDepthLayout = displayLayout;
-			if (timelines)
-			{
-				AddTimelines(timelines);
-			}
-			//Cause a change to the depth of the elements
-			var currentTime:Number = masterTimeline.position;
-			//var layoutChangeTime:Number;
-			//Start at the end and work backwards
-			for (var i:int = displayLayout.frameVector.length -1; i >= 0; --i)
-			{
-				var frameLayout:LayoutFrameVector = displayLayout.frameVector[i];
-				if (currentTime >= frameLayout.changeTime)
-				{
-					//latestIndexOfLayoutChangeUsed = i;
-					latestFrameDepthLayout = frameLayout;
-					ChangeElementDepths(frameLayout);
-					break; //Break out the for loop
-				}
-			}
-		}*/
 		
 		[Inline]
 		//final public function ChangeElementDepths(depthLayout:Object):void
@@ -693,7 +583,7 @@ package animations
 			if (animationPaused) { animationPaused = false; }
 			if (masterTimeline)
 			{
-				masterTimeline.stopOnComplete = false;	
+				//masterTimeline.stopOnComplete = false;	
 				masterTimeline.gotoAndPlay(startTime);
 			}
 		}
@@ -703,7 +593,7 @@ package animations
 			if (masterTimeline != null)
 			{
 				animationPaused = false;
-				masterTimeline.stopOnComplete = false;
+				//masterTimeline.stopOnComplete = false;
 				masterTimeline.play();
 			}
 		}
@@ -758,13 +648,6 @@ package animations
 				}
 			}
 		}
-		
-		/*public function ChangeGraphicSetsUsed(sets:Vector.<GraphicSet>):void
-		{
-			currentGraphicSets = sets;
-			ClearGraphicsFromAllActorsOnCanvas();
-			ApplyCurrentGraphicSets();
-		}*/
 		
 		/* Animation Creation Functions */
 		//{
@@ -945,65 +828,6 @@ package animations
 			}
 		}
 		
-		/*private function ProcessDisplayObjects(dispObjContainer:Object):void
-		{
-			//Received an object with vectors of dispobjinfo instances. There are possibly multiple instances that will overwrite each other. 
-			for (var time:String in dispObjContainer) 
-			{
-				//The raw vector of dispObjInfo objects for a particular time of the animation.
-				var dispObjDataForTimePoint:Vector.<DispObjInfo> = dispObjContainer[time];
-				
-				//The vector with the end result, which will be sorted by depth. Any dispobjinfo that are to have its controlDispObj be masked or added as a child will be place at the end of the 
-				var sortedDispObjInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-				var deferredDispObjInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-				var overwriteTracker:Dictionary = new Dictionary();
-				
-				for (var i:int = 0, l:int = dispObjDataForTimePoint.length; i < l; i++) 
-				{
-					if (dispObjDataForTimePoint[i].GetTargetFlag() == 0) // For normal behavior
-					{
-						var controlName:String = dispObjDataForTimePoint[i].GetControlObjectName();
-						var dispInfoIndex:int = 0;
-						if (controlName in overwriteTracker)
-						{
-							//replace the old index that had the dispobjinfo for the control object.
-							sortedDispObjInfo[overwriteTracker[controlName]] = dispObjDataForTimePoint[i];
-							
-						}
-						else
-						{
-							dispInfoIndex = sortedDispObjInfo.length;
-							sortedDispObjInfo[dispInfoIndex] = dispObjDataForTimePoint[i];
-						}
-						overwriteTracker[controlName] = dispInfoIndex;
-					}
-					else //For masked or child behavior
-					{
-						deferredDispObjInfo[deferredDispObjInfo.length] = dispObjDataForTimePoint[i];
-					}					
-				}
-				
-				//Handle the deferredDispObjs
-				var deferredLength:int = deferredDispObjInfo.length;
-				for (var j:int = 0; j < deferredLength; j++) 
-				{
-					var targetName:String = deferredDispObjInfo[j].GetTargetObjName();
-					if (targetName in overwriteTracker)
-					{
-						//trace(targetName + sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
-						deferredDispObjInfo[j].SetTargetDepth(sortedDispObjInfo[overwriteTracker[targetName]].GetDepth());
-						sortedDispObjInfo[sortedDispObjInfo.length] = deferredDispObjInfo[j];
-					}
-
-					//deferredDispObjInfo[j] = null;
-				}
-				
-				//Need to sort the dispobjinfo by depth.
-				SortDispObjInfoVector(sortedDispObjInfo);
-				dispObjContainer[time] = sortedDispObjInfo;				
-			}
-		}*/
-		
 		//Sorts a vector containing DispObjInfo by depth using the bottom-up merge sorting algorithm.
 		private function SortDispObjInfoVector(vector:Vector.<DispObjInfo>):void
 		{
@@ -1041,68 +865,9 @@ package animations
 				}
 			}
 		}
-		
-		
-		//Compares 2 dispObjInfo instances and returns an int to indicate which info object should be moved for the merge sort. Returns 0 when info1 should be moved and returns 1 when info 2 should be moved.
-		/*private function CompareDispObjInfoDepths(info1:DispObjInfo, info2:DispObjInfo):int
-		{
-			if (info1.GetTargetFlag() > 0 || info2.GetTargetFlag() > 0) //Target is to be masked or be a child
-			{
-				if (info1.GetTargetFlag() == info2.GetTargetFlag()) //Need to check both depth and target depth
-				{
-					if (info1.GetTargetDepth() == info2.GetTargetDepth()) //Check depth since the target depth is the same
-					{
-						if (info1.GetDepth() <= info2.GetDepth())
-							{return 0;}
-						else
-							{return 1;}
-					}
-					else //Target depths are different, so sort by that.
-					{
-						if (info1.GetTargetDepth() <= info2.GetTargetDepth())
-							{return 0;}
-						else
-							{return 1;}
-					}
-				}
-				else if(info1.GetTargetFlag() > 0 && info2.GetTargetFlag() == 0) //Compare info1 target depth to info2's depth
-				{
-					if (info1.GetTargetDepth() <= info2.GetDepth())
-						{return 0;}
-					else
-						{return 1;}
-				}
-				else if(info1.GetTargetFlag() == 0 && info2.GetTargetFlag() > 0) //Compare info2 target depth to info1's depth
-				{
-					if (info1.GetDepth() <= info2.GetTargetDepth())
-						{return 0;}
-					else
-						{return 1;}
-				}
-				else //Both have a flag > 0, sort by target depth since masking and setting a parent are incompatible
-				{
-					if (info1.GetTargetDepth() <= info2.GetTargetDepth())
-						{return 0;}
-					else
-						{return 1;}
-				}
-			}
-			else //Neither dispobjinfo indicate that their Sprite should be masked or a child, just need to compare their depths.
-			{
-				if (info1.GetDepth() <= info2.GetDepth())
-					{return 0;}
-				else
-					{return 1;}
-			}
-		}*/
 		//}
 		/* End of Animation Creation Functions */
-		
-		
-		/*public function GetPPPPU_Stage():PPPPU_Stage
-		{
-			return m_ppppuStage;
-		}*/
+
 		[Inline]
 		final public function RoundToNearest(roundTo:Number, value:Number):Number{
 		return Math.round(value/roundTo)*roundTo;
@@ -1119,40 +884,14 @@ package animations
 			return (masterTimeline) ? masterTimeline.position : Number.NaN;
 		}
 		
-		/*private function ConvertVectorToArray(vector:Vector.<SerialTween>):Array
+		public function IsAnimationFinished():Boolean
 		{
-			var array:Array =[];
-			for (var i:int = 0; i < vector.length; ++i)
+			if (!masterTimeline || masterTimeline.position >= masterTimeline.duration)
 			{
-				array[i] = vector[i];
+				return true;
 			}
-			return array;
-		}*/
-		
-		/*private function ChangeSpriteVisibility(target:DisplayObject, visible:Boolean):void
-		{
-			target.visible = visible;
-		}*/
-		
-		/*private function LoopAnimation(e:TweenEvent):void
-		{
-			masterTimeline.gotoAndPlay(0);
-		}*/
+			return false;
+		}
 	}
 
-}
-import animations.Actor;
-class DisableActorInfo
-{
-	public var targetActor:Actor;
-	public var disableActor:Actor;
-	public var animationName:String;
-	public var depthFlag:int;
-	public function DisableActorInfo(actor:Actor, actorToDisable:Actor, animName:String, flag:int)
-	{
-		targetActor = actor;
-		disableActor = actorToDisable;
-		animationName = animName;
-		depthFlag = flag;
-	}
 }

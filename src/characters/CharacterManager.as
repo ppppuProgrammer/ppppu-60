@@ -24,9 +24,9 @@ package characters
 		private var m_characterSelectMode:int = 0;
 		
 		//Controls whether the user wants character switching to be allowed or not.
-		private var m_allowCharSwitches:Boolean = true;
+		//private var m_allowCharSwitches:Boolean = true;
 		//Controls whether the user wants a character to be randomly picked when it's switching time.
-		private var m_selectRandomChar:Boolean = false;
+		//private var m_selectRandomChar:Boolean = false;
 		//Indicates if a character is locked, meaning they can't be switched to. The index of the vector correspondes to the character's id.
 		private var m_characterLocks:Vector.<Boolean> = new Vector.<Boolean>();
 		//Keep a tally of how many characters are not able to be switched to.
@@ -38,6 +38,112 @@ package characters
 		public function CharacterManager() 
 		{
 			
+		}
+		
+		public function CharacterSwitchLogic():void
+		{
+			if (m_currentCharacter != null && (CheckIfTransitionLockIsActive() == true || !CheckCharactersForSwitchEligibility()))	{ return; }
+			
+			var numChars:int = m_Characters.length;
+			//Sequential character changing
+			if(m_characterSelectMode == 0)
+			{
+				//character list wrap around
+				if(m_nextCharacterId + 1 >= numChars)
+				{
+					m_nextCharacterId = 0;
+				}
+				else
+				{
+					//go to next character
+					++m_nextCharacterId;
+				}
+				//Make sure the character can be switched to. If not, cycle through until we find one we can switch to
+				while(m_characterLocks[m_nextCharacterId] == true || DoesCharacterHaveAnimations(m_nextCharacterId) == false)
+				{
+					if(m_nextCharacterId + 1 >= numChars)
+					{
+						m_nextCharacterId = 0;
+					}
+					else
+					{
+						++m_nextCharacterId;
+					}
+				}
+			}
+			else if(m_characterSelectMode == 1)
+			{
+				/*Randomly select a character. If a disallowed switch occur, keep rerolling.*/
+				var switchOk:Boolean = false;
+				var charactersAllowed:int = 0;
+				for(var i:int = 0; i < numChars; ++i)
+				{
+					if(m_characterLocks[i] == false && DoesCharacterHaveAnimations(i))	{++charactersAllowed;}
+				}
+				/*if(charactersAllowed <= 1) //Too limited of a pool of characters to pick from. To avoid a potential error and waste of time, just bypass switching characters and stick with the current one.
+				{
+					switchOk = true;
+				}
+				else*/
+				{
+					while(!switchOk)
+					{
+						var randomCharId:int = int(Math.random() * numChars);
+						
+						if(m_characterLocks[randomCharId] == false && DoesCharacterHaveAnimations(randomCharId) == true)
+						{
+							if(charactersAllowed <= 2)
+							{
+								m_nextCharacterId = randomCharId;
+								switchOk = true;
+							}
+							else
+							{
+								if(m_nextCharacterId != randomCharId)
+								{
+									m_nextCharacterId = randomCharId;
+									switchOk = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		//Tests if the character of the given id has animations.
+		public function DoesCharacterHaveAnimations(charId:int):Boolean
+		{
+			if (charId > -1 && charId < GetTotalNumOfCharacters())
+			{
+				return (m_Characters[charId].GetNumberOfFilledAnimationSlots() > 0) ? true : false;
+			}
+			//Invalid id, so technically the char id given does not have any animations.
+			return false;
+		}
+		
+		//Returns the id of the character that was switched to. Returns -1 if no switch happened
+		public function GetIdOfCharacterToSwitchTo():int
+		{
+			var charSwitchOccured:int = -1;
+			if (m_currentCharacter != null && CheckIfTransitionLockIsActive())	{return charSwitchOccured; }
+			
+			var currentCharacter:Character = m_Characters[m_nextCharacterId];//m_currentCharacter;
+			//If the current character selected is not the latest one being displayed, there needs to be some changes to get them on screen.
+			if (m_currentCharacter != currentCharacter)
+			{				
+				//Update user settings
+				//userSettings.currentCharacterName = GetCurrentCharacter().GetName();
+				//Update latest char id 
+				m_currentCharacter = currentCharacter;
+				charSwitchOccured = m_nextCharacterId;
+			}
+			//currentCharacter.OnAccessibleAnimationCheck();
+			currentCharacter.RandomizePlayAnim();
+			currentCharacter.PlayingLockedAnimCheck();
+			//currentCharacter.ChangeAnimationIndexToPlay();
+			//currentCharacter.GotoFrameAndPlayForCurrentAnimation(setFrameForAnimation);
+			return charSwitchOccured;
 		}
 		
 		public function CheckIfCharacterCanBeAdded(charName:String):Boolean
@@ -231,6 +337,19 @@ package characters
 			
 			var character:Character = m_Characters[charId];
 			character.data.graphicSettings = settings.graphicSettings;
+			if ("colors" in settings)
+			{
+				character.data.Color = settings.colors;
+			}
+			else
+			{
+				//There was no colorize data in the settings, so update the settings to have the colorize data in the character if that exists.
+				if ("Color" in character.data)
+				{
+					settings.colors = character.data.Color;
+				}
+			}
+			
 			character.DeserializeAnimationLists(settings.animationLists);
 			/*var lockedAnimationCount:int = 0;
 			
@@ -312,8 +431,9 @@ package characters
 		{
 			if (name in m_charNamesDict)
 			{
-				var character:Character = m_Characters[m_charNamesDict[name]];
-				return [name, character.GetDefaultMusicName(), IsCharacterLocked(m_charNamesDict[name]), character.IsResettable()];
+				var charId:int = m_charNamesDict[name];
+				var character:Character = m_Characters[charId];
+				return [name, character.GetDefaultMusicName(), IsCharacterLocked(charId), character.IsResettable()];
 			}
 			return null;
 			
@@ -355,9 +475,9 @@ package characters
 			return null;
 		}
 		
-		public function GetCurrentCharacterColorData():Object
+		public function GetCharacterColorData(charId:int):Object
 		{
-			var characterData:Object = m_currentCharacter.data;
+			var characterData:Object = m_Characters[charId].data;
 			if (characterData && "Color" in characterData)
 			{
 				return characterData.Color;
@@ -365,9 +485,9 @@ package characters
 			return null;
 		}
 		
-		public function GetCurrentCharacterGraphicSettings():Object
+		public function GetCharacterGraphicSettings(charId:int):Object
 		{
-			var characterData:Object = m_currentCharacter.data;
+			var characterData:Object = m_Characters[charId].data;
 			if (characterData && "graphicSettings" in characterData)
 			{
 				for (var name:String in characterData.graphicSettings) 
@@ -378,9 +498,9 @@ package characters
 			return null;
 		}
 		
-		public function GetCurrentCharacterGraphicSets():Object
+		public function GetCharacterGraphicSets(charId:int):Object
 		{
-			var characterData:Object = m_currentCharacter.data;
+			var characterData:Object = m_Characters[charId].data;
 			if (characterData && "GraphicSets" in characterData)
 			{
 				return characterData.GraphicSets;
@@ -391,6 +511,13 @@ package characters
 		public function IsACharacterSelected():Boolean
 		{
 			return (m_currentCharacter != null);
+		}
+		
+		
+		public function CheckIfTransitionLockIsActive():Boolean
+		{
+			if (m_currentCharacter == null) { return false;}
+			return (transitionLockout == true) /*|| m_currentCharacter.IsStillInLinkedAnimation()*/;
 		}
 		
 		public function SetLockOnCurrentCharacter(locked:Boolean):Boolean
@@ -420,6 +547,44 @@ package characters
 		public function GetTotalNumOfCharacters():int
 		{
 			return m_Characters.length;
+		}
+		
+		//Tests if there are any characters that can be switched to. To be eligible, a character must not be locked and must have at least one animation list assigned to a slot. Returns true if there is a character that can be switched to, false if there are no characters that can be switched to.
+		public function CheckCharactersForSwitchEligibility():Boolean
+		{
+			var charactersAvailable:Boolean = false;
+			for (var i:int = 0, l:int = m_Characters.length; i < l; i++) 
+			{
+				if (DoesCharacterHaveAnimations(i) == true && m_characterLocks[i] == false)
+				{
+					charactersAvailable = true;
+					break;
+				}
+			}
+			return charactersAvailable;
+		}
+		
+		//Checks the character's animations to make sure at least 1 animation that is not an end link animation is accessible.
+		//If there are none, unlock every animation that is not an end link.
+		public function CheckLocksForCurrentCharacter(charId:int):void
+		{
+			if (charId < 0 || charId >= m_Characters.length) { return; }
+			
+			var character:Character = m_Characters[charId];
+			var accessibleAnimations:Array = character.GetAccessibleAnimationsIndices();
+			if (character.GetNumberOfLockedAnimations() >= accessibleAnimations.length)
+			{
+				//Unlock every single animation.
+				for (var i:int = 0, l:int = character.GetNumberOfAnimationSlots(); i < l; ++i)
+				{
+					character.SetLockOnAnimation(i, false);
+				}
+			}
+		}
+		
+		public function GetCurrentAnimationIdOfCharacter():int
+		{
+			return m_currentCharacter.GetCurrentAnimationId();
 		}
 	}
 

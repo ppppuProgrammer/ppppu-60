@@ -38,21 +38,16 @@ package menu
 		private var buttonGroup:Vector.<PushButton> = new Vector.<PushButton>();
 		private var signal1:Signal1;
 		private var signal2:Signal2;
-		public function MainMenu(app:AppCore, director:Director) 
+		public function MainMenu() 
 		{
 			name = "Main Menu";
-			app.addChild(this);
-
-			signal1 = new Signal1;
-			signal1.addSlot(app);
-			signal2 = new Signal2;
+			
 			
 			var tabsList:Vector.<String> = Vector.<String>(["Characters", "Customization", "Animations", "Music", "Load"]);
-			CONFIG::debug
+			CONFIG::debug 
 			{
 				tabsList[tabsList.length] = "Development";
 			}
-
 			var WIDTH:Number = 480;
 			var HEIGHT:Number = 720;
 
@@ -77,8 +72,9 @@ package menu
 				button.width = buttonWidth;
 				button.name = label + "Tab";
 				buttonGroup[buttonGroup.length] = button;
-				
 			}
+			
+				
 			panel.width = WIDTH; panel.height = HEIGHT;
 			
 			submenuContainer = new Panel(this, 0, BUTTON_HEIGHT);
@@ -87,37 +83,48 @@ package menu
 			submenuContainer.width = WIDTH;
 			
 			this.visible = false;
- 
-			CONFIG::debug 
-			{
-				developerMenu = new DeveloperMenu();
-				addChild(developerMenu);
-			}
-			
-			animationMenu = new AnimationMenu();
-			addChild(animationMenu);
-			
-			customizationMenu = new CustomizationMenu();
-			addChild(customizationMenu);
-			
-			loadMenu = new LoadMenu();
-			addChild(loadMenu);
-			
-			musicMenu = new MusicMenu();
-			addChild(musicMenu);
-			
-			characterMenu = new CharacterMenu();
-			addChild(characterMenu);
 			
 			addEventListener(IOErrorEvent.IO_ERROR, MenuLoadFailed, true);
 			addEventListener(Event.COMPLETE, MenusReadyCheck, true);
-			InitializeAllSubmenus(app, director);
 			
-			addEventListener(MouseEvent.CLICK, ClickEventHandler, true);
+			
+			addEventListener(MouseEvent.CLICK, ClickEventHandler);
 			addEventListener(Event.CHANGE, ChangeEventHandler, true);
 			addEventListener(Event.SELECT, SelectEventHandler, true);
 			
 			
+		}
+		
+		public function InitializeMainMenu(app:AppCore, director:Director):void
+		{
+			app.addChild(this);
+
+			signal1 = new Signal1;
+			signal1.addSlot(app);
+			signal2 = new Signal2;
+			
+			CONFIG::debug 
+			{
+				developerMenu = CreateSubmenu(DeveloperMenu) as DeveloperMenu;
+				addChild(developerMenu);
+			}
+			
+			animationMenu = CreateSubmenu(AnimationMenu) as AnimationMenu;
+			addChild(animationMenu);
+			
+			customizationMenu = CreateSubmenu(CustomizationMenu) as CustomizationMenu;
+			addChild(customizationMenu);
+			
+			loadMenu = CreateSubmenu(LoadMenu) as LoadMenu;
+			addChild(loadMenu);
+			
+			musicMenu = CreateSubmenu(MusicMenu) as MusicMenu;
+			addChild(musicMenu);
+			
+			characterMenu = CreateSubmenu(CharacterMenu) as CharacterMenu;
+			addChild(characterMenu);
+			
+			InitializeAllSubmenus(app, director);
 		}
 		
 		private function ClickEventHandler(e:MouseEvent):void
@@ -206,12 +213,12 @@ package menu
 		
 		private function InitializeAllSubmenus(app:AppCore, director:Director):void
 		{
-			if (characterMenu != null) { characterMenu.InitializeMenu(app); RegisterSubmenu(characterMenu); ++submenuCreated; }
-			if (musicMenu != null) { musicMenu.InitializeMenu(app); RegisterSubmenu(musicMenu); ++submenuCreated; }
-			if (developerMenu != null) {developerMenu.InitializeMenu(app, director); RegisterSubmenu(developerMenu); ++submenuCreated;} 
-			if (animationMenu != null) {animationMenu.InitializeMenu(app); RegisterSubmenu(animationMenu); ++submenuCreated;}
-			if (customizationMenu != null) {customizationMenu.InitializeMenu(app, director); RegisterSubmenu(customizationMenu); ++submenuCreated;}
-			if (loadMenu != null) {loadMenu.InitializeMenu(app); RegisterSubmenu(loadMenu); ++submenuCreated;}
+			if (characterMenu != null) { characterMenu.InitializeMenu(app); RegisterSubmenu(characterMenu); }
+			if (musicMenu != null) { musicMenu.InitializeMenu(app); RegisterSubmenu(musicMenu); }
+			if (developerMenu != null) {developerMenu.InitializeMenu(app); developerMenu.RegisterDirectorForMessages(director); RegisterSubmenu(developerMenu);} 
+			if (animationMenu != null) {animationMenu.InitializeMenu(app); RegisterSubmenu(animationMenu);}
+			if (customizationMenu != null) { customizationMenu.InitializeMenu(app); customizationMenu.RegisterDirectorForMessages(director); RegisterSubmenu(customizationMenu); }
+			if (loadMenu != null) {loadMenu.InitializeMenu(app); RegisterSubmenu(loadMenu);}
 		}
 		
 		[inline]
@@ -269,6 +276,17 @@ package menu
 			removeEventListener(IOErrorEvent.IO_ERROR, MenuLoadFailed, true);
 			this.visible = true;
 			signal1.dispatch("MenuFinishedInitializing");
+		}
+		
+		private function CreateSubmenu(menuClass:Class):ISubMenu
+		{
+			submenuCreated++;
+			var submenu:ISubMenu = new menuClass() as ISubMenu;
+			if (!submenu)
+			{
+				--submenuCreated;
+			}
+			return submenu;
 		}
 	}
 

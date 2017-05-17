@@ -14,16 +14,22 @@ package menu
 	import com.jacksondunstan.signals.Slot2;
 	import mx.utils.StringUtil;
 	import flash.utils.Dictionary;
+	import flash.utils.ByteArray;
 	/**
 	 *
 	 * @author 
 	 */
-	public class CustomizationMenu extends Sprite  implements Slot2
+	public class CustomizationMenu extends Sprite  implements Slot2, ISubMenu
 	{
 		private var config:MinimalConfigurator;
 		private var signal2:Signal2;
 		
 		private var assetPreviewSprites:Dictionary = new Dictionary();
+		
+		CONFIG::release {
+			[Embed(source="CustomMenuDefinition.xml",mimeType="application/octet-stream")]
+			private var menuDefinitionClass:Class;
+		}
 		
 		public function CustomizationMenu(/*app:AppCore, director:Director*/) 
 		{
@@ -34,15 +40,27 @@ package menu
 			config.loadXML("MainMenuDefinition.xml");*/
 		}
 				
-		public function InitializeMenu(app:AppCore, director:Director):void
+		public function InitializeMenu(app:AppCore):void
 		{
 			config = new MinimalConfigurator(this);
 			app.SetupMenuHooks(null, this);
-			director.RegisterMenuForMessaging(this);
-			signal2.addSlot(director);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
-			config.loadXML("CustomMenuDefinition.xml");
+			if(CONFIG::debug) {
+				config.loadXML("../src/menu/CustomMenuDefinition.xml");
+			}
+			else
+			{
+				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
+				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));
+			}
+		}
+		
+		public function RegisterDirectorForMessages(director:Director):void
+		{
+			//Allow the director and menu to communicate with each other
+			signal2.addSlot(director);
+			director.RegisterMenuForMessaging(this);
 		}
 		
 		private function UpdateGraphicSetsUsed():void

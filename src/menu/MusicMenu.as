@@ -7,14 +7,21 @@ package menu
 	import flash.errors.IOError;
 	import flash.events.IOErrorEvent;
 	import com.jacksondunstan.signals.Slot2;
+	import flash.utils.ByteArray;
 	/**
 	 * ...
 	 * @author 
 	 */
-	public class MusicMenu extends Sprite implements Slot2
+	public class MusicMenu extends Sprite implements Slot2, ISubMenu
 	{
 		private var config:MinimalConfigurator;
 		private var signal2:Signal2;
+		
+		CONFIG::release {
+			[Embed(source="MusicMenuDefinition.xml",mimeType="application/octet-stream")]
+			private var menuDefinitionClass:Class;
+		}
+		
 		public function MusicMenu() 
 		{
 			name = "Music Menu";
@@ -27,7 +34,14 @@ package menu
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
 			app.SetupMenuHooks(null, this);
-			config.loadXML("MusicMenuDefinition.xml");
+			if(CONFIG::debug) {
+				config.loadXML("../src/menu/MusicMenuDefinition.xml");
+			}
+			else
+			{
+				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
+				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));
+			}
 
 		}
 		

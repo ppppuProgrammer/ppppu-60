@@ -19,17 +19,14 @@ package menu
 	import flash.utils.Dictionary;
 	
 	import mx.utils.StringUtil;
-	import org.libspark.betweenas3.core.tweens.AbstractTween;
-	import org.libspark.betweenas3.core.tweens.ObjectTween;
-	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
-	import org.libspark.betweenas3.tweens.ITween;
 	
 	import flash.errors.IOError;
 	import flash.events.IOErrorEvent;
 	import AppCore;
+	import flash.utils.ByteArray;
 
 	//[SWF(backgroundColor=0xeeeeee, width=480, height=720)]
-	public class DeveloperMenu extends Sprite implements /*Slot1,*/Slot2
+	public class DeveloperMenu extends Sprite implements /*Slot1,*/Slot2, ISubMenu
 	{
 		/*private var animProgressSlider:HUISlider;
 		private var animationLabel:Label;
@@ -53,7 +50,10 @@ package menu
 		private var signal2:Signal2 = new Signal2();
 		private var config:MinimalConfigurator;
 		
-		
+		CONFIG::release {
+			[Embed(source="DevMenuDefinition.xml",mimeType="application/octet-stream")]
+			private var menuDefinitionClass:Class;
+		}
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
 		private var serialTweenDict:Dictionary = new Dictionary();
@@ -67,7 +67,7 @@ package menu
 			//addEventListener(Event.SELECT, SelectEventHandler, true);
 		}
 		
-		public function InitializeMenu(app:AppCore, director:Director):void
+		public function InitializeMenu(app:AppCore):void
 		{
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
@@ -75,10 +75,22 @@ package menu
 			signal1.addSlot(app);
 			signal2.addSlot(app);
 			
-			//Allow the director and dev menu to communicate with each other
+			
+			if(CONFIG::debug ){
+				config.loadXML("../src/menu/DevMenuDefinition.xml");
+			}
+			else
+			{
+				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
+				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));
+			}
+		}
+		
+		public function RegisterDirectorForMessages(director:Director):void
+		{
+			//Allow the director and menu to communicate with each other
 			signal2.addSlot(director);
 			director.RegisterMenuForMessaging(this);
-			config.loadXML("DevMenuDefinition.xml");
 		}
 		
 		private function FailedLoadingXML(e:IOErrorEvent):void

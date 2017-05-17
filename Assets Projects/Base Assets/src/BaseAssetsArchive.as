@@ -32,6 +32,9 @@ package
 			modsList[modsList.length] = new AssetsMod(new EyeMask, "EyeMaskL", "Standard", 1);
 			modsList[modsList.length] = new AssetsMod(new EyeMask, "EyeMaskR", "Standard", 1);
 			
+			modsList[modsList.length] = new AssetsMod(new EyeMask2, "EyeMask2L", "Standard", 1);
+			modsList[modsList.length] = new AssetsMod(new EyeMask2, "EyeMask2R", "Standard", 1);
+			
 			modsList[modsList.length] = new AssetsMod(new Eyelash, "EyelashL", "Standard", 1);
 			modsList[modsList.length] = new AssetsMod(new Eyelash, "EyelashR", "Standard", 1);		
 			
@@ -68,7 +71,7 @@ package
 			/*Head related*/
 			modsList[modsList.length] = new AssetsMod(new Neck, "Neck", "Standard", 1, { Colorable: skinColorProperties } );
 			var faceColorProperties:Object = { Group: ["Face", "Hair"], Target: ["Color", "Hair" ]};
-			var faceWithHairColorProperties:Object = { Group: ["Skin","Hair"], Target: ["Skin", "Hair"] };
+			var faceWithHairColorProperties:Object = { Group: ["Skin","HairAngled"], Target: ["Skin", "Hair"] };
 			modsList[modsList.length] = new AssetsMod(new Face, "Face", "Standard", 1, { Colorable: faceColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new FaceAngled, "FaceAngled", "Standard", 1, { Colorable: faceWithHairColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new FaceAngled2, "FaceAngled2", "Standard", 1, { Colorable: faceWithHairColorProperties } );
@@ -85,6 +88,8 @@ package
 			modsList[modsList.length] = new AssetsMod(new OpenSmile, "OpenSmile", "Standard", 1, { Colorable: lipColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new TeardropMouth, "TeardropMouth", "Standard", 1, { Colorable: lipColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new WideMouth, "WideMouth", "Standard", 1, { Colorable: lipColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new WideTeardropMouth, "WideTeardropMouth", "Standard", 1, { Colorable: lipColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new OhMouth, "OhMouth", "Standard", 1, { Colorable: lipColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Grin, "Grin", "Standard", 1);
 			modsList[modsList.length] = new AssetsMod(new Tongue, "Tongue", "Standard", 1);
 			
@@ -130,10 +135,13 @@ package
 			/* Torso related*/
 			modsList[modsList.length] = new AssetsMod(new Hips, "Hips", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Hips2, "Hips2", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new HipsAngled, "HipsAngled", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new BackHipsAngled, "BackHipsAngled", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Chest, "Chest", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new ChestAngled, "ChestAngled", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new UpperBackAngled, "UpperBackAngled", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new LowerBackAngled, "LowerBackAngled", "Standard", 1, { Colorable: skinColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new MidTorsoAngled, "MidTorsoAngled", "Standard", 1, { Colorable: skinColorProperties } );
 			
 			modsList[modsList.length] = new AssetsMod(new Boob, "BoobL", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Boob, "BoobR", "Standard", 1, { Colorable: skinWithHighlightColorProperties } );
@@ -180,7 +188,10 @@ package
 			modsList[modsList.length] = new AssetsMod(new Groin, "Groin", "Standard", 1, { Colorable: skinColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Groin2, "Groin2", "Standard", 1, { Colorable: skinColorProperties } );
 			var vulvaColorProperties:Object = { Group: ["Vulva", "SkinHighlight", "SkinHighlight"], Target: ["Color", "Highlight", "Highlight2"] };
+			
 			modsList[modsList.length] = new AssetsMod(new Vulva, "Vulva", "Standard", 1, { Colorable: vulvaColorProperties } );
+			var vulvaAngColorProperties:Object ={ Group: ["Vulva", "Vulva", "SkinHighlight", "SkinHighlight"], Target: ["Color_1", "Color_2", "Highlight_1", "Highlight_2"] }
+			modsList[modsList.length] = new AssetsMod(new VulvaAngled, "VulvaAngled", "Standard", 1, { Colorable: vulvaAngColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new BackVulva, "BackVulva", "Standard", 1, { Colorable: { Group: "Vulva", Target: "Color" } } );
 			
 			/* Male */

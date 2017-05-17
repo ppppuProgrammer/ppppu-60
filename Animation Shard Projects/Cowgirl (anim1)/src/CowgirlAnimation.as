@@ -1,5 +1,7 @@
 package
 {
+	import Pch.Cowgirl_Peach;
+	import Ros.Cowgirl_Rosalina;
 	import animations.AnimateShard;
 	import animations.DispObjInfo;
 	import modifications.AnimateShardMod;
@@ -20,6 +22,7 @@ package
 		{
 			modsList.push(CreateShardModForFemale());
 			modsList.push(CreateShardModForMale());
+			modsList = modsList.concat(Cowgirl_Peach.GetShardMods(), Cowgirl_Rosalina.GetShardMods());
 		}
 		
 		private function GetTimelineDataForMale():Vector.<Object>
@@ -45,9 +48,9 @@ package
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleGroin", 4200, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("ShaftMask", 4400, 0);
 			dispInfo[dispInfo.length] = new DispObjInfo("MaleBody", 5800, 0);
-dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 400, 0, "ShaftMask", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 600, 0, "ShaftMask", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("PenisHighlight", 800, 0, "ShaftMask", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("MaleShaft", 200, 0, "ShaftMask", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("MalePenisHead", 400, 0, "ShaftMask", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("PenisHighlight", 600, 0, "ShaftMask", DispObjInfo.FLAG_MASKED);
 			return dispInfo;
 		}
 		

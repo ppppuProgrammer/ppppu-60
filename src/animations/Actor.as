@@ -63,11 +63,11 @@ package animations
 				//Main layer is not allowed to be empty once an asset is set to it.
 				
 				//Check that the layer is not main. If this is true, unset the asset
-				if (assetData.layer != LAYER_MAIN)
-				{
-					RemoveAssetFromUse(assetData);
+				//if (assetData.layer != LAYER_MAIN)
+				//{
+					RemoveAssetFromUse(assetCurrentlyUsed);
 					//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", assetData.layer]);
-				}
+				//}
 			}
 			else //An unused asset was selected to be used
 			{
@@ -107,8 +107,9 @@ package animations
 			}
 			//Removes the graphic from the layer
 			ChangeGraphicInLayer(assetData.layer, null);
+
 			signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", assetData.layer]);
-		}
+	}
 		
 		public function SetAssetForUse(assetData:AssetData):void
 		{
@@ -286,6 +287,7 @@ package animations
 			}
 			else if (commandStr == "ClearAllAssets")
 			{
+				
 				RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(0));
 				RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(1));
 				RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(2));
@@ -349,11 +351,11 @@ package animations
 						{
 							//Actor is to remove the set. 
 							//Main layer assets can not be removed unless there is another asset ready to take its place.
-							if (asset.layer != LAYER_MAIN)
-							{
+							//if (asset.layer != LAYER_MAIN)
+							//{
 								RemoveAssetFromUse(asset);
 								//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", asset.layer]);
-							}
+							//}
 							
 						}
 					}

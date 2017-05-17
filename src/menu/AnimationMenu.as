@@ -20,7 +20,7 @@ package menu
 	 * ...
 	 * @author 
 	 */
-	public class AnimationMenu extends Sprite implements Slot2
+	public class AnimationMenu extends Sprite implements Slot2, ISubMenu
 	{
 		private var config:MinimalConfigurator;
 		private var signal1:Signal1;
@@ -32,6 +32,13 @@ package menu
 		private var currentSelectedShardName:String;
 		
 		private var animationDuration:Number;
+		
+		private const INVALIDANIMATIONSTRING:String = "\" needs to be loaded";
+		
+		CONFIG::release {
+			[Embed(source="AnimationMenuDefinition.xml",mimeType="application/octet-stream")]
+			private var menuDefinitionClass:Class;
+		}
 		
 		public function AnimationMenu() 
 		{
@@ -45,7 +52,15 @@ package menu
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
-			config.loadXML("AnimationMenuDefinition.xml");
+			
+			if(CONFIG::debug) {
+				config.loadXML("../src/menu/AnimationMenuDefinition.xml");
+			}
+			else
+			{
+				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
+				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));
+			}
 			
 			signal1.addSlot(app);
 			signal2.addSlot(app);
@@ -188,7 +203,7 @@ package menu
 			}*/
 			else if (command == "timeText")
 			{
-				//var position:Number = roundToNearest(.01, value);
+				
 				var position:Number = value;
 				var timeStr:String = position.toFixed(2) + " / " + animationDuration.toFixed(2);
 				(config.getCompById(command) as Label).text = timeStr;
@@ -201,7 +216,10 @@ package menu
 			else if (command == "animationDuration")
 			{
 				animationDuration = value;
-				(config.getCompById("frameSlider") as HUISlider).maximum = value*stage.frameRate;
+				if (stage)
+				{
+				(config.getCompById("frameSlider") as HUISlider).maximum = value * stage.frameRate;
+				}
 			}
 			else if (command == "SetShardDescription")
 			{
@@ -235,7 +253,7 @@ package menu
 				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
 				if (cbox)
 				{
-					cbox.selectedIndex = cbox.items.indexOf(value as String);
+					cbox.selectedIndex = cbox.items.indexOf(value as String);					
 				}
 			}
 			else if (command == "AddNewAnimation")
@@ -265,6 +283,7 @@ package menu
 					if (charAnimationList)
 					{
 						charAnimationList.addItem( { label: "Empty" } );
+						ChangeDefaultLabelForAnimationSelector("");					
 					}
 				}
 			}
@@ -304,7 +323,7 @@ package menu
 							}
 							else
 							{
-								charAnimationList.addItem( { label: String(i) } );
+								charAnimationList.addItem( { label: String(i+1) } );
 							}
 						}
 					}
@@ -356,24 +375,11 @@ package menu
 					}
 					//Don't have direct access to the shards, send a command to AppCore to do stuff with the list. The dev menu will receive a command with the shards that the list wants.
 					signal2.dispatch("ProcessAnimationList", list);
-					/*var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
-					var animateList:List = config.getCompById("animList") as List;
-					intentionallyBreaking;
-					//The way "shards" are added to the animate list is completely wrong. It needs to be added similiar to the standard way, not brute forcing shard names into it.
-					if (cbox && animateList)
-					{
-						animateList.removeAll();
-						cbox.selectedIndex = cbox.items.indexOf(list.TargetAnimationName);
-						var shardsAmount:int = list.ShardNameList.length;
-						var shard:AnimateShard;
-						for (var j:int = 0; j < shardsAmount; j++) 
-						{
-							shard = 
-							animList.addItem({name: currentSelectedShardName, shard: currentSelectedShard, type: list.ShardTypeList[j]});
-							//animateList.addItem(list.ShardNameList[j]);
-						}
-					}*/
 				}
+			}
+			else if (command == "AnimMenu_InvalidAnimationSelected")
+			{
+				ChangeDefaultLabelForAnimationSelector("\"" + (value as String) + INVALIDANIMATIONSTRING);
 			}
 			
 		}
@@ -454,9 +460,7 @@ package menu
 			{
 				//setFrameButton needs to also send data on what frame to go to.
 				signal2.dispatch(targetName, int((config.getCompById("frameSlider") as HUISlider).value));
-			}
-
-			
+			}			
 		}
 		
 		public function ChangeEventHandler(target:Object):void
@@ -528,6 +532,8 @@ package menu
 				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
 				var cbox2:ComboBox = config.getCompById("shardTypeSelector") as ComboBox;
 				var cbox3:ComboBox = config.getCompById("shardSelector") as ComboBox;
+				if (cbox.selectedIndex > -1)	{ ChangeDefaultLabelForAnimationSelector(""); }
+				
 				if (cbox2.selectedItem == null) { return; }
 				
 				//If the animation selected changes, clear the animation list so shards from different animations can't be used together.
@@ -616,6 +622,16 @@ package menu
 			//Disable certain buttons
 			config.getCompById("animationListButtonGroup").enabled = false;
 			config.getCompById("addShardButton").enabled = false;
+		}
+		
+		[inline]
+		private function ChangeDefaultLabelForAnimationSelector(defaultLabel:String):void
+		{
+			var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+			if (cbox)
+			{
+				cbox.defaultLabel = defaultLabel;					
+			}
 		}
 		
 	}

@@ -5,21 +5,29 @@ package menu
 	import com.bit101.components.RadioButton;
 	import com.bit101.components.TextArea;
 	import com.jacksondunstan.signals.Slot2;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import com.bit101.utils.MinimalConfigurator;
 	import flash.errors.IOError;
 	import flash.events.IOErrorEvent;
 	import com.jacksondunstan.signals.Signal2;
+	import flash.utils.ByteArray;
 
 	/**
 	 * ...
 	 * @author 
 	 */
-	public class CharacterMenu extends Sprite implements Slot2
+	public class CharacterMenu extends Sprite implements Slot2, ISubMenu
 	{
 		private var config:MinimalConfigurator;
 		private var signal2:Signal2;
+		
+		CONFIG::release {
+			[Embed(source="CharacterMenuDefinition.xml",mimeType="application/octet-stream")]
+			private var menuDefinitionClass:Class;
+		}
+		
 		public function CharacterMenu() 
 		{
 			name = "Character Menu";
@@ -31,7 +39,14 @@ package menu
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
-			config.loadXML("CharacterMenuDefinition.xml");
+			if(CONFIG::debug) {
+				config.loadXML("../src/menu/CharacterMenuDefinition.xml");
+			}
+			else
+			{
+				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
+				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));
+			}
 			app.SetupMenuHooks(null, this);
 			signal2.addSlot(app);
 		}
@@ -102,9 +117,14 @@ package menu
 				var lockRadioBtn:RadioButton = config.getCompById("lockRBtn") as RadioButton;
 				var unlockRadioBtn:RadioButton = config.getCompById("unlockRBtn") as RadioButton;
 				var deleteAndResetBtn:PushButton = config.getCompById("deleteCharButton") as PushButton;
+				var charList:List = config.getCompById("charSelectList") as List;
+				var charName:String = charInfo[0] as String;
+				//In order to change the index of the char list without it dispatching an event, it is temporarily removed from the display list.
+				var charListParent:DisplayObjectContainer = charList.parent;
+				charListParent.removeChild(charList);
 				if (charInfo)
 				{
-					charNameTextArea.text = charInfo[0] as String;
+					charNameTextArea.text = charName;
 					musicNameTextArea.text = charInfo[1] as String;
 					
 					if ((charInfo[2] as Boolean) == true)
@@ -116,7 +136,8 @@ package menu
 					if ((charInfo[3] as Boolean) == true)
 					{ deleteAndResetBtn.label = "Reset current character";}
 					else
-					{ deleteAndResetBtn.label = "Delete current character";}
+					{ deleteAndResetBtn.label = "Delete current character"; }
+					charList.selectedItem = charName;	
 				}
 				else
 				{
@@ -124,7 +145,9 @@ package menu
 					musicNameTextArea.text = "Not Available";
 					lockRadioBtn.selected = unlockRadioBtn.selected = false;
 					deleteAndResetBtn.enabled = false;
+					charList.selectedIndex = -1;
 				}
+				charListParent.addChild(charList);
 			}
 			else if (command == "CharMenu_CharacterHasChanged")
 			{
@@ -182,12 +205,15 @@ package menu
 				var unlockRadioBtn:RadioButton = config.getCompById("unlockRBtn") as RadioButton;
 				if ((value as Boolean) == true)
 				{
-					lockRadioBtn.selected = true;
+					lockRadioBtn.selected = true;	
 				}
 				else
 				{
 					unlockRadioBtn.selected = true;
+						
 				}
+				//unlockRadioBtn.draw();
+					//lockRadioBtn.draw();
 			}
 		}
 		

@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="..\..\bin\TCHAR_Rosalina.swf" />
+    <movie path="..\..\bin\Characters\TCHAR_Rosalina.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />

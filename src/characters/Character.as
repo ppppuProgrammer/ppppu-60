@@ -29,7 +29,12 @@
 		
 		protected var m_Id:int = -1; //The id number of the character. Can change depending on the order that characters
 		protected var m_name:String;
-		//protected var m_playAnimationFrame:int = 0;
+		//protected var m_playAnimationFrame:int = 0
+		
+		/*The id of the characters animation collection that is slated to play or is playing currently. -1 indicates nothing is playing.
+		 * Value corresponds to the index of the character animationlist vector*/
+		private var m_currentAnimationId:int = -1;
+		
 		protected var m_randomizePlayAnim:Boolean = true;
 		protected var m_lockedAnimation:Vector.<Boolean>; //Keeps track if an animation can be switched to.
 		
@@ -43,9 +48,13 @@
 		
 		protected var animationLists:Vector.<AnimationList>;
 		
+		//Indicates whether the animation in the animationLists vector of the corresponding index is a regular animation or an end-link animation. True indicates a regular animation (that can possibly transition to an end link type).
+		protected var standardAnimationType:Vector.<Boolean> = new Vector.<Boolean>();
+		
 		public function Character(name:String, charData:Object, isPresetCharacter:Boolean = false, presetAnimationLists:Vector.<AnimationList>=null)
 		{
 			registerClassAlias("AnimationList", AnimationList);
+			registerClassAlias("ColorTransform", ColorTransform);
 			m_lockedAnimation = new Vector.<Boolean>();
 			m_name = name;
 			if (charData)
@@ -100,6 +109,7 @@
 			}
 			animationLists[animationLists.length] = new AnimationList();
 			m_lockedAnimation[m_lockedAnimation.length] = false;
+			standardAnimationType[standardAnimationType.length] = true;
 		}
 		
 		public function RemoveAnimationSlot(index:int):Boolean
@@ -108,6 +118,7 @@
 			{
 				/*animationLists = */animationLists.splice(index, 1);
 				/*m_lockedAnimation = */m_lockedAnimation.splice(index, 1);
+				standardAnimationType.splice(index, 1);
 				return true;
 			}
 			return false;
@@ -180,6 +191,7 @@
 			characterByteArray.writeBoolean(m_randomizePlayAnim);
 			characterByteArray.writeObject(m_lockedAnimation);
 			characterByteArray.writeObject(animationLists);
+			characterByteArray.writeObject(standardAnimationType);
 			return characterByteArray;
 		}
 		
@@ -192,6 +204,22 @@
 			m_randomizePlayAnim = charStorageData.readBoolean();
 			m_lockedAnimation = charStorageData.readObject();
 			animationLists = charStorageData.readObject();
+			standardAnimationType = charStorageData.readObject();
+			if (standardAnimationType.length < animationLists.length)
+			{
+				for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+				{
+					standardAnimationType[i] = true;
+				}
+			}
+			
+			if (m_lockedAnimation.length < animationLists.length)
+			{
+				for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+				{
+					m_lockedAnimation[i] = false;
+				}
+			}
 			
 		}
 		
@@ -225,8 +253,171 @@
 			{
 				animationListsBinaryData.position = 0;
 				animationLists = animationListsBinaryData.readObject() as Vector.<AnimationList>;
+				if (standardAnimationType.length < animationLists.length)
+				{
+					for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+					{
+						standardAnimationType[i] = true;
+					}
+				}
+				if (m_lockedAnimation.length < animationLists.length)
+				{
+					for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+					{
+						m_lockedAnimation[i] = false;
+					}
+				}
 			}
 		}
+		
+		public function GetNumberOfAnimationSlots():int
+		{
+			return animationLists.length;
+		}
+		
+		public function GetNumberOfFilledAnimationSlots():int
+		{
+			if (animationLists == null) { return 0;}
+			var count:int;
+			for (var i:int = 0,l:int = animationLists.length; i < l; i++) 
+			{
+				if (animationLists[i] != null && animationLists[i].IsAnimListEmpty() == false)
+				{
+					++count;
+				}
+			}
+			return count;
+		}
+		
+		/*"accessible" animations are animations that are not end linked animations (meaning, they must be manually activated by the user
+		 * with a special command)*/
+		[inline]
+		public function GetAccessibleAnimationsIndices():Array
+		{
+			var accessibleArray:Array = [];
+			for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+			{
+				if (standardAnimationType[i] == true)
+				{
+					accessibleArray[accessibleArray.length] = i;
+				}
+			}
+			return accessibleArray;
+		}
+		
+		public function SetLockOnAnimation(animId:int, lockValue:Boolean):void
+		{
+			if (animId < 0 || animId >= animationLists.length) { return;}
+			//logger.debug("Trying to set lock on animation {0} (id {1}) to {2}",GetNameOfAnimationByIndex(indexForId),  animId, lockValue);
+			/*Conditions that will not have a set locked:
+			 * 1) animation type for the id is an end link animation (These are always unlocked but will be skipped in most cases.) 
+			 * 2) if lockValue is true: setting the lock on the given animation will lead to all standard type animations being locked.*/
+			if (standardAnimationType[animId] == false ||(lockValue == true && GetNumberOfLockedAnimations() + 1 >= GetAccessibleAnimationsIndices().length) )
+			{
+				//logger.debug("Could not change lock on animation {0} (id {1})", GetNameOfAnimationByIndex(indexForId),  animId);
+				return;
+			}
+			m_lockedAnimation[animId] = lockValue;
+		}
+		
+		[inline]
+		public function GetNumberOfLockedAnimations():int
+		{
+			var lockedAnimNum:int = 0;
+			var numLockedAnims:int = m_lockedAnimation.length;
+			for (var i:int = 0; i < numLockedAnims; ++i)
+			{
+				if(m_lockedAnimation[i] == true)
+				{
+					++lockedAnimNum;
+				}
+			}
+			return lockedAnimNum;
+		}
+		
+		public function GetCurrentAnimationId():int
+		{
+			return m_currentAnimationId;
+		}
+		
+		
+		public function RandomizePlayAnim(forceRandomization:Boolean=false):void
+		{
+			if(m_randomizePlayAnim || forceRandomization == true)
+			{
+				//Randomly select a number out of the number of accessible animations
+				//var accessibleAnimationCount:int = GetNumberOfAccessibleAnimations();
+				var randomAccessibleAnimId:int = RandomlySelectAnimationId();
+				var standardAnimationIndices:Array = GetAccessibleAnimationsIndices();
+				if((standardAnimationIndices.length - GetNumberOfLockedAnimations()) > 2)
+				{
+					while( GetAnimationLockedStatus(randomAccessibleAnimId))
+					{
+						randomAccessibleAnimId = RandomlySelectAnimationId();
+					}
+				}
+				else
+				{
+					while(GetAnimationLockedStatus(randomAccessibleAnimId))
+					{
+						randomAccessibleAnimId = RandomlySelectAnimationId();
+					}
+				}
+				m_currentAnimationId = randomAccessibleAnimId;
+				
+				//ChangeAnimationIndexToPlay(randomAnimIndex);
+			}
+		}
+		
+		public function PlayingLockedAnimCheck():void
+		{
+			//Make sure the currently playing animation can be locked.
+			//animation id are already the accessible animations.
+
+			//id returned was -1, meaning the animation at the index was not accessible.
+			//if (accessibleId == -1) { return;}
+			if(m_lockedAnimation[m_currentAnimationId] && (GetAccessibleAnimationsIndices().length - GetNumberOfLockedAnimations() == 1))
+			{
+				var unlockedAnimNum:int = 0;
+				for (var i:int = 0, l:int = m_lockedAnimation.length; i < l; i++) 
+				{
+					if (m_lockedAnimation[i] == false)
+					{
+						break;
+					}
+					++unlockedAnimNum;
+				}
+				m_currentAnimationId = unlockedAnimNum;
+				/*for each(var locked:Boolean in m_lockedAnimation)
+				{
+					if(!locked)
+					{
+						break;
+					}
+					++unlockedAnimNum;
+				}
+				m_currentAnimationIndex = m_idTargets[unlockedAnimNum];*/
+				//ChangeAnimationIndexToPlay(unlockedAnimNum);
+			}
+		}
+		
+		[inline]
+		private function RandomlySelectAnimationId():int
+		{
+			var accessibleAnimations:Array = GetAccessibleAnimationsIndices();
+			if (accessibleAnimations.length == 0) { return -1; }
+			
+			return accessibleAnimations[Math.floor(Math.random() * accessibleAnimations.length)];
+		}
+		
+		//Checks if an accessible animation is locked or unlocked.
+		public function GetAnimationLockedStatus(animId:int):Boolean
+		{
+			return m_lockedAnimation[animId];
+		}
+		
+		
+		
 		//public function GetIf
 		/*public function GetDiamondColor1():uint { return m_innerDiamondColor1;}
 		public function GetDiamondColor2():uint{ return m_innerDiamondColor2;}
