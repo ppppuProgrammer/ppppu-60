@@ -18,8 +18,8 @@ package animations
 		
 		public function AddNewBackgroundAsset(asset:Sprite):Boolean
 		{
-			var assetName:String = asset.name;
-			if (spriteList.indexOf(assetName) == -1)
+			//var assetName:String = asset.name;
+			if (spriteList.indexOf(asset) == -1)
 			{
 				spriteList[spriteList.length] = asset;
 				return true;

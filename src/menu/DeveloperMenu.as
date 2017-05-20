@@ -76,10 +76,11 @@ package menu
 			signal2.addSlot(app);
 			
 			
-			if(CONFIG::debug ){
+			CONFIG::debug{
 				config.loadXML("../src/menu/DevMenuDefinition.xml");
 			}
-			else
+			
+			CONFIG::release
 			{
 				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
 				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));

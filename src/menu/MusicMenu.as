@@ -34,10 +34,11 @@ package menu
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
 			app.SetupMenuHooks(null, this);
-			if(CONFIG::debug) {
+			CONFIG::debug {
 				config.loadXML("../src/menu/MusicMenuDefinition.xml");
 			}
-			else
+			
+			CONFIG::release
 			{
 				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
 				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));

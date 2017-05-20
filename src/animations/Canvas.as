@@ -92,6 +92,7 @@ package animations
 		private var actorDict:Dictionary = new Dictionary();
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
 		
+
 		//public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
 		
 		//private var disableActorsBasedOnGfxSetData:Vector.<DisableActorInfo> = new Vector.<DisableActorInfo>;
@@ -145,6 +146,10 @@ package animations
 				{
 					child.mouseChildren = false;
 					child.mouseEnabled = false;
+					if (child is Actor)
+					{
+						AddActor(child as Actor);
+					}
 				}
 			}
 		}
@@ -373,6 +378,25 @@ package animations
 			return position;
 		}
 		
+		public function AddActor(actor:Actor):void
+		{			
+			actor.mouseChildren = actor.mouseEnabled = false;
+			actorDict[actor.name] = actor;
+			director.RegisterActor(actor);
+			//See if there are any assets that tried to be added but couldn't since the actor didn't exist when they were loaded in.
+			if (assetsInStorage.length > 0)
+			{
+				for (var i:int = 0, l:int = assetsInStorage.length; i < l; i++) 
+				{
+					if (assetsInStorage[i] != null && (assetsInStorage[i][0] as String) == actor.name)
+					{
+						actor.AddAsset(assetsInStorage[i][1] as AssetData);
+						assetsInStorage[i] = null;							
+					}
+				}
+			}
+		}
+		
 		public function AddNewActor(actorName:String):Boolean
 		{
 			var result:Boolean;
@@ -386,22 +410,10 @@ package animations
 			{
 				var actor:Actor = new Actor();
 				actor.name = actorName;
-				actor.mouseChildren = actor.mouseEnabled = false;
-				actorDict[actorName] = actor;
-				director.RegisterActor(actor);
+				
+				AddActor(actor);
 				result = true;
-				//See if there are any assets that tried to be added but couldn't since the actor didn't exist when they were loaded in.
-				if (assetsInStorage.length > 0)
-				{
-					for (var i:int = 0, l:int = assetsInStorage.length; i < l; i++) 
-					{
-						if (assetsInStorage[i] != null && (assetsInStorage[i][0] as String) == actorName)
-						{
-							actor.AddAsset(assetsInStorage[i][1] as AssetData);
-							assetsInStorage[i] = null;							
-						}
-					}
-				}
+				
 			}
 			return result;
 		}
@@ -621,14 +633,15 @@ package animations
 		{
 			if (data)
 			{
-				for (var name:String in data ) 
+				director.ChangeAssetForActorByCharData(data);
+				/*for (var name:String in data ) 
 				{
 					for (var i:int = 0; i < 3; i++) 
 					{
 						director.ChangeAssetForActorByName(name, i, data[name][i]);
 					}
 					
-				}
+				}*/
 			}
 		}
 		
@@ -726,10 +739,10 @@ package animations
 			}
 			//Create a parallel tween out of the timelines.
 			var compiledAnimation:ParallelTween = BetweenAS3.parallelTweens(timelines) as ParallelTween;
-			if (masterTimeline && masterTimeline.isPlaying)
+			/*if (masterTimeline && masterTimeline.isPlaying)
 			{
 				masterTimeline.stop();
-			}
+			}*/
 			
 			//ClearGraphicsFromAllActorsOnCanvas();
 			//ApplyCurrentGraphicSets();
@@ -742,7 +755,7 @@ package animations
 			//For testing purposes.
 			//director.ChangeAssetForAllActorsBySetName("Standard");
 			
-			masterTimeline.gotoAndStop(0.0);
+			//masterTimeline.gotoAndStop(0.0);
 		}
 		
 		private function ProcessDisplayObjects(dispObjContainer:Object):void

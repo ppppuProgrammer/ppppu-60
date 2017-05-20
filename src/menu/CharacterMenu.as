@@ -39,10 +39,12 @@ package menu
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
-			if(CONFIG::debug) {
+			CONFIG::debug
+			{
 				config.loadXML("../src/menu/CharacterMenuDefinition.xml");
 			}
-			else
+			
+			CONFIG::release
 			{
 				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
 				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));

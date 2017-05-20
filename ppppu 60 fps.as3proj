@@ -8,7 +8,7 @@
     <movie fps="60" />
     <movie width="960" />
     <movie height="720" />
-    <movie version="13" />
+    <movie version="12" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#0C0046" />
@@ -44,7 +44,7 @@
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
-    <option additional="-use-gpu=true&#xA;-use-direct-blit=true" />
+    <option additional="-use-gpu=true&#xA;-use-direct-blit=true&#xA;-frame=FTwo,Main" />
     <option compilerConstants="CONFIG::BuildMenu, true" />
     <option minorVersion="" />
   </build>
@@ -75,14 +75,14 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Main.as" />
+    <compile path="src\Preloader.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand />
+  <preBuildCommand>cmd /C python "$(ProjectDir)\BuildModsSwf.py" "$(CompilerPath)" "$(FDBuild)" "$(BuildConfig)"</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False">cmd.exe /C python "$(ProjectDir)\MakeBuildCopy.py" "$(OutputDir)" "$(OutputName)" "$(BuildConfig)" "$(TimeStamp)"</postBuildCommand>
   <!-- Other project options -->

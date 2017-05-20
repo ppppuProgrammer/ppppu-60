@@ -328,8 +328,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//if (int((totalRunTime + difference)/ 4000) > int(totalRunTime/4000))
 			if(canvas.IsAnimationFinished())
 			{
-				//if (!menuModeActive)
-				//{
+				if (!menuModeActive)
+				{
 					characterManager.CharacterSwitchLogic();
 					
 					var switchedCharsId:int = characterManager.GetIdOfCharacterToSwitchTo();
@@ -350,7 +350,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var animId:int = characterManager.GetCurrentAnimationIdOfCharacter();
 					CompileAndSwitchAnimation(characterManager.GetAnimationListForCurrentCharacter(animId));
 					canvas.PlayAnimation(0);
-				//}
+				}
 			}
 			totalRunTime += difference;
 			lastUpdateTime = currentUpdateTime;

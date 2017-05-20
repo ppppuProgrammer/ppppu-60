@@ -13,19 +13,20 @@ package animations
 	{
 		//Ref to the colorizer so Actors can request to have accepted assets be colorized. 
 		private var colorizer:Colorizer;
-		private var signal2:Signal2 = new Signal2;
+		private var appSignaller2:Signal2 = new Signal2;
+		private var actorSignaller2:Signal2 = new Signal2;
 		private var signal3:Signal3 = new Signal3;
 		private var currentAnimationName:String;
 		public function Director(appCore:Slot2, assetColorizer:Colorizer) 
 		{
-			signal2.addSlot(appCore);
+			appSignaller2.addSlot(appCore);
 			colorizer = assetColorizer;
 		}
 		
 		public function AnimationWasChanged(newAnimationName:String):void
 		{
 			currentAnimationName = newAnimationName;
-			signal2.dispatch("AnimationChanged", currentAnimationName);
+			actorSignaller2.dispatch("AnimationChanged", currentAnimationName);
 		}
 		
 		
@@ -35,7 +36,7 @@ package animations
 			if (commandStr == "DisableActorsRequest")
 			{
 				//Got the request, now send the vector list to all listening actors as a command.
-				signal2.dispatch("DisableActorsCommand", value);
+				actorSignaller2.dispatch("DisableActorsCommand", value);
 			}
 			else if (commandStr == "DisableActorsForAssetChangeRequest")
 			{
@@ -51,7 +52,7 @@ package animations
 					}
 				}
 				//Got the request, now send the vector list to all listening actors as a command.
-				signal2.dispatch("DisableActorsCommand", actorsToDisableList);
+				actorSignaller2.dispatch("DisableActorsCommand", actorsToDisableList);
 			}
 			else if (command == "EnableActorRequest")
 			{
@@ -68,16 +69,16 @@ package animations
 					}
 				}
 				//Got the request, now send the vector list to all listening actors as a command.
-				signal2.dispatch("EnableActorsCommand", actorsToEnableList);
+				actorSignaller2.dispatch("EnableActorsCommand", actorsToEnableList);
 			}
 			else if (commandStr == "ActorAssetListRequest")
 			{
-				signal2.dispatch(command, value);
+				actorSignaller2.dispatch(command, value);
 			}
 			else if (commandStr == "AssetListDelivery")
 			{
 				//Send the asset list received from an actor to any objects listening for them.
-				signal2.dispatch(command, value);
+				appSignaller2.dispatch(command, value);
 			}
 			else if (commandStr == "ApplyAssetToActor")
 			{
@@ -90,11 +91,11 @@ package animations
 			}
 			else if (commandStr == "SetNameOfAddedAsset")
 			{
-				signal2.dispatch(command, value);
+				appSignaller2.dispatch(command, value);
 			}
 			else if (commandStr == "Actor_ReportingAssetChanged")
 			{
-				signal2.dispatch(command, value);
+				appSignaller2.dispatch(command, value);
 			}
 		}
 		
@@ -113,17 +114,17 @@ package animations
 		//Registers an Actor to send and receive messages to/from the Director. 
 		public function RegisterActor(actor:Actor):void
 		{
-			signal2.addSlot(actor);
+			actorSignaller2.addSlot(actor);
 			signal3.addSlot(actor);
 			actor.RegisterDirector(this);
 			//Send a message for any menus listening that a new actor was available for use. 
-			signal2.dispatch("NewActorRegistered", actor.name);
+			appSignaller2.dispatch("NewActorRegistered", actor.name);
 		}
 		
 		//Intended to register a menu to receive messages from the signal2 object this class contains
 		public function RegisterMenuForMessaging(menu:Slot2):void
 		{
-			signal2.addSlot(menu);
+			appSignaller2.addSlot(menu);
 		}
 		
 		public function UpdateAnimationInUse(animationName:String):void
@@ -138,10 +139,14 @@ package animations
 		}
 
 		[inline]
-		public function ChangeAssetForActorByName(actorName:String, layer:int, setName:String):void
+		public function ChangeAssetForActorByCharData(data:Object):void
+		{
+			actorSignaller2.dispatch("ChangeAssetByData", data);
+		}
+		/*public function ChangeAssetForActorByName(actorName:String, layer:int, setName:String):void
 		{
 			signal3.dispatch("ChangeAssetByName", actorName, [setName, layer]);
-		}	
+		}*/	
 		
 		[inline]
 		public function ChangeAssetForActor(actorName:String, assetId:int):void
@@ -151,7 +156,7 @@ package animations
 		
 		public function ClearAllActors():void
 		{
-			signal2.dispatch("ClearAllAssets", null);
+			actorSignaller2.dispatch("ClearAllAssets", null);
 		}
 		
 		/*public function ChangeColorsForAssets(colorizeData:Object):void

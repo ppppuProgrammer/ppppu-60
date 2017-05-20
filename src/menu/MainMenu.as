@@ -130,7 +130,7 @@ package menu
 		private function ClickEventHandler(e:MouseEvent):void
 		{
 			var eventTarget:Object = e.target as Object;
-			if (buttonGroup.indexOf(eventTarget) > -1)
+			if (buttonGroup.indexOf(eventTarget as PushButton) > -1)
 			{
 				var eventButton:PushButton = eventTarget as PushButton;
 				if (eventButton == null) { return;}

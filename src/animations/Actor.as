@@ -66,7 +66,6 @@ package animations
 				//if (assetData.layer != LAYER_MAIN)
 				//{
 					RemoveAssetFromUse(assetCurrentlyUsed);
-					//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", assetData.layer]);
 				//}
 			}
 			else //An unused asset was selected to be used
@@ -74,7 +73,6 @@ package animations
 				//Remove the currently used asset
 				RemoveAssetFromUse(assetCurrentlyUsed);
 				SetAssetForUse(assetData);
-				//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, assetData.setName, assetData.layer]);
 			}
 			
 		}
@@ -230,7 +228,38 @@ package animations
 		public function onSignal2(command:*, value:*): void
 		{
 			var commandStr:String = command as String;
-			if (commandStr == "AnimationChanged")
+			if (commandStr == "ChangeAssetByData")
+			{
+				var data:Object = value as Object;
+				var actorData:Array = data[this.name];
+				if (actorData)
+				{
+					var nameOfSet:String;
+					for (var i:int = 0, l:int = actorData.length; i < l; i++) 
+					{
+						nameOfSet = actorData[i] as String;
+						if (nameOfSet == "")
+						{
+							RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(i));
+						}
+						else
+						{
+							var asset:AssetData;
+							for (var j:int = 0, k:int = assetList.length; j < k; j++) 
+							{
+								asset = assetList[j];
+								if (asset.layer == i && asset.setName == nameOfSet)
+								{
+									SetAssetForUse(asset);
+									//SelectAssetToUse(j);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			else if (commandStr == "AnimationChanged")
 			{
 				var animationName:String = value as String;
 				//Since the new animation may not require an actor to be disabled, reset the count.
@@ -306,7 +335,7 @@ package animations
 					SelectAssetToUse(value2 as int);
 				}
 			}
-			else if (commandStr == "ChangeAssetByName")
+			/*else if (commandStr == "ChangeAssetByName")
 			{
 				var targetedActor:String = value as String;
 				if (this.name == targetedActor)
@@ -329,7 +358,7 @@ package animations
 					}
 					
 				}
-			}
+			}*/
 			else if (commandStr == "ChangeAssetForAllActors")
 			{
 				var setName:String = value as String;
@@ -345,7 +374,6 @@ package animations
 						{
 							RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(asset.layer));
 							SetAssetForUse(asset);
-							//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, asset.setName, asset.layer]);
 						}
 						else
 						{
@@ -354,7 +382,6 @@ package animations
 							//if (asset.layer != LAYER_MAIN)
 							//{
 								RemoveAssetFromUse(asset);
-								//signal2.dispatch("Actor_ReportingAssetChanged", [this.name, "", asset.layer]);
 							//}
 							
 						}
