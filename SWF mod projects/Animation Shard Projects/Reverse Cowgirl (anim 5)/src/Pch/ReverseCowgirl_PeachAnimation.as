@@ -220,7 +220,7 @@ dataForTimelineCreation.push(new OpenSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Reverse Cowgirl", Vector.<String>(["Eye", "Right", "Peach", "Standard"]), timelineData, dispInfo, "Right eye var 1", false, "Eye Motion: Fully open > Closed > Half Closed. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Reverse Cowgirl", Vector.<String>(["Eye", "Right", "Peach", "Standard"]), timelineData, dispInfo, "Right Eye Variant 1", false, "Eye Motion: Fully open > Closed > Half Closed. Originally used for Peach's default animation.");
             return animateShard;
         }
 
@@ -228,7 +228,7 @@ dataForTimelineCreation.push(new OpenSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForMouth();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForMouth();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Reverse Cowgirl", Vector.<String>(["Mouth", "Peach", "Standard"]), timelineData, dispInfo, "Mouth var 1", false, "Mouth Motion: Open Smile > Closed Smile > Teardrop. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Reverse Cowgirl", Vector.<String>(["Mouth", "Peach", "Standard"]), timelineData, dispInfo, "Mouth Variant 1", false, "Mouth Motion: Open Smile > Closed Smile > Teardrop. Originally used for Peach's default animation.");
             return animateShard;
         }
 

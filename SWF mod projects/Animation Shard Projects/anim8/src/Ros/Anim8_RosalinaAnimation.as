@@ -48,12 +48,13 @@ dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashL", 200, 0, "LeftEyeLayer
 		private static function CreateDisplayInfoForEyeR():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
+			dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 200, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+			dispInfo[dispInfo.length] = new DispObjInfo("ScleraR", 400, 0, "RightEyeLayer", DispObjInfo.FLAG_MASKED);
 dispInfo[dispInfo.length] = new DispObjInfo("EyeballR", 200, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("ScleraR", 400, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 600, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 4000, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 200, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 400, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 400, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 600, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+
             return dispInfo;
         }
 
@@ -134,7 +135,7 @@ dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Left Eye var 2", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Left Eye Variant 2", false, "Put description here");
             return animateShard;
         }
 
@@ -142,7 +143,7 @@ dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Right Eye var 2", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Right Eye Variant 2", false, "Put description here");
             return animateShard;
         }
 
@@ -150,7 +151,7 @@ dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForMouth();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForMouth();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Mouth var 2", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Mouth Variant 2", false, "Put description here");
             return animateShard;
         }
 

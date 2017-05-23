@@ -188,7 +188,7 @@ dispInfo[dispInfo.length] = new DispObjInfo("EyelashL", 800, 0, "LeftEyeLayer", 
 		{
 			var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
 			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Peach", "Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye var 1", false, "Eye Motion: Open > Closed > Half closed. Originally used for Peach's default animation.");
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Peach", "Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye Variant 1", false, "Eye Motion: Open > Closed > Half closed. Originally used for Peach's default animation.");
 			return bodyAnimateShard;
 		}
 		
@@ -221,7 +221,7 @@ dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, 0, "RightEyeLayer",
 		{
 			var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
 			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Peach", "Eye", "Right", "Standard"]), timelineData, dispInfo, "Right Eye var 1", false, "Eye Motion: Open > Closed > Half closed. Originally used for Peach's default animation.");
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Peach", "Eye", "Right", "Standard"]), timelineData, dispInfo, "Right Eye Variant 1", false, "Eye Motion: Open > Closed > Half closed. Originally used for Peach's default animation.");
 			return bodyAnimateShard;
 		}
 		
@@ -246,7 +246,7 @@ dispInfo[dispInfo.length] = new DispObjInfo("ClosedSmile", 400, 0, "MouthLayer",
 		{
 			var timelineData:Vector.<Object> = GetTimelineDataForMouth();
 			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForMouth();
-			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Peach", "Mouth", "Standard"]), timelineData, dispInfo, "Mouth var 1", false, "Mouth motion: Closed Smile > Open smile. Originally used for Peach's default animation.");
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Peach", "Mouth", "Standard"]), timelineData, dispInfo, "Mouth Variant 1", false, "Mouth motion: Closed Smile > Open smile. Originally used for Peach's default animation.");
 			return bodyAnimateShard;
 		}
 		//}

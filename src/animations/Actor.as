@@ -37,11 +37,15 @@ package animations
 		{
 			super();
 			topLayer = new Sprite();
+			topLayer.mouseEnabled = topLayer.mouseChildren = false;
 			topLayer.name = "TopLayer";
 			mainLayer = new Sprite();
 			mainLayer.name = "MainLayer";
+			mainLayer.mouseEnabled = mainLayer.mouseChildren = false;
 			bottomLayer = new Sprite();
 			bottomLayer.name = "BottomLayer";
+			bottomLayer.mouseEnabled = bottomLayer.mouseChildren = false;
+			this.mouseEnabled = this.mouseChildren = false;
 			addChild(bottomLayer);
 			addChild(mainLayer);
 			addChild(topLayer);

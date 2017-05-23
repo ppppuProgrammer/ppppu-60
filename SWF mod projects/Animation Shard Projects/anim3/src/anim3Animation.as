@@ -176,7 +176,7 @@ dataForTimelineCreation.push(new FrontButtRTimelineData().GetTimelineData());
 		{
 			var timelineData:Vector.<Object> = Vector.<Object>([new EyebrowRTimelineData().GetTimelineData()]);
 			var dispInfo:Vector.<DispObjInfo> =Vector.<DispObjInfo>([new DispObjInfo("EyebrowR", 8800, 0)]);
-            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Right Eyebrow var 1", true, "Curve upwards");
+            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Right Eyebrow Variant 1", true, "Curve upwards from the center");
             return animateShard;
 		}
 		
@@ -184,7 +184,7 @@ dataForTimelineCreation.push(new FrontButtRTimelineData().GetTimelineData());
 		{
 			var timelineData:Vector.<Object> = Vector.<Object>([new EyebrowRTimelineData2().GetTimelineData()]);
 			var dispInfo:Vector.<DispObjInfo> =Vector.<DispObjInfo>([new DispObjInfo("EyebrowR", 8800, 0)]);
-            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Right Eyebrow var 2", true, "Curves downwards");
+            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Right Eyebrow Variant 2", true, "Curves downwards from the center");
             return animateShard;
 		}
 		
@@ -192,7 +192,7 @@ dataForTimelineCreation.push(new FrontButtRTimelineData().GetTimelineData());
 		{
 			var timelineData:Vector.<Object> = Vector.<Object>([new EyebrowLTimelineData().GetTimelineData()]);
 			var dispInfo:Vector.<DispObjInfo> =Vector.<DispObjInfo>([new DispObjInfo("EyebrowL", 9000, 0)]);
-            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Left Eyebrow var 1", true, "Curve upwards");
+            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Left Eyebrow Variant 1", true, "Curve upwards from the center");
             return animateShard;
 		}
 		
@@ -200,7 +200,7 @@ dataForTimelineCreation.push(new FrontButtRTimelineData().GetTimelineData());
 		{
 			var timelineData:Vector.<Object> = Vector.<Object>([new EyebrowLTimelineData2().GetTimelineData()]);
 			var dispInfo:Vector.<DispObjInfo> =Vector.<DispObjInfo>([new DispObjInfo("EyebrowL", 9000, 0)]);
-            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Left Eyebrow var 2", true, "Curves downwards");
+            var animateShard:AnimateShardMod = new AnimateShardMod("anim3", Vector.<String>(["Eyebrow", "Standard"]), timelineData, dispInfo, "Left Eyebrow Variant 2", true, "Curves downwards from the center");
             return animateShard;
 		}
 

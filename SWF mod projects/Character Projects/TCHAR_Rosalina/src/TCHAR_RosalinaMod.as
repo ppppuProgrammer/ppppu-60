@@ -39,15 +39,15 @@ package
 			
 			characterData.GraphicSets = ["Standard", "Headwear_Rosalina", "Earring_Rosalina", "Hair_Rosalina"];
 			
-			animationPresets[animationPresets.length] = ["Cowgirl",true,"Female_Taker",true,"Male_Giver",false,"Rosalina Body",false,"Rosalina Right Eye",false,"Rosalina Mouth",false,"Rosalina Left Eye",false,"Crown",false,"Right Earring ",false,"Left Earring",false,"Rosalina Hair"];
-			//animationPresets[animationPresets.length] =
-			animationPresets[animationPresets.length] = ["anim3", true, "Male", true, "Female", true, "EyebrowL2", true, "EyebrowR2", false, "Rosalina Headwear", false, "Rosalina EyeL", false, "Rosalina EarringR", false, "Rosalina EarringL", false, "Rosalina Mouth", false, "Rosalina Face", false, "Rosalina Hair", false, "Rosalina EyeR"];
-			//animationPresets[animationPresets.length] = 
-			animationPresets[animationPresets.length] = ["Reverse Cowgirl", true, "Male", true, "Female", false, "Rosalina Mouth", false, "Rosalina EarringL", false, "Rosalina EyeL", false, "Rosalina Hair", false, "Rosalina Headwear", false, "Rosalina EarringR", false, "Rosalina EyeR", true, "Left Eye"];
-			animationPresets[animationPresets.length] = ["Paizuri",true,"Female",true,"Mouth",true,"Male",false,"Rosalina EyeR",false,"EarringL",false,"Rosalina EyeL",false,"Crown",false,"EarringR",false,"Rosalina Hair"];
-			//animationPresets[animationPresets.length] = 
-			//animationPresets[animationPresets.length] = 
-			//animationPresets[animationPresets.length] = 
+			animationPresets[animationPresets.length] = ["Cowgirl", true, "Female (Standard)", true, "Male (Standard)", false, "Crown", false, "Left Earring", false, "Right Earring", false, "Left Eye Variant 2", false, "Right Eye Variant 2", false, "Mouth Variant 2", false, "Rosalina Hair", false, "Body Variant 1"];
+			animationPresets[animationPresets.length] = ["Anim2",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 2",false,"Mouth Variant 2",false,"Right Eye Variant 2",false,"Rosalina Hair"];
+			animationPresets[animationPresets.length] = ["anim3",true,"Female (Standard)",true,"Male (Standard)",true,"Left Eyebrow Variant 2",true,"Right Eyebrow Variant 2",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Face ver2",false,"Left Eye (ver2)",false,"Mouth (ver2)",false,"Right Eye (ver2)",false,"Rosalina Hair (ver2)"];
+			animationPresets[animationPresets.length] = ["Anim4",true,"Female (Standard)",true,"Male (Standard)",true,"Left Eye (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Mouth Variant 2",false,"Right Eye Variant 2",false,"Rosalina Hair"];
+			animationPresets[animationPresets.length] = ["Reverse Cowgirl",true,"Female (Standard)",true,"Male (Standard)",true,"Left Eye (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Mouth Variant 2",false,"Right Eye Variant 2",false,"Rosalina Hair"];
+			animationPresets[animationPresets.length] = ["Paizuri",true,"Female (Standard)",true,"Male (Standard)",true,"Mouth (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 2",false,"Right Eye Variant 2",false,"Rosalina Hair"];
+			animationPresets[animationPresets.length] = ["Blowjob",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 2",false,"Right Eye Variant 2",false,"Rosalina Hair"];
+			animationPresets[animationPresets.length] = ["Anim8",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Mouth Variant 2",false,"Left Eye Variant 2",false,"Right Eye Variant 2",false,"Rosalina Hair"];
+			animationPresets[animationPresets.length] = ["Anim9",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 2",false,"Right Eye Variant 2",false,"Mouth Variant 2",false,"Rosalina Hair"];
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;
 			//characterData.DiamondCenterColor = 0x000000;

@@ -31,7 +31,10 @@ package menu
 		public function InitializeMenu(app:AppCore):void
 		{
 			config = new MinimalConfigurator(this);
+			CONFIG::BuildMenu
+			{
 			app.SetupMenuHooks(null, this);
+			}
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
 

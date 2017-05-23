@@ -116,6 +116,7 @@ package menu
 			{
 				cbox.addItem(shardNames[i]);
 			}
+			cbox.items.sort(Array.CASEINSENSITIVE);
 			
 		}
 		
@@ -165,7 +166,7 @@ package menu
 		public function CompileAnimation():void
 		{
 			var animateList:AnimationList = CreateAnimationList();
-			signal2.dispatch("CompileAnimationFromAnimationList", animateList);
+			signal2.dispatch("AnimMenu_CompileAnimationFromAnimationList", animateList);
 		}
 		
 		public function onSignal2(targetName:*, value:*):void

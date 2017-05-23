@@ -194,6 +194,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
             var timelineData:Vector.<Object> = GetTimelineDataForHeadwear();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForHeadwear();
             var animateShard:AnimateShardMod = new AnimateShardMod("Paizuri", Vector.<String>(["Headwear", "Crown", "Peach", "Rosalina", "Standard"]), timelineData, dispInfo, "Crown", false, "Adds an crown on top of the character's head, slighty obscured by their hair. Intended for the crown of Peach or Rosalina.");
+			 return animateShard;
         }
 
 		private static function CreateShardModForEarringL():AnimateShardMod
@@ -216,7 +217,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Paizuri", Vector.<String>(["Left", "Eye", "Standard"]), timelineData, dispInfo, "Left Eye var 1", false, "Eye Motion: Open > Closed. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Paizuri", Vector.<String>(["Left", "Eye", "Standard"]), timelineData, dispInfo, "Left Eye Variant 1", false, "Eye Motion: Open > Closed. Originally used for Peach's default animation.");
             return animateShard;
         }
 
@@ -224,7 +225,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Paizuri", Vector.<String>(["Right", "Eye", "Standard"]), timelineData, dispInfo, "Right Eye var 1", false, "Eye Motion: Open > Closed. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Paizuri", Vector.<String>(["Right", "Eye", "Standard"]), timelineData, dispInfo, "Right Eye Variant 1", false, "Eye Motion: Open > Closed. Originally used for Peach's default animation.");
             return animateShard;
         }
 

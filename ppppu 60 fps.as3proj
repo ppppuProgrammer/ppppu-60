@@ -45,7 +45,7 @@
     <option loadExterns="" />
     <option staticLinkRSL="True" />
     <option additional="-use-gpu=true&#xA;-use-direct-blit=true&#xA;-frame=FTwo,Main" />
-    <option compilerConstants="CONFIG::BuildMenu, true" />
+    <option compilerConstants="CONFIG::BuildMenu,false" />
     <option minorVersion="" />
   </build>
   <!-- SWC Include Libraries -->

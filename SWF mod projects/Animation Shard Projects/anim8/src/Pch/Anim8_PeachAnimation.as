@@ -225,7 +225,7 @@ dataForTimelineCreation.push(new TeardropMouthTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Peach", "Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye var 1", false, "Eye Motion: Looking slightly down > Closed > Looking ahead. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Peach", "Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye Variant 1", false, "Eye Motion: Looking slightly down > Closed > Looking ahead. Originally used for Peach's default animation.");
             return animateShard;
         }
 
@@ -233,7 +233,7 @@ dataForTimelineCreation.push(new TeardropMouthTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Right Eye var 1", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Right Eye Variant 1", false, "Put description here");
             return animateShard;
         }
 
@@ -241,7 +241,7 @@ dataForTimelineCreation.push(new TeardropMouthTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForMouth();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForMouth();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Mouth var 1", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim8", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Mouth Variant 1", false, "Put description here");
             return animateShard;
         }
 

@@ -37,15 +37,15 @@ package
 			//characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
 			
 			characterData.GraphicSets = ["Standard", "Headwear_Peach", "Earring_Peach", "Hair_Peach"];
-			animationPresets[animationPresets.length] = ["Cowgirl", true, "Female_Taker", true, "Male_Giver", false, "Peach Hair", false, "Peach Left Eye", false, "Peach Right Eye", false, "Peach Mouth", false, "Crown", false, "Right Earring ", false, "Left Earring"];
-			animationPresets[animationPresets.length] = ["Anim2", true, "Male", true, "Female", false, "Peach EyeL", false, "Peach Hair", false, "Peach Mouth", false, "Peach EyeR", false, "Crown", false, "EarringL", false, "EarringR"];
-			animationPresets[animationPresets.length] = ["anim3", true, "Male", true, "Female", true, "EyebrowL1", true, "EyebrowR1", false, "Peach Hair", false, "Peach EarringR", false, "Peach Mouth", false, "Peach EyeL", false, "Peach EarringL", false, "Peach Headwear", false, "Peach EyeR"];
-			animationPresets[animationPresets.length] = ["Anim4",true,"Default EyeL",true,"Male",true,"Female",false,"Peach EyeR",false,"Peach EarringR",false,"Crown",false,"Peach Mouth",false,"EarringL",false,"Peach Hair"];
-			animationPresets[animationPresets.length] = ["Reverse Cowgirl", true, "Female", true, "Male", true, "Left Eye", false, "Peach EarringL", false, "Peach Headwear", false, "Peach EarringR", false, "Peach Mouth", false, "Peach EyeR", false, "Peach Hair"];
-			animationPresets[animationPresets.length] = ["Paizuri", true, "Female", true, "Male", true, "Mouth", false, "Peach Hair", false, "EarringR", false, "Peach EyeL", false, "Peach EyeR", false, "EarringL", false, "Crown"];
-			animationPresets[animationPresets.length] = ["Blowjob", true, "Female_Taker", true, "Male_Giver", false, "Peach Hair", false, "Peach EyeL", false, "Peach EarringL", false, "Peach Headwear", false, "Peach EyeR", false, "Peach EarringR"];
-			animationPresets[animationPresets.length] = ["Anim8",true,"Male",true,"Female",false,"Peach Hair",false,"EarringL",false,"Crown",false,"Peach EyeR",false,"EarringR",false,"Peach EyeL",false,"Peach Mouth"];
-			animationPresets[animationPresets.length] = ["Anim9",true,"Male",true,"Female",false,"Crown",false,"Peach Mouth",false,"Peach EyeR",false,"EarringR",false,"Peach EyeL",false,"Peach Hair",false,"EarringL"];
+			animationPresets[animationPresets.length] = ["Cowgirl", true, "Female (Standard)", true, "Male (Standard)", false, "Crown", false, "Left Earring", false, "Right Earring", false, "Left Eye Variant 1", false, "Right Eye Variant 1", false, "Mouth Variant 1", false, "Peach Hair"];
+			animationPresets[animationPresets.length] = ["Anim2", true, "Female (Standard)", true, "Male (Standard)", false, "Crown", false, "Left Earring", false, "Right Earring", false, "Left Eye Variant 1", false, "Mouth Variant 1", false, "Right Eye Variant 1", false, "Peach Hair"];
+			animationPresets[animationPresets.length] = ["anim3",true,"Female (Standard)",true,"Male (Standard)",true,"Left Eyebrow Variant 1",true,"Right Eyebrow Variant 1",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Right Eye Variant 1",false,"Left Eye Variant 1",false,"Mouth Variant 1",false,"Peach Hair"];
+			animationPresets[animationPresets.length] = ["Anim4", true, "Female (Standard)", true, "Male (Standard)", true, "Left Eye (Standard)", false, "Crown", false, "Left Earring", false, "Right Earring", false, "Mouth Variant 1", false, "Right Eye Variant 1", false, "Peach Hair"];
+			animationPresets[animationPresets.length] = ["Reverse Cowgirl",true,"Female (Standard)",true,"Male (Standard)",true,"Left Eye (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Mouth Variant 1",false,"Right Eye Variant 1",false,"Peach Hair"];
+			animationPresets[animationPresets.length] = ["Paizuri",true,"Female (Standard)",true,"Male (Standard)",true,"Mouth (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Right Eye Variant 1",false,"Peach Hair"];
+			animationPresets[animationPresets.length] = ["Blowjob",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Right Eye Variant 1",false,"Peach Hair"];
+			animationPresets[animationPresets.length] = ["Anim8",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Mouth Variant 1",false,"Right Eye Variant 1",false,"Peach Hair"];
+			animationPresets[animationPresets.length] = ["Anim9",true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Right Eye Variant 1",false,"Mouth Variant 1",false,"Peach Hair"];
 			//characterData.ChangeableGfxSets = false;
 			//characterData.preferredMusic = "BeepBlockSkyway";
 			//characterData.DiamondULColor = 0x000000;

@@ -222,7 +222,7 @@ dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim9", Vector.<String>(["Peach", "Eye", "Left"]), timelineData, dispInfo, "Left Eye var 1", false, "Eye Motion: Looking slightly down > Closed > Looking ahead. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim9", Vector.<String>(["Peach", "Eye", "Left"]), timelineData, dispInfo, "Left Eye Variant 1", false, "Eye Motion: Looking slightly down > Closed > Looking ahead. Originally used for Peach's default animation.");
             return animateShard;
         }
 
@@ -230,7 +230,7 @@ dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim9", Vector.<String>(["Peach", "Eye", "Right"]), timelineData, dispInfo, "Right Eye var 1", false, "Eye Motion: Looking slightly down > Closed > Looking ahead. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim9", Vector.<String>(["Peach", "Eye", "Right"]), timelineData, dispInfo, "Right Eye Variant 1", false, "Eye Motion: Looking slightly down > Closed > Looking ahead. Originally used for Peach's default animation.");
             return animateShard;
         }
 
@@ -238,7 +238,7 @@ dataForTimelineCreation.push(new ClosedSmileTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForMouth();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForMouth();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim9", Vector.<String>(["Peach", "Mouth"]), timelineData, dispInfo, "Mouth var 1", false, "Mouth Motion: Closed Smile > O Mouth. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim9", Vector.<String>(["Peach", "Mouth"]), timelineData, dispInfo, "Mouth Variant 1", false, "Mouth Motion: Closed Smile > O Mouth. Originally used for Peach's default animation.");
             return animateShard;
         }
 

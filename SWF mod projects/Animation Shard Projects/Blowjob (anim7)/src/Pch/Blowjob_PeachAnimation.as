@@ -258,7 +258,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye var 1", false, "Eye Motion: Closed > Open. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye Variant 1", false, "Eye Motion: Closed > Open. Originally used for Peach's default animation.");
             return animateShard;
         }
 
@@ -266,7 +266,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Eye", "Right", "Standard"]), timelineData, dispInfo, "Right Eye var 1", false, "Eye Motion: Closed > Open. Originally used for Peach's default animation.");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Eye", "Right", "Standard"]), timelineData, dispInfo, "Right Eye Variant 1", false, "Eye Motion: Closed > Open. Originally used for Peach's default animation.");
             return animateShard;
         }
 

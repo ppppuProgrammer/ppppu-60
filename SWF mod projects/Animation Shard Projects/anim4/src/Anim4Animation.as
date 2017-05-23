@@ -190,7 +190,7 @@ dataForTimelineCreation.push(new ClosedLashLTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Anim4", Vector.<String>(["Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye", true, "Eye Motion: Closed");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Anim4", Vector.<String>(["Eye", "Left", "Standard"]), timelineData, dispInfo, "Left Eye (Standard)", true, "Eye Motion: Closed");
             return animateShard;
         }
 

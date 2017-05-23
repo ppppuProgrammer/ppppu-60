@@ -20,73 +20,23 @@ how to accomplish base + rosa body parts + peach hair (char is peach)
 * Can't have timelines tied to character.
 Need to set base. Need to add/replace with rosa body parts timelines. Need to then add peach hair timelines.*/
 	//import AnimationSettings.CowgirlInfo;
-	import animations.AnimateShard;
-	import animations.AnimateShardLibrary;
-	import animations.AnimationLayout;
-	import animations.AnimationList;
-	import animations.Director;
-	import animations.ExchangeableBackground;
-	import animations.TimelineLibrary;
-	import com.greensock.loading.BinaryDataLoader;
-	import com.jacksondunstan.signals.*;
-	import flash.system.System;
-	import menu.DeveloperMenu;
-	import menu.MainMenu;
-	import modifications.AnimateShardMod;
-	import modifications.AnimationMod;
+	import animations.*;
 	import animations.background.*;
-	import modifications.AssetsMod;
-	import modifications.BackgroundAssetMod;
-	import modifications.TemplateAnimationMod;
-	import modifications.TemplateCharacterMod;
-	import mx.utils.StringUtil;
-	import org.libspark.betweenas3.BetweenAS3;
+	import menu.*;
+	import flash.display.*;
+	import com.jacksondunstan.signals.*;
+	import flash.events.*;
+	import modifications.*;
+	import characters.*;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
-	//import animations.background.BacklightTimelineData;
-	//import animations.background.InnerDiamondTimelineData;
-	//import animations.background.OuterDiamondTimelineData;
-	//import animations.background.TransitionDiamondTimelineData;
-	import animations.TimelineDefinition;
-	import characters.*;
-	import characters.Character;
-	import com.greensock.easing.Linear;
-	import com.greensock.events.LoaderEvent;
-	import com.greensock.loading.LoaderMax;
-	import com.greensock.loading.SWFLoader;
-	import flash.display.DisplayObject;
-	import flash.display.DisplayObjectContainer;
-	import flash.display.Loader;
-	import flash.display.MovieClip;
-	import flash.display.FrameLabel;
-	import flash.display.Sprite;
-	import flash.errors.IOError;
-	import flash.events.Event;
-	import flash.events.IOErrorEvent;
-	import flash.events.KeyboardEvent;
-	import flash.events.TimerEvent;
-	import flash.geom.Point;
 	import flash.net.registerClassAlias;
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
-	import flash.system.Capabilities;
-	import flash.utils.ByteArray;
-	import flash.utils.describeType;
-	import flash.utils.Dictionary;
-	import flash.utils.getDefinitionByName;
-	import com.greensock.plugins.*;
-	import com.greensock.data.TweenLiteVars;
-	import com.greensock.*;
-	import flash.geom.Rectangle;
-	import modifications.ModArchive;
-	import modifications.MusicMod;
-	import modifications.Mod;
-	import audio.MusicPlayer;
-	import animations.Canvas;
-	import flash.ui.Keyboard;
+	import flash.system.System;
 	import flash.utils.*;
+	import flash.ui.Keyboard;
+	import mx.utils.StringUtil;
+	import org.libspark.betweenas3.BetweenAS3;
 	import flash.net.SharedObject;
-	import flash.display.StageScaleMode
 	
 	/**
 	 * Responsible for all the various aspects of ppppuNX. 
@@ -132,8 +82,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var colorizer:Colorizer = new Colorizer();
 		
-		CONFIG::BuildMenu
-		{
+		
 		//Settings related
 		public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX_Settings", "/");
 		
@@ -141,7 +90,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		//Indicates whether the program is in edit mode or play mode. Edit mode has the menus on screen. 
 		private var menuModeActive:Boolean = false;
-		}
+		
 		
 		public var userSettings:UserSettings = new UserSettings();
 		
@@ -730,8 +679,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		}*/
 		//CONFIG::debug
 		//{
-		CONFIG::BuildMenu
-		{
+		
 		public function SetupMenuHooks(target1:Slot1=null, target2:Slot2=null):void
 		{
 			if (target1 != null)
@@ -743,15 +691,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				menuSignal2.addSlot(target2);
 			}
 		}
-		}
+		
 		
 		/*private function AddNewLineToDevOutputWindow(message:String):void
 		{
 			devMenuSignaller1.dispatch(message);
 		}
 		}*/
-		CONFIG::BuildMenu
-		{
+		
 		public function onSignal1(targetName:*):void
 		{
 			var target:String = targetName as String;
@@ -993,7 +940,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				}
 			}
 		}
-		}
+		
 		
 		[inline]
 		private function FinalPreparations():void

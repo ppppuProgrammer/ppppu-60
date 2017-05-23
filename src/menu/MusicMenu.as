@@ -33,7 +33,10 @@ package menu
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
+			CONFIG::BuildMenu
+			{
 			app.SetupMenuHooks(null, this);
+			}
 			CONFIG::debug {
 				config.loadXML("../src/menu/MusicMenuDefinition.xml");
 			}

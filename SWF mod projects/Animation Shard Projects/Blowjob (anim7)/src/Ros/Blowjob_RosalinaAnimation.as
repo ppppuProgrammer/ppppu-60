@@ -124,7 +124,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Left Eye var 2", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Left Eye Variant 2", false, "Put description here");
             return animateShard;
         }
 
@@ -132,7 +132,7 @@ dataForTimelineCreation.push(new ClosedLashRTimelineData().GetTimelineData());
         {
             var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
             var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Right Eye var 2", false, "Put description here");
+            var animateShard:AnimateShardMod = new AnimateShardMod("Blowjob", Vector.<String>(["Categories", "Here", "Standard"]), timelineData, dispInfo, "Right Eye Variant 2", false, "Put description here");
             return animateShard;
         }
 
