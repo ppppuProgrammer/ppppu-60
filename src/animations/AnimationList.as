@@ -11,6 +11,7 @@ package animations
 		private var targetAnimationName:String;
 		private var shardNameList:Vector.<String>;
 		private var shardTypeList:Vector.<Boolean>;
+		private var animationType:int = 0;
 		public static const ANIMATION_LIST_VERSION:int = 1;
 		public var version:int = ANIMATION_LIST_VERSION;
 		
@@ -25,19 +26,18 @@ package animations
 		public function get TargetAnimationName():String { return targetAnimationName; }
 		public function get ShardNameList():Vector.<String> { return shardNameList; }
 		public function get ShardTypeList():Vector.<Boolean> { return shardTypeList; }
-		public function set TargetAnimationName(value:String):void 
-		{
-			targetAnimationName = value;
-		}
+		public function get AnimationType():int { return animationType; }
+		public function set TargetAnimationName(value:String):void {
+			targetAnimationName = value;}
 		
-		public function set ShardNameList(value:Vector.<String>):void 
-		{
-			shardNameList = value;
-		}
+		public function set ShardNameList(value:Vector.<String>):void {	
+			shardNameList = value;}
 		
-		public function set ShardTypeList(value:Vector.<Boolean>):void 
-		{
-			shardTypeList = value;
+		public function set ShardTypeList(value:Vector.<Boolean>):void 	{	
+			shardTypeList = value; }
+			
+		public function set AnimationType(value:int):void {
+			animationType = value;
 		}
 		
 		public function IsAnimListEmpty():Boolean

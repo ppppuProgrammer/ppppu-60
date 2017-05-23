@@ -49,7 +49,7 @@
 		protected var animationLists:Vector.<AnimationList>;
 		
 		//Indicates whether the animation in the animationLists vector of the corresponding index is a regular animation or an end-link animation. True indicates a regular animation (that can possibly transition to an end link type).
-		protected var standardAnimationType:Vector.<Boolean> = new Vector.<Boolean>();
+		protected var animationTypes:Vector.<int> = new Vector.<int>();
 		
 		public function Character(name:String, charData:Object, isPresetCharacter:Boolean = false, presetAnimationLists:Vector.<AnimationList>=null)
 		{
@@ -61,7 +61,8 @@
 			{
 				data = charData;
 			}
-			animationLists = presetAnimationLists;
+			SetAnimationLists(presetAnimationLists);
+			//if(animationList
 			if (isPresetCharacter)
 			{
 				defaultSettings = ExportCharacterDataForStorage();
@@ -70,9 +71,21 @@
 			
 		}
 		
+		[inline]
 		public function SetAnimationLists(animationPresets:Vector.<AnimationList>):void
 		{
 			animationLists = animationPresets;
+			animationTypes = new Vector.<int>(animationLists.length);
+			m_lockedAnimation = new Vector.<Boolean>(animationLists.length);
+
+			for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+			{
+				animationTypes[i] = animationLists[i].AnimationType;
+			}
+			for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+			{
+				m_lockedAnimation[i] = false;
+			}
 		}
 		
 		public function ChangeDefaultSettings(characterPreset:Character):void
@@ -109,7 +122,7 @@
 			}
 			animationLists[animationLists.length] = new AnimationList();
 			m_lockedAnimation[m_lockedAnimation.length] = false;
-			standardAnimationType[standardAnimationType.length] = true;
+			animationTypes[animationTypes.length] = 0;
 		}
 		
 		public function RemoveAnimationSlot(index:int):Boolean
@@ -118,7 +131,7 @@
 			{
 				/*animationLists = */animationLists.splice(index, 1);
 				/*m_lockedAnimation = */m_lockedAnimation.splice(index, 1);
-				standardAnimationType.splice(index, 1);
+				animationTypes.splice(index, 1);
 				return true;
 			}
 			return false;
@@ -191,7 +204,7 @@
 			characterByteArray.writeBoolean(m_randomizePlayAnim);
 			characterByteArray.writeObject(m_lockedAnimation);
 			characterByteArray.writeObject(animationLists);
-			characterByteArray.writeObject(standardAnimationType);
+			characterByteArray.writeObject(animationTypes);
 			return characterByteArray;
 		}
 		
@@ -204,12 +217,12 @@
 			m_randomizePlayAnim = charStorageData.readBoolean();
 			m_lockedAnimation = charStorageData.readObject();
 			animationLists = charStorageData.readObject();
-			standardAnimationType = charStorageData.readObject();
-			if (standardAnimationType.length < animationLists.length)
+			animationTypes = charStorageData.readObject();
+			if (animationTypes.length < animationLists.length)
 			{
 				for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
 				{
-					standardAnimationType[i] = true;
+					animationTypes[i] = 0;
 				}
 			}
 			
@@ -253,11 +266,11 @@
 			{
 				animationListsBinaryData.position = 0;
 				animationLists = animationListsBinaryData.readObject() as Vector.<AnimationList>;
-				if (standardAnimationType.length < animationLists.length)
+				if (animationTypes.length < animationLists.length)
 				{
 					for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
 					{
-						standardAnimationType[i] = true;
+						animationTypes[i] = 0;
 					}
 				}
 				if (m_lockedAnimation.length < animationLists.length)
@@ -297,7 +310,7 @@
 			var accessibleArray:Array = [];
 			for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
 			{
-				if (standardAnimationType[i] == true)
+				if (animationTypes[i] == 0)
 				{
 					accessibleArray[accessibleArray.length] = i;
 				}
@@ -312,7 +325,7 @@
 			/*Conditions that will not have a set locked:
 			 * 1) animation type for the id is an end link animation (These are always unlocked but will be skipped in most cases.) 
 			 * 2) if lockValue is true: setting the lock on the given animation will lead to all standard type animations being locked.*/
-			if (standardAnimationType[animId] == false ||(lockValue == true && GetNumberOfLockedAnimations() + 1 >= GetAccessibleAnimationsIndices().length) )
+			if (animationTypes[animId] != 0 ||(lockValue == true && GetNumberOfLockedAnimations() + 1 >= GetAccessibleAnimationsIndices().length) )
 			{
 				//logger.debug("Could not change lock on animation {0} (id {1})", GetNameOfAnimationByIndex(indexForId),  animId);
 				return;

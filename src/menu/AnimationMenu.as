@@ -91,6 +91,8 @@ package menu
 			list.TargetAnimationName = cbox.selectedItem as String;
 			list.ShardNameList = shardNames;
 			list.ShardTypeList = shardTypes;
+			//NYI - need to get the type of animation and set it properly. For now have it set to be the standard type.
+			list.AnimationType = 0;
 			return list;
 		}
 		

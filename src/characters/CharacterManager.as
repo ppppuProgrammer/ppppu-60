@@ -42,7 +42,7 @@ package characters
 		
 		public function CharacterSwitchLogic():void
 		{
-			if (m_currentCharacter != null && (CheckIfTransitionLockIsActive() == true || !CheckCharactersForSwitchEligibility()))	{ return; }
+			if (m_Characters.length == 0 || m_currentCharacter != null && (CheckIfTransitionLockIsActive() == true || !CheckCharactersForSwitchEligibility()))	{ return; }
 			
 			var numChars:int = m_Characters.length;
 			//Sequential character changing

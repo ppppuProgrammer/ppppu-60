@@ -82,12 +82,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var colorizer:Colorizer = new Colorizer();
 		
-		
+		CONFIG::BuildMenu
+		{
 		//Settings related
 		public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX_Settings", "/");
 		
 		private var mainMenu:MainMenu;
-		
+		}
 		//Indicates whether the program is in edit mode or play mode. Edit mode has the menus on screen. 
 		private var menuModeActive:Boolean = false;
 		
@@ -194,7 +195,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			modsLoadedAtStartUp = startupMods;
 			
 			LoadUserSettings();
-			if(CONFIG::BuildMenu == true)
+			if(CONFIG::BuildMenu)
 			{
 				
 				//Create the main menu. 
@@ -268,8 +269,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			
 			
-			var animationPosition:Number = canvas.Update();				
+			var animationPosition:Number = canvas.Update();	
+			CONFIG::BuildMenu
+			{
 			menuSignal2.dispatch("timeText", animationPosition);
+			}
 
 			var currentUpdateTime:Number = getTimer();
 			var difference:Number = (currentUpdateTime - lastUpdateTime);
@@ -387,10 +391,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					canvas.PlayAnimation(0);
 				}
 				
+				CONFIG::BuildMenu
+				{
 				if (keyPressed == Keyboard.SPACE)
 				{
 					ToggleMenuMode();
 					
+				}
 				}
 				
 				
@@ -435,6 +442,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 		}*/
 		
+		CONFIG::BuildMenu
+		{
 		private function ToggleMenuMode():void
 		{
 			menuModeActive = !menuModeActive;
@@ -450,6 +459,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				removeChild(mainMenu);
 				stage.focus = null;
 			}
+		}
 		}
 		
 		/*public function GetListOfCharacterNames():Vector.<String>
@@ -494,12 +504,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					for (var j:int = 0, k:int = presetAnimationData.length; j < k; j++) 
 					{
 						var dataArray:Array = presetAnimationData[j];
-						if (dataArray.length >= 3)
+						if (dataArray.length >= 4)
 						{
 							var animationFor:String = dataArray[0] as String;
 							var shardTypes:Vector.<Boolean> = new Vector.<Boolean>;
 							var shardNames:Vector.<String> = new Vector.<String>;
-							for (var m:int = 1, n:int = dataArray.length; m < n; m+=2) 
+							for (var m:int = 2, n:int = dataArray.length; m < n; m+=2) 
 							{
 								shardTypes[shardTypes.length] = dataArray[m] as Boolean;
 								shardNames[shardNames.length] = dataArray[m + 1] as String;
@@ -508,6 +518,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 							animList.TargetAnimationName = animationFor;
 							animList.ShardNameList = shardNames;
 							animList.ShardTypeList = shardTypes;
+							animList.AnimationType = dataArray[1] as int;
 							charPresetAnimations[charPresetAnimations.length] = animList;
 						}
 					}
@@ -679,7 +690,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		}*/
 		//CONFIG::debug
 		//{
-		
+		if(CONFIG::BuildMenu)
+		{
 		public function SetupMenuHooks(target1:Slot1=null, target2:Slot2=null):void
 		{
 			if (target1 != null)
@@ -738,11 +750,18 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				ToggleMenuMode();*/
 				InitializeSettingsForCharactersLoadedAtStartup();
 				//Change menu to reflect the loaded settings
+				CONFIG::BuildMenu
+				{
 				removeChild(mainMenu);
+				
 				ToggleMenuMode();
+				}
 				ChangeCharacter(userSettings.currentCharacterName);
+				CONFIG::BuildMenu
+				{
 				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
 				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
+				}
 				//menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(userSettings.currentCharacterName), true));
 				//menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(userSettings.currentCharacterName));
 			}
@@ -940,7 +959,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				}
 			}
 		}
-		
+		}
+		else
+		{
+			public function onSignal1(targetName:*):void{}			
+			public function onSignal2(targetName:*, value:*):void{}
+		}
 		
 		[inline]
 		private function FinalPreparations():void
@@ -1016,7 +1040,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private function LoadUserSettings():void
 		{
-			if(CONFIG::BuildMenu == true)
+			if(CONFIG::BuildMenu)
 			{
 				//logger.info("Loading user settings");
 				if (settingsSaveFile.data.ppppuSettings != null)
@@ -1057,7 +1081,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				//ToggleHelpScreen(); //Show the help screen
 				//ShowMenu(true);
 				userSettings.firstTimeRun = false;
-				if (CONFIG::BuildMenu == true)
+				if (CONFIG::BuildMenu)
 				{
 					settingsSaveFile.data.ppppuSettings = userSettings;
 					settingsSaveFile.flush();
