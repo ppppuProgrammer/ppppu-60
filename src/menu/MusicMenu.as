@@ -33,7 +33,7 @@ package menu
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
-			CONFIG::BuildMenu
+			CONFIG::NX
 			{
 			app.SetupMenuHooks(null, this);
 			}

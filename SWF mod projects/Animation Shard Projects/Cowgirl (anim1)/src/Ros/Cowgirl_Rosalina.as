@@ -283,7 +283,7 @@ dispInfo[dispInfo.length] = new DispObjInfo("EyelashL", 800, 0, "LeftEyeLayer", 
 		{
 			var timelineData:Vector.<Object> = GetTimelineDataForEyeL();
 			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeL();
-			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Eye", "Standard"]), timelineData, dispInfo, "Left Eye Variant 2", false, "Body animations changes for Rosalina");
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Eye", "Standard"]), timelineData, dispInfo, "Left Eye Variant 2", false, "Eye animation originally used for Rosalina");
 			return bodyAnimateShard;
 		}
 		
@@ -316,7 +316,7 @@ dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, 0, "RightEyeLayer",
 		{
 			var timelineData:Vector.<Object> = GetTimelineDataForEyeR();
 			var dispInfo:Vector.<DispObjInfo> = CreateDisplayInfoForEyeR();
-			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Eye", "Standard"]), timelineData, dispInfo, "Right Eye Variant 2", false, "Body animations changes for Rosalina");
+			var bodyAnimateShard:AnimateShardMod = new AnimateShardMod("Cowgirl", Vector.<String>(["Female", "Replacement", "Rosalina", "Eye", "Standard"]), timelineData, dispInfo, "Right Eye Variant 2", false, "Eye animation originally used for Rosalina");
 			return bodyAnimateShard;
 		}
 		

@@ -42,6 +42,8 @@ package animations
 		public function GetTargetObjName():String{ return targetDispObj;}
 		public function GetTargetFlag():int { return targetFlag; }
 		
+		//public function Clone():DispObjInfo	{ return DispObjInfo(this.controlDispObj, depth, time, targetDispObj, targetFlag); }
+		
 		//public function GetTargetDepth():int { return targetDepth; }
 		//public function SetTargetDepth(depth:int):void { targetDepth = depth; }
 		

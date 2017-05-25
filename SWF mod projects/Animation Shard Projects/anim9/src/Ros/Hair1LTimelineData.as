@@ -123,12 +123,12 @@ package Ros
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-0.9945068359375,b:-0.26190185546875,c:-0.2236785888671875,d:1.07525634765625,tx:186.55,ty:193.1}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-0.9892578125,b:-0.2480926513671875,c:-0.2137451171875,d:1.0682373046875,tx:188.8,ty:187.5}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-0.9933319091796875,b:-0.2395172119140625,c:-0.217987060546875,d:1.06951904296875,tx:190.3,ty:186}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.01361083984375,b:-0.2345428466796875,c:-0.2313690185546875,d:1.087158203125,tx:190.85,ty:188.3}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.048583984375,b:-0.233154296875,c:-0.258148193359375,d:1.118499755859375,tx:190.4,ty:191.1}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.0969085693359375,b:-0.233154296875,c:-0.29461669921875,d:1.161895751953125,tx:189.05,ty:194.2}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.1606292724609375,b:-0.232269287109375,c:-0.3229522705078125,d:1.2234954833984375,tx:187.45,ty:198.75}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.2483367919921875,b:-0.2711334228515625,c:-0.3871612548828125,d:1.309814453125,tx:178.25,ty:204.7}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.352386474609375,b:-0.31634521484375,c:-0.446044921875,d:1.41680908203125,tx:167.85,ty:213.15}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.0052947998046875,b:-0.2326202392578125,c:-0.2294769287109375,d:1.0782470703125,tx:192.7,ty:192}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.0296630859375,b:-0.2289581298828125,c:-0.2534942626953125,d:1.098388671875,tx:191.5,ty:194.9}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.0634613037109375,b:-0.2260589599609375,c:-0.2856292724609375,d:1.126556396484375,tx:191,ty:201.1}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.10833740234375,b:-0.2218017578125,c:-0.3083953857421875,d:1.168365478515625,tx:190.25,ty:209.6}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.1726531982421875,b:-0.25469970703125,c:-0.3636932373046875,d:1.2304534912109375,tx:182.75,ty:220.1}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.2483978271484375,b:-0.292022705078125,c:-0.4117431640625,d:1.307861328125,tx:174.2,ty:233.85}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.25885009765625,b:-0.3037261962890625,c:-0.42254638671875,d:1.31854248046875,tx:170.15,ty:237.15}};
 			timelineData.tweenProperties = tweenPropVector;
 		}

@@ -1,0 +1,77 @@
+<comps>
+	<VBox spacing="15">
+		<Window id="charAnimationsWindow" title="Character animations" x="0" y="445" width="480" height="140" hasMinimizeButton="false" draggable="false">
+			<List id="charAnimationsSelector" x="0" width="48" height="480" scaleX="-1" rotation="270" listItemHeight="48"/>
+			<VBox y = "60" spacing="10">
+				<HBox x="80" spacing="20" enabled="false">
+					<Label text="Animation status: "  />
+					<RadioButton id="lockRBtn" y="5" groupName = "animLockGroup" label="Locked" />
+					<RadioButton id="unlockRBtn" y="5" groupName = "animLockGroup" label="Unlocked"/>
+					<PushButton id="randomAnimSelectBtn" label="Randomly select animation" width="130"  />
+				</HBox>
+				<HBox x="20" spacing="20">
+					<PushButton id="saveAnimationListBtn" x="10"  label="Save Animation" width="100"/>
+					<PushButton id="addAnimationSlotBtn" x="10"  label="Add New Animation Slot" width="130"/>
+					<PushButton id="removeAnimationSlotBtn" x="100" label="Remove Animation Slot" width="130"/>
+				</HBox>				
+				<Label id="charAnimWarningLabel" x="10" text=""/>
+			</VBox>
+		</Window>
+	<!-- Window 1 -->
+		<Window id="animCompileWindow" title="Animation creation" width="480" height="395" y="0" hasMinimizeButton="false" draggable="false">
+			<!-- Section 1 -->
+			<VBox spacing="10" y="10">
+				<HBox x="10" spacing="10">
+					<Label id="animationLabel" text="Animation:"/>
+					<ComboBox id="animationSelector" width="170"/>
+					<Label id="shardTypeLabel" text="Type:"/>
+					<ComboBox id="shardTypeSelector" width="70"/>
+				</HBox>
+				<HBox x="10" spacing="20">
+					<Label id="shardLabel" x="10" y="0" text="Shard:"/>
+					<ComboBox id="shardSelector"  x="45" width="300"/>
+					<PushButton id="addShardButton" x="355" width="80" label="Add Shard to list" />
+				</HBox>
+				<VBox x="0" spacing="5">
+					<Label id="ShardInfoLabel" x="10" text="Shard information"/>
+					<TextArea id="shardInfoText" x="0" width="480" height="80" editable="false"/>
+				</VBox>
+				<VBox x="0" spacing="5">
+					<Label id="animListLabel" x="10"  text="Animate Shards list"/>
+					<List id="animList" x="0" width="480" height="100"/>
+				</VBox>
+				<HBox id="animationListButtonGroup" x="15" spacing="30">
+					<PushButton id="removeShardButton" x="5"  width="80" label="Remove shard" />
+					<PushButton id="finalizeButton" x="165" width="150" label="Compile animation preview" />
+					<PushButton id="copyListToClipboardButton" x="375"  width="110" label="Copy List to clipboard" />	
+				</HBox>
+				<HBox x="100" spacing="60">				
+					<PushButton id="loadAnimationListButton" x="265" width="100" label="Load List from File" />
+					<PushButton id="saveAnimationListButton" x="375"  width="100" label="Save List to File" />	
+				</HBox>
+			</VBox>
+		</Window>
+		
+		<!-- Window 2 Animation Playback -->
+		<Window id="animPlayWindow" title="Animation playback" x="0" y="335" width="480" height="100" hasMinimizeButton="false" draggable="false">
+			<!-- Section 1 Animation play progress -->
+			<PushButton id="animPlayButton" x="10" y="10" label="Play" width="50" toggle="false"/>
+			<PushButton id="animPauseButton" x="70" y="10" label="Pause" width="50" toggle="false"/>
+			<Label id="timeLabel" x="130" y="10" text="Time:"/>
+			<Label id="timeText" x="160" y="10" text=""/>
+			<Label id="frameLabel" x="220" y="10" text="Keyframe:"/>
+			<Label id="frameText" x="270" y="10" text=""/>
+			
+			<!-- Section 2 Changing frame for animation-->
+			<Label id="frameSettingLabel" x="10" y="30" text="Frame Settings"/>
+			<PushButton id="-1FrameChange" x="10" y="50" label="-1F" width="30"/>
+			<PushButton id="-5FrameChange" x="40" y="50" label="-5F" width="30"/>
+			<PushButton id="-10FrameChange" x="70" y="50" label="-10F" width="30"/>
+			<PushButton id="+1FrameChange" x="110" y="50" label="+1F" width="30"/>
+			<PushButton id="+5FrameChange" x="140" y="50" label="+5F" width="30"/>
+			<PushButton id="+10FrameChange" x="170" y="50" label="+10F" width="30"/>
+			<PushButton id="setFrameButton" x="210" y="50" label="Set to frame" width="80"/>
+			<HUISlider id="frameSlider" x="300" y="50" label="" minimum="1" value="1" labelPrecision="0"/>
+		</Window>
+	</VBox>	
+</comps>

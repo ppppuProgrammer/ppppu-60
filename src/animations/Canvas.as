@@ -710,7 +710,7 @@ package animations
 					{
 						shardDispInfo = shardDispObjInfoVector[m];
 						//Get the time that this disp obj info is used for.
-						var time:String = String(shardDispInfo.GetStartTime()) 
+						var time:String = String(shardDispInfo.GetStartTime());
 						if (!(time in finalizedLayout) )
 						{
 							finalizedLayout[time] = new Vector.<DispObjInfo>();
@@ -760,6 +760,21 @@ package animations
 		
 		private function ProcessDisplayObjects(dispObjContainer:Object):void
 		{
+			//Check if there are any dispobjinfo instances that indicate that the object is to be displayed for the entire animation and to not be removed if there if there are multiple times in the animation that depths will change.
+			if ("-1" in dispObjContainer)
+			{
+				var noDepthChangeDispInfoObjs:Vector.<DispObjInfo> = dispObjContainer["-1"];
+				delete dispObjContainer["-1"];
+				for (var animTime:String in dispObjContainer)
+				{
+					var dispObjDataForAnimTime:Vector.<DispObjInfo> = dispObjContainer[animTime];
+					//dispObjDataForAnimTime = dispObjDataForAnimTime.concat(noDepthChangeDispInfoObjs);
+					for (var i:int = 0, l:int = noDepthChangeDispInfoObjs.length; i < l; i++) 
+					{
+						dispObjDataForAnimTime[dispObjDataForAnimTime.length] = noDepthChangeDispInfoObjs[i];
+					}
+				}
+			}
 			//Received an object with vectors of dispobjinfo instances. There are possibly multiple instances that will overwrite each other. 
 			for (var time:String in dispObjContainer) 
 			{

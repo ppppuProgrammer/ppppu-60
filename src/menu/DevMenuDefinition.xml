@@ -1,0 +1,9 @@
+<comps>
+		
+		
+		<!-- Window 4 Debug output -->
+		<Window id="consoleWindow" title="NX developer debug output" x="0" y="0" width="480" height="300" hasMinimizeButton="false" minimized="false">
+			<TextArea id="debugOutput" x="0" y="0" width="480" height="280" editable="false"/>
+		</Window>
+	
+</comps>

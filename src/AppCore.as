@@ -82,7 +82,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var colorizer:Colorizer = new Colorizer();
 		
-		CONFIG::BuildMenu
+		CONFIG::NX
 		{
 		//Settings related
 		public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX_Settings", "/");
@@ -174,11 +174,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//backgroundMasterTimeline.stopOnComplete = false;
 			
 			var planetBGMod:BackgroundAssetMod = new BackgroundAssetMod(new PlanetBackground, "Standard", "Background", null);
-			var outerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new OuterDiamondBG, "Standard", "OuterDiamond", null);
+		var outerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new OuterDiamondBG, "Standard", "OuterDiamond", {Colorable:{Group: "ODiamondColor1", Target:"this"}});
 			
-			var innerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new InnerDiamondBG, "Standard", "InnerDiamond", null);
-			var transitionBGMod:BackgroundAssetMod = new BackgroundAssetMod(new TransitionDiamondBG, "Standard", "TransitionDiamond", null);
-			var lightBGMod:BackgroundAssetMod = new BackgroundAssetMod(new Light, "Standard", "Backlight", null);
+			var innerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new InnerDiamondBG, "Standard", "InnerDiamond", {Colorable: { Group: ["IDiamondColor1", "IDiamondColor2", "IDiamondColor3", "IDiamondColor4"], Target: ["Color1", "Color2", "Color3", "Color4"] }});
+		var transitionBGMod:BackgroundAssetMod = new BackgroundAssetMod(new TransitionDiamondBG, "Standard", "TransitionDiamond", {Colorable:{ Group: ["TDiamondColor1", "TDiamondColor2", "TDiamondColor3", "TDiamondColor4", "TDiamondColor5"], Target: ["Color1", "Color2", "Color3", "Color4", "Color5"] }});
+	var lightBGMod:BackgroundAssetMod = new BackgroundAssetMod(new Light, "Standard", "Backlight", {Colorable:{ Group: "BackLight", Target: "this" }});
 			ProcessMod(planetBGMod);
 			ProcessMod(outerBGMod);
 			ProcessMod(innerBGMod);
@@ -195,7 +195,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			modsLoadedAtStartUp = startupMods;
 			
 			LoadUserSettings();
-			if(CONFIG::BuildMenu)
+			if(CONFIG::NX)
 			{
 				
 				//Create the main menu. 
@@ -206,7 +206,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			else
 			{
 				FinalPreparations();
-				ChangeCharacter("Peach");
+				//ChangeCharacter("Peach");
 			}
 			
 		}
@@ -270,7 +270,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			
 			
 			var animationPosition:Number = canvas.Update();	
-			CONFIG::BuildMenu
+			CONFIG::NX
 			{
 			menuSignal2.dispatch("timeText", animationPosition);
 			}
@@ -285,7 +285,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					characterManager.CharacterSwitchLogic();
 					
-					var switchedCharsId:int = characterManager.GetIdOfCharacterToSwitchTo();
+					var switchedCharsId:int = characterManager.GetIdOfCharacterToSwitchTo(animationNameIndexes);
 					if (switchedCharsId > -1)
 					{
 						userSettings.UpdateCurrentCharacterName(characterManager.GetCurrentCharacterName());
@@ -303,6 +303,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					var animId:int = characterManager.GetCurrentAnimationIdOfCharacter();
 					CompileAndSwitchAnimation(characterManager.GetAnimationListForCurrentCharacter(animId));
 					canvas.PlayAnimation(0);
+					backgroundMasterTimeline.gotoAndPlay(0);
 				}
 			}
 			totalRunTime += difference;
@@ -377,21 +378,26 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				if((keyPressed == 48 || keyPressed == 96))
 				{
-					var randomAnimIndex:int = Math.floor(Math.random() * animationNameIndexes.length);
+					var randomAnimIndex:int = characterManager.RandomizeCurrentCharacterAnimation(animationNameIndexes);
 					//SwitchTemplateAnimation(randomAnimIndex);
-					canvas.PlayAnimation(-1);
+					var animationCurrentPosition:Number = canvas.GetTimeInCurrentAnimation();
+					CompileAndSwitchAnimation(characterManager.GetAnimationListForCurrentCharacter(randomAnimIndex));
+					canvas.PlayAnimation(animationCurrentPosition);
+					//backgroundMasterTimeline.gotoAndPlay(animationCurrentPosition);
+					
+					
 				}
-				else if((!(Keyboard.NUMBER_0 > keyPressed) && !(keyPressed > Keyboard.NUMBER_9 )) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
+				/*else if((!(Keyboard.NUMBER_0 > keyPressed) && !(keyPressed > Keyboard.NUMBER_9 )) ||  (!(97 > keyPressed) && !(keyPressed > 105)))
 				{
 					//keypress of 1 has a keycode of 49
 					if(keyPressed > 96)
 					{
 						keyPressed = keyPressed - 48;
 					}
-					canvas.PlayAnimation(0);
-				}
+					canvas.PlayAnimation(-1);
+				}*/
 				
-				CONFIG::BuildMenu
+				CONFIG::NX
 				{
 				if (keyPressed == Keyboard.SPACE)
 				{
@@ -423,26 +429,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 		}
 		
-		/*[Inline]
-		final public function SwitchCharacter(charId:int):void
-		{
-			if (charId >= 0 && charId < characterList.length)
-			{
-				currentCharacter = characterList[charId];
-				userSettings.currentCharacterName = currentCharacter.GetName();
-				var charData:Object = currentCharacter.data;
-				if ("Color" in charData)
-				{
-					colorizer.ChangeColorsUsingCharacterData(charData.Color);
-				}
-				if ("GraphicSets" in charData)
-				{
-					canvas.ChangeGraphicSets(charData.GraphicSets);
-				}
-			}
-		}*/
-		
-		CONFIG::BuildMenu
+		CONFIG::NX
 		{
 		private function ToggleMenuMode():void
 		{
@@ -526,9 +513,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					
 					//var character:Character = new Character(charName, tcharacter.GetCharacterData(), true, charPresetAnimations);
 					var newCharacterId:int = characterManager.AddNewCharacter(charName, tcharacter.GetCharacterData(), true, charPresetAnimations);
+					
+					CONFIG::NX
+					{
 					if (newCharacterId > -1)
 					{
 						menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(newCharacterId));
+					}
 					}
 					
 					/*if (characterManager.CheckIfCharacterCanBeAdded(character))
@@ -558,11 +549,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 						animationIndex = animationNameIndexes.length;
 						animationNameIndexes[animationIndex] = animationName;
 						
-						//CONFIG::debug
-						//{
+						CONFIG::NX
+						{
 						menuSignal2.dispatch("AddNewAnimation", animationName);
-						//devMenu.AddNewAnimation(animationName);
-						//}
+						}
 					}
 					
 					var timelines:Vector.<SerialTween> = new Vector.<SerialTween>();
@@ -677,20 +667,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mod = null;
 			return addedMod;
 		}
-		
-		/*private function ConvertLayoutObjectToAnimationLayout(entireLayoutObj:Object):AnimationLayout
-		{
-			if (entireLayoutObj == null) { return null;}
-			var animLayout:AnimationLayout = new AnimationLayout();
-			for (var frameKey:String in entireLayoutObj)
-			{
-				animLayout.AddNewFrameVector(parseFloat(frameKey), entireLayoutObj[frameKey], masterTemplate);
-			}
-			return animLayout;
-		}*/
-		//CONFIG::debug
-		//{
-		if(CONFIG::BuildMenu)
+
+		CONFIG::NX
 		{
 		public function SetupMenuHooks(target1:Slot1=null, target2:Slot2=null):void
 		{
@@ -703,13 +681,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				menuSignal2.addSlot(target2);
 			}
 		}
-		
-		
-		/*private function AddNewLineToDevOutputWindow(message:String):void
-		{
-			devMenuSignaller1.dispatch(message);
-		}
-		}*/
 		
 		public function onSignal1(targetName:*):void
 		{
@@ -749,42 +720,23 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				removeChild(mainMenu);
 				ToggleMenuMode();*/
 				InitializeSettingsForCharactersLoadedAtStartup();
-				//Change menu to reflect the loaded settings
-				CONFIG::BuildMenu
-				{
-				removeChild(mainMenu);
 				
-				ToggleMenuMode();
-				}
 				ChangeCharacter(userSettings.currentCharacterName);
-				CONFIG::BuildMenu
+				
+				//Change menu to reflect the loaded settings
+				CONFIG::NX
 				{
+				removeChild(mainMenu);				
+				ToggleMenuMode();
 				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
 				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
 				}
-				//menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(userSettings.currentCharacterName), true));
-				//menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(userSettings.currentCharacterName));
 			}
 		}
 		
 		public function onSignal2(targetName:*, value:*):void
 		{
-			/*if (targetName == "animationSelector")
-			{
-				SwitchTemplateAnimation(value);
-				devMenuSignaller2.dispatch("elementSelector", timelineLib.GetBaseTimelinesFromLibrary(value));
-			}*/
-			/*if (targetName == "setAnimationButton")
-			{
-				//value is expected to be an array with 3 values; animation index, body type index, and character index.
-				if ((value[0] as int) == (value[1] as int) == -1)
-				{
-					return;
-				}
-				
-				SwitchTemplateAnimation(value[0] as uint, value[1] as int);
-			}
-			else */if (targetName == "setFrameButton")
+			if (targetName == "setFrameButton")
 			{
 				var position:Number = (value as int) * (1.0 / stage.frameRate);
 				canvas.JumpToPosition(position);
@@ -818,7 +770,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				////devMenu.SetSelectedShard(shard);
 				////devMenu.set
 			}
-			else if (targetName == "CompileAnimationFromAnimationList")
+			else if (targetName == "AnimMenu_CompileAnimationFromAnimationList")
 			{
 				//Compiles an animation by using an animation list. Goes through the list and builds a vector of shards then passes the vector to the canvas.
 				//Value is an animation list.
@@ -827,6 +779,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (animList)
 				{
 					CompileAndSwitchAnimation(animList);
+					canvas.JumpToPosition(0.0);
+					backgroundMasterTimeline.gotoAndStop(0.0);
 					/*var animationId:int = animationNameIndexes.indexOf(animList.TargetAnimationName);
 					var shardsForAnimation:Vector.<AnimateShard> = shardLib.GetListOfShards(animationId, animList.ShardNameList, animList.ShardTypeList);
 					canvas.CompileAnimation(shardsForAnimation, animList.TargetAnimationName);
@@ -914,7 +868,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				}
 				else if (result == 0)
 				{
-					userSettings.UpdateSettingForCharacter_AnimationLists(charName, characterManager.GetAnimationListsForCharacterInBinaryFormat(characterManager.GetCharacterIdByName(charName)));
+					var characterId:int = characterManager.GetCharacterIdByName(charName);
+					userSettings.UpdateSettingForCharacter_AnimationLists(charName, characterManager.GetAnimationListsForCharacterInBinaryFormat(characterId));
+					userSettings.UpdateColorSettingsForCharacter(charName, characterManager.GetCharacterColorData(characterId));					
 				}
 				menuSignal2.dispatch("CharMenu_DeleteCharacterResult", delResetResult);
 			}
@@ -954,13 +910,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				if (characterManager.IsACharacterSelected())
 				{
 					characterManager.UpdateGraphicSettingForCurrentCharacter(nameOfActor, nameOfSet, layer);
-					userSettings.UpdateGraphicSettingsForCharacter(characterManager.GetCurrentCharacterName(), nameOfActor, nameOfSet, layer);
+					userSettings.UpdateGraphicSettingForCharacter(characterManager.GetCurrentCharacterName(), nameOfActor, nameOfSet, layer);
 					
 				}
 			}
 		}
 		}
-		else
+		CONFIG::FPS60
 		{
 			public function onSignal1(targetName:*):void{}			
 			public function onSignal2(targetName:*, value:*):void{}
@@ -993,9 +949,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					canvas.ClearAllActors();
 					canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCharacterGraphicSets(charId));
+					//Update user settings to have the new graphic settings for the character
+					userSettings.UpdateAllGraphicSettingsForCharacter(characterName, characterManager.GetCharacterGraphicSettings(charId));
 				}
+				CONFIG::NX
+				{
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(characterName));
 				menuSignal2.dispatch("AnimMenu_UpdateAnimationListing", characterManager.GetCurrentCharacterAnimationStates());
+				}
 				userSettings.UpdateCurrentCharacterName(characterName);
 			}
 		}
@@ -1018,8 +979,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCharacterGraphicSets(charId));
 				}
 				var characterName:String = characterManager.GetCharacterNameById(charId);
+				CONFIG::NX
+				{
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(characterName));
 				menuSignal2.dispatch("AnimMenu_UpdateAnimationListing", characterManager.GetCurrentCharacterAnimationStates());
+				}
 				userSettings.UpdateCurrentCharacterName(characterName);
 			}
 		}
@@ -1040,7 +1004,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private function LoadUserSettings():void
 		{
-			if(CONFIG::BuildMenu)
+			if(CONFIG::NX)
 			{
 				//logger.info("Loading user settings");
 				if (settingsSaveFile.data.ppppuSettings != null)
@@ -1081,7 +1045,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				//ToggleHelpScreen(); //Show the help screen
 				//ShowMenu(true);
 				userSettings.firstTimeRun = false;
-				if (CONFIG::BuildMenu)
+				if (CONFIG::NX)
 				{
 					settingsSaveFile.data.ppppuSettings = userSettings;
 					settingsSaveFile.flush();
@@ -1095,6 +1059,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			//if (chosenMusicId > -1) { musicPlayer.SetInitialMusicToPlay(chosenMusicId);}			
 		}
 		
+		CONFIG::NX
+		{
 		private function UpdateAnimationMenuShardsList(list:AnimationList):void
 		{
 			if (list)
@@ -1123,35 +1089,26 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				menuSignal2.dispatch("SetupShardsList", shardsData);
 			}
 		}
+		}
 		
 		private function CompileAndSwitchAnimation(animList:AnimationList):void
 		{
-			var animationId:int = animationNameIndexes.indexOf(animList.TargetAnimationName);
-			if (animationId > -1)
+			if (animList)
 			{
-				var shardsForAnimation:Vector.<AnimateShard> = shardLib.GetListOfShards(animationId, animList.ShardNameList, animList.ShardTypeList);
-				canvas.CompileAnimation(shardsForAnimation, animList.TargetAnimationName);
-				backgroundMasterTimeline.gotoAndStop(canvas.GetTimeInCurrentAnimation());
-				var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
-				//CONFIG::debug
-				//{
-					menuSignal2.dispatch("animationDuration", animationDuration);
-				//}
+				var animationId:int = animationNameIndexes.indexOf(animList.TargetAnimationName);
+				if (animationId > -1)
+				{
+					var shardsForAnimation:Vector.<AnimateShard> = shardLib.GetListOfShards(animationId, animList.ShardNameList, animList.ShardTypeList);
+					canvas.CompileAnimation(shardsForAnimation, animList.TargetAnimationName);
+					//backgroundMasterTimeline.gotoAndStop(canvas.GetTimeInCurrentAnimation());
+					CONFIG::NX
+					{
+						var animationDuration:Number = canvas.GetDurationOfCurrentAnimation();
+						menuSignal2.dispatch("animationDuration", animationDuration);
+					}
+				}
 			}
 		}
-		
-		//[inline]
-		/*private function AddNewCharacter(name:String, charData:Object, isPresetCharacter:Boolean = false, presetAnimationLists:Vector.<AnimationList>=null):int
-		{
-			if (characterManager.CheckIfCharacterCanBeAdded(character))
-			{
-				var newCharId:int = characterManager.AddNewCharacter(name, charData, isPresetCharacter, presetAnimationLists);
-				
-				menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(newCharId));
-				return newCharId;
-			}
-			return -1;
-		}*/
 		
 		private function InitializeSettingsForCharactersLoadedAtStartup():void
 		{
@@ -1193,9 +1150,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				//var newCharacter:Character = new Character(characterName, null);
 				charId = characterManager.AddNewCharacter(characterName, null);
-				if (charId > -1)
+				CONFIG::NX
 				{
-					menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(charId));
+					if (charId > -1)
+					{
+						menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(charId));
+					}
 				}
 			}
 			if (charId > -1)

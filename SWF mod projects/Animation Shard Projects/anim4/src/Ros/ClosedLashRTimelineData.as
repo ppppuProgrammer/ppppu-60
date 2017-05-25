@@ -9,8 +9,8 @@ package Ros
 			timelineData.TIME_PER_FRAME = 0.03333333333333333;
 			timelineData.targetName = "ClosedLashR";
 			var tweenPropVector:Vector.<Object> = new Vector.<Object>();
-			tweenPropVector[tweenPropVector.length]= {visible:true,transformMatrix:{a:-1.4766845703125,b:0.2498626708984375,c:-0.11395263671875,d:-1.8282318115234375,tx:263.25,ty:224.45}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,visible:false};
+			tweenPropVector[tweenPropVector.length]= {visible:false,transformMatrix:{a:-1.4766845703125,b:0.2498626708984375,c:-0.11395263671875,d:-1.8282318115234375,tx:263.25,ty:224.45}};
+			tweenPropVector[tweenPropVector.length]= {duration:1};
 			tweenPropVector[tweenPropVector.length]= {duration:36,transformMatrix:{a:-1.1693115234375,b:0.264801025390625,c:-0.1536865234375,d:-1.25732421875,tx:237.9,ty:159.65}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,visible:true,transformMatrix:{a:-1.1693115234375,b:0.264801025390625,c:-0.1536865234375,d:-1.25732421875,tx:238.7,ty:159.65}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.17181396484375,b:0.2606048583984375,c:-0.1496734619140625,d:-1.2598114013671875,tx:237.45,ty:161.2}};
@@ -94,7 +94,7 @@ package Ros
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.3414306640625,b:0.1614837646484375,c:-0.02374267578125,d:-1.614898681640625,tx:285.4,ty:183.45}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.40411376953125,b:0.199920654296875,c:-0.06219482421875,d:-1.7187957763671875,tx:281.45,ty:196}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.4766845703125,b:0.2498626708984375,c:-0.11395263671875,d:-1.8282318115234375,tx:275.25,ty:211.45}};
-			tweenPropVector[tweenPropVector.length]= {duration:1,transformMatrix:{a:-1.4766845703125,b:0.2498626708984375,c:-0.11395263671875,d:-1.8282318115234375,tx:263.25,ty:224.45}};
+			tweenPropVector[tweenPropVector.length]= {duration:1,visible:false,transformMatrix:{a:-1.4766845703125,b:0.2498626708984375,c:-0.11395263671875,d:-1.8282318115234375,tx:263.25,ty:224.45}};
 			timelineData.tweenProperties = tweenPropVector;
 		}
 	}

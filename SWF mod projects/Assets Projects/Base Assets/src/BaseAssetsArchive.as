@@ -25,6 +25,8 @@ package
 			var scleraColorProperties:Object = { Group: ["Eyelid", "Sclera"], Target: ["EyelidColor", "Color"] };
 			modsList[modsList.length] = new AssetsMod(new Sclera, "ScleraL", "Standard", 1, { Colorable: scleraColorProperties } );
 			modsList[modsList.length] = new AssetsMod(new Sclera, "ScleraR", "Standard", 1, { Colorable: scleraColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Sclera, "Sclera2L", "Standard", 1, { Colorable: scleraColorProperties } );
+			modsList[modsList.length] = new AssetsMod(new Sclera, "Sclera2R", "Standard", 1, { Colorable: scleraColorProperties } );
 			
 			modsList[modsList.length] = new AssetsMod(new ClosedLash, "ClosedLashL", "Standard", 1);
 			modsList[modsList.length] = new AssetsMod(new ClosedLash, "ClosedLashR", "Standard", 1);

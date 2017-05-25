@@ -27,6 +27,7 @@ package menu
 		private var signal2:Signal2;
 		
 		private var currentSelectedAnimationId:int;
+		//private var currentSelectedAnimationType:int;
 		private var currentSelectedShardTypeIsBase:Boolean;
 		private var currentSelectedShardItem:ShardItem;
 		private var currentSelectedShardName:String;
@@ -384,7 +385,20 @@ package menu
 			}
 			else if (command == "AnimMenu_InvalidAnimationSelected")
 			{
-				ChangeDefaultLabelForAnimationSelector("\"" + (value as String) + INVALIDANIMATIONSTRING);
+				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
+				if (cbox)
+				{
+					cbox.selectedIndex = -1;
+				}
+				var animName:String = value as String;
+				if (animName != null)
+				{
+					ChangeDefaultLabelForAnimationSelector("\"" + animName + INVALIDANIMATIONSTRING);
+				}
+				else
+				{
+					ChangeDefaultLabelForAnimationSelector("");
+				}
 			}
 			
 		}
@@ -442,7 +456,7 @@ package menu
 				var cbox:ComboBox = config.getCompById("animationSelector") as ComboBox;
 				if (cbox.selectedIndex == -1) { return; }
 				var shardList:List = config.getCompById("animList") as List;
-				var clipboardContents:Array = ["[\"" + cbox.selectedItem + "\""];
+				var clipboardContents:Array = ["[\"" + cbox.selectedItem + "\"", 0];
 				//clipboardContents[0] = cbox.selectedItem;
 				for (var i:int = 0, l:int = shardList.items.length; i < l; i++) 
 				{
@@ -576,14 +590,16 @@ package menu
 			{
 				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
 				signal2.dispatch("AnimMenu_ChangeSelectedAnimationOfCurrentCharacter", charAnimationList.selectedIndex);
-				if (charAnimationList.selectedItem == null)
+				
+				config.getCompById("animationListButtonGroup").enabled = config.getCompById("addShardButton").enabled = (charAnimationList.selectedItem != null);
+				/*if (charAnimationList.selectedItem == null)
 				{
 					config.getCompById("animationListButtonGroup").enabled = config.getCompById("addShardButton").enabled = false;
 				}
 				else
 				{
 					config.getCompById("animationListButtonGroup").enabled = config.getCompById("addShardButton").enabled = true;
-				}
+				}*/
 			}
 			else
 			{

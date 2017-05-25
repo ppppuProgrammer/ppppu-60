@@ -46,13 +46,14 @@ package
 			animationPresets[animationPresets.length] = ["Blowjob", 0,true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Right Eye Variant 1",false,"Peach Hair"];
 			animationPresets[animationPresets.length] = ["Anim8", 0,true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Mouth Variant 1",false,"Right Eye Variant 1",false,"Peach Hair"];
 			animationPresets[animationPresets.length] = ["Anim9", 0,true,"Female (Standard)",true,"Male (Standard)",false,"Crown",false,"Left Earring",false,"Right Earring",false,"Left Eye Variant 1",false,"Right Eye Variant 1",false,"Mouth Variant 1",false,"Peach Hair"];
-			//characterData.ChangeableGfxSets = false;
-			//characterData.preferredMusic = "BeepBlockSkyway";
-			//characterData.DiamondULColor = 0x000000;
-			//characterData.DiamondCenterColor = 0x000000;
-			//characterData.DiamondBRColor = 0x000000;
-			//characterData.DiamondULColor = 0x000000;
-			//characterData.BackgroundColor = 0x000000;
+			characterData.PreferredMusic = "BeepBlockSkyway";
+			characterData.Color.ODiamondColor1 = 0xFC7883FF;
+			characterData.Color.IDiamondColor1 = characterData.Color.TDiamondColor1 = 0xFFE1E3FF;
+			characterData.Color.IDiamondColor2 = characterData.Color.TDiamondColor2 = 0xFEC2C7FF;
+			characterData.Color.IDiamondColor3 = characterData.Color.TDiamondColor3 = 0xFD9FA7FF;
+			characterData.Color.IDiamondColor4 = characterData.Color.TDiamondColor4 = 0xFEC2C7FF;
+			characterData.Color.TDiamondColor5 = 0xFC7883FF;
+			characterData.Color.BackLight = [0xFFD200FF, 0xFFCC0000];
 		}
 		
 	}

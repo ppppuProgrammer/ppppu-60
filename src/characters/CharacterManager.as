@@ -14,7 +14,7 @@ package characters
 		private var m_Characters:Vector.<Character> = new Vector.<Character>();
 		
 		//Holds the id of the character to switch to next time a automatic character switch occurs.
-		private var m_nextCharacterId:int = 0;
+		private var m_nextCharacterId:int = -1;
 		//The character that is being managed.
 		private var m_currentCharacter:Character = null;
 		//The character that is being displayed on the stage.
@@ -123,7 +123,7 @@ package characters
 		}
 		
 		//Returns the id of the character that was switched to. Returns -1 if no switch happened
-		public function GetIdOfCharacterToSwitchTo():int
+		public function GetIdOfCharacterToSwitchTo(loadedAnimationNames:Vector.<String>):int
 		{
 			var charSwitchOccured:int = -1;
 			if (m_currentCharacter != null && CheckIfTransitionLockIsActive())	{return charSwitchOccured; }
@@ -139,7 +139,7 @@ package characters
 				charSwitchOccured = m_nextCharacterId;
 			}
 			//currentCharacter.OnAccessibleAnimationCheck();
-			currentCharacter.RandomizePlayAnim();
+			currentCharacter.RandomizePlayAnim(loadedAnimationNames);
 			currentCharacter.PlayingLockedAnimCheck();
 			//currentCharacter.ChangeAnimationIndexToPlay();
 			//currentCharacter.GotoFrameAndPlayForCurrentAnimation(setFrameForAnimation);
@@ -585,6 +585,18 @@ package characters
 		public function GetCurrentAnimationIdOfCharacter():int
 		{
 			return m_currentCharacter.GetCurrentAnimationId();
+		}
+		
+		/*Has the current character randomly select one of their animations and starts playing it from the
+		 * specified frame. Returns the id of the animation that will play.*/
+		public function RandomizeCurrentCharacterAnimation(loadedAnimationNames:Vector.<String>):int
+		{
+			var currChar:Character = m_currentCharacter;
+			currChar.SetRandomizeAnimation(true);
+			currChar.RandomizePlayAnim(loadedAnimationNames);
+			//userSettings.characterSettings[currChar.GetName()].animationSelect = 0;
+
+			return currChar.GetCurrentAnimationId();
 		}
 	}
 

@@ -31,7 +31,7 @@ package menu
 		public function InitializeMenu(app:AppCore):void
 		{
 			config = new MinimalConfigurator(this);
-			CONFIG::BuildMenu
+			CONFIG::NX
 			{
 			app.SetupMenuHooks(null, this);
 			}

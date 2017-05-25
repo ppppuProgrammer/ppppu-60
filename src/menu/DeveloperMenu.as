@@ -50,10 +50,10 @@ package menu
 		private var signal2:Signal2 = new Signal2();
 		private var config:MinimalConfigurator;
 		
-		CONFIG::release {
+		/*CONFIG::release {
 			[Embed(source="DevMenuDefinition.xml",mimeType="application/octet-stream")]
 			private var menuDefinitionClass:Class;
-		}
+		}*/
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
 		private var serialTweenDict:Dictionary = new Dictionary();
@@ -80,11 +80,11 @@ package menu
 				config.loadXML("../src/menu/DevMenuDefinition.xml");
 			}
 			
-			CONFIG::release
+			/*CONFIG::release
 			{
 				var xmlByteArray:ByteArray = new menuDefinitionClass() as ByteArray;
 				config.parseXMLString(xmlByteArray.readUTFBytes(xmlByteArray.length));
-			}
+			}*/
 		}
 		
 		public function RegisterDirectorForMessages(director:Director):void

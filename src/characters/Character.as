@@ -74,7 +74,12 @@
 		[inline]
 		public function SetAnimationLists(animationPresets:Vector.<AnimationList>):void
 		{
-			animationLists = animationPresets;
+			if (animationPresets != null){
+				animationLists = animationPresets;
+			}
+			else {
+				animationLists = new Vector.<AnimationList>();
+			}
 			animationTypes = new Vector.<int>(animationLists.length);
 			m_lockedAnimation = new Vector.<Boolean>(animationLists.length);
 
@@ -353,9 +358,33 @@
 			return m_currentAnimationId;
 		}
 		
-		
-		public function RandomizePlayAnim(forceRandomization:Boolean=false):void
+		public function SetRandomizeAnimation(randomStatus:Boolean):void
 		{
+			m_randomizePlayAnim = randomStatus;
+		}
+		
+		public function GetRandomAnimStatus() : Boolean
+		{
+			return m_randomizePlayAnim;
+		}
+		
+		public function RandomizePlayAnim(loadedAnimationNames:Vector.<String>, forceRandomization:Boolean=false):void
+		{
+			if (!loadedAnimationNames || loadedAnimationNames.length  < 1) { m_currentAnimationId = -1; return; }
+			var cantSelectAnimation:Boolean = true;
+			//Do a scan on all animation lists for the character to make sure that at least one animation list is for one of the loaded animations.
+			for (var i:int = 0, l:int = animationLists.length; i < l; i++) 
+			{
+				if (loadedAnimationNames.indexOf(animationLists[i].TargetAnimationName) > -1)
+				{
+					cantSelectAnimation = false;
+					break;
+				}
+			}
+			if (cantSelectAnimation) {
+				m_currentAnimationId = -1; return;
+			}
+			
 			if(m_randomizePlayAnim || forceRandomization == true)
 			{
 				//Randomly select a number out of the number of accessible animations
@@ -364,14 +393,7 @@
 				var standardAnimationIndices:Array = GetAccessibleAnimationsIndices();
 				if((standardAnimationIndices.length - GetNumberOfLockedAnimations()) > 2)
 				{
-					while( GetAnimationLockedStatus(randomAccessibleAnimId))
-					{
-						randomAccessibleAnimId = RandomlySelectAnimationId();
-					}
-				}
-				else
-				{
-					while(GetAnimationLockedStatus(randomAccessibleAnimId))
+					while( GetAnimationLockedStatus(randomAccessibleAnimId) || loadedAnimationNames.indexOf(animationLists[randomAccessibleAnimId].TargetAnimationName) == -1)
 					{
 						randomAccessibleAnimId = RandomlySelectAnimationId();
 					}
@@ -388,7 +410,7 @@
 			//animation id are already the accessible animations.
 
 			//id returned was -1, meaning the animation at the index was not accessible.
-			//if (accessibleId == -1) { return;}
+			if (m_currentAnimationId == -1) { return;}
 			if(m_lockedAnimation[m_currentAnimationId] && (GetAccessibleAnimationsIndices().length - GetNumberOfLockedAnimations() == 1))
 			{
 				var unlockedAnimNum:int = 0;

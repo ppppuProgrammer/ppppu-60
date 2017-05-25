@@ -4,9 +4,9 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\ppppu60fps.swf" />
+    <movie path="bin\ppppuNX.swf" />
     <movie fps="60" />
-    <movie width="480" />
+    <movie width="960" />
     <movie height="720" />
     <movie version="12" />
     <movie minorVersion="0" />
@@ -45,7 +45,7 @@
     <option loadExterns="" />
     <option staticLinkRSL="True" />
     <option additional="-use-gpu=true&#xA;-use-direct-blit=true&#xA;-frame=FTwo,Main" />
-    <option compilerConstants="CONFIG::NX,false&#xA;CONFIG::FPS60,(!CONFIG::NX)" />
+    <option compilerConstants="CONFIG::NX,true&#xA;CONFIG::FPS60,(!CONFIG::NX)" />
     <option minorVersion="" />
   </build>
   <!-- SWC Include Libraries -->
@@ -82,7 +82,7 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>cmd /C python "$(ProjectDir)\BuildModsSwf.py" "$(CompilerPath)" "$(FDBuild)" "$(BuildConfig)"</preBuildCommand>
+  <preBuildCommand />
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False">cmd.exe /C python "$(ProjectDir)\MakeBuildCopy.py" "$(OutputDir)" "$(OutputName)" "$(BuildConfig)" "$(TimeStamp)"</postBuildCommand>
   <!-- Other project options -->

@@ -27,8 +27,10 @@ package menu
 		private var musicMenu:MusicMenu;
 		private var loadMenu:LoadMenu;
 		private var animationMenu:AnimationMenu;
+		CONFIG::debug 
+		{
 		private var developerMenu:DeveloperMenu;
-		
+		}
 		private var currentSubmenu:Sprite;
 		
 		//private 
@@ -137,10 +139,6 @@ package menu
 				
 				switch(e.target.name)
 				{
-					case "DevelopmentTab":
-						SwitchSubmenu(developerMenu);
-						break;
-						
 					case "AnimationsTab":
 						SwitchSubmenu(animationMenu);
 						break;
@@ -159,6 +157,13 @@ package menu
 						
 					case "CharactersTab":
 						SwitchSubmenu(characterMenu);
+						break;
+						
+					case "DevelopmentTab":
+						CONFIG::debug
+						{
+						SwitchSubmenu(developerMenu);
+						}
 						break;
 				}
 				
@@ -215,7 +220,10 @@ package menu
 		{
 			if (characterMenu != null) { characterMenu.InitializeMenu(app); RegisterSubmenu(characterMenu); }
 			if (musicMenu != null) { musicMenu.InitializeMenu(app); RegisterSubmenu(musicMenu); }
-			if (developerMenu != null) {developerMenu.InitializeMenu(app); developerMenu.RegisterDirectorForMessages(director); RegisterSubmenu(developerMenu);} 
+			CONFIG::debug 
+			{
+			if (developerMenu != null) { developerMenu.InitializeMenu(app); developerMenu.RegisterDirectorForMessages(director); RegisterSubmenu(developerMenu); } 
+			}
 			if (animationMenu != null) {animationMenu.InitializeMenu(app); RegisterSubmenu(animationMenu);}
 			if (customizationMenu != null) { customizationMenu.InitializeMenu(app); customizationMenu.RegisterDirectorForMessages(director); RegisterSubmenu(customizationMenu); }
 			if (loadMenu != null) {loadMenu.InitializeMenu(app); RegisterSubmenu(loadMenu);}
@@ -241,9 +249,7 @@ package menu
 				case musicMenu: 
 					musicMenu = null;
 					break;
-				case developerMenu: 
-					developerMenu = null;
-					break;
+
 				case animationMenu: 
 					animationMenu = null;
 					break;
@@ -253,7 +259,15 @@ package menu
 				case loadMenu: 
 					loadMenu = null;
 					break;
+					
+				
 			}
+			CONFIG::debug
+			{
+				if(e.target == developerMenu){
+					developerMenu = null;}
+			}
+			
 			if (submenuLoadFinishedCount >= submenuCreated)
 			{
 				RemoveEventListeners();

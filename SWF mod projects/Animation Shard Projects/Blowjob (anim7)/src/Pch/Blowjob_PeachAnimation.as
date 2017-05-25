@@ -38,51 +38,36 @@ package Pch
 		private static function CreateDisplayInfoForHair():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-dispInfo[dispInfo.length] = new DispObjInfo("HairBack", 200, 0, "BehindHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair1L", 400, 0, "FrontEarLayer", DispObjInfo.FLAG_CHILD);
-//dispInfo[dispInfo.length] = new DispObjInfo("WideMouth", 200, 0, "MouthLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair1R", 400, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair3R", 600, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair3L", 800, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair2L", 1200, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair2R", 1400, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("HairFrontAngled", 1600, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-
-dispInfo[dispInfo.length] = new DispObjInfo("HairBack", 200, 2.0, "BehindHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair1L", 400, 2.0, "FrontEarLayer", DispObjInfo.FLAG_CHILD);
-//dispInfo[dispInfo.length] = new DispObjInfo("WideMouth", 200, 2.0, "MouthLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair1R", 400, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair3R", 600, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair3L", 800, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair2L", 1200, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Hair2R", 1400, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("HairFrontAngled", 1600, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("HairBack", 200, -1.0, "BehindHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair1L", 400, -1.0, "FrontEarLayer", DispObjInfo.FLAG_CHILD);
+//dispInfo[dispInfo.length] = new DispObjInfo("WideMouth", 200, -1.0, "MouthLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair1R", 400, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair3R", 600, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair3L", 800, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair2L", 1200, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Hair2R", 1400, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("HairFrontAngled", 1600, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
             return dispInfo;
         }
 
 		private static function CreateDisplayInfoForHeadwear():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-dispInfo[dispInfo.length] = new DispObjInfo("Headwear", 1000, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("Headwear", 1000, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("Headwear", 1000, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
             return dispInfo;
         }
 
 		private static function CreateDisplayInfoForEarringL():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-dispInfo[dispInfo.length] = new DispObjInfo("EarringL", 200, 0, "FrontEarLayer", DispObjInfo.FLAG_CHILD);
-
-dispInfo[dispInfo.length] = new DispObjInfo("EarringL", 200, 2.0, "FrontEarLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EarringL", 200, -1.0, "FrontEarLayer", DispObjInfo.FLAG_CHILD);
             return dispInfo;
         }
 
 		private static function CreateDisplayInfoForEarringR():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-dispInfo[dispInfo.length] = new DispObjInfo("EarringR", 200, 0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
-
-dispInfo[dispInfo.length] = new DispObjInfo("EarringR", 200, 2.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EarringR", 200, -1.0, "FrontHeadLayer", DispObjInfo.FLAG_CHILD);
             return dispInfo;
         }
 
@@ -96,38 +81,25 @@ dispInfo[dispInfo.length] = new DispObjInfo("EarringR", 200, 2.0, "FrontHeadLaye
 		private static function CreateDisplayInfoForEyeL():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashL", 200, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("ScleraL", 400, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeballL", 200, 0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelidL", 400, 0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskL", 600, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelashL", 800, 0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-
-dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashL", 200, 2.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("ScleraL", 400, 2.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeballL", 200, 2.0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelidL", 400, 2.0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskL", 600, 2.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelashL", 800, 2.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashL", 200, -1.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("ScleraL", 400, -1.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeballL", 200, -1.0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelidL", 400, -1.0, "EyeMaskL", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskL", 600, -1.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelashL", 800, -1.0, "LeftEyeLayer", DispObjInfo.FLAG_CHILD);
+;
             return dispInfo;
         }
 
 		private static function CreateDisplayInfoForEyeR():Vector.<DispObjInfo>
         {
             var dispInfo:Vector.<DispObjInfo> = new Vector.<DispObjInfo>();
-dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 200, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("ScleraR", 400, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeballR", 200, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 400, 0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 600, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, 0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-
-dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 200, 2.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("ScleraR", 400, 2.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeballR", 200, 2.0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 400, 2.0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
-dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 600, 2.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
-dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, 2.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("ClosedLashR", 200, -1.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("ScleraR", 400, -1.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeballR", 200, -1.0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelidR", 400, -1.0, "EyeMaskR", DispObjInfo.FLAG_MASKED);
+dispInfo[dispInfo.length] = new DispObjInfo("EyeMaskR", 600, -1.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
+dispInfo[dispInfo.length] = new DispObjInfo("EyelashR", 800, -1.0, "RightEyeLayer", DispObjInfo.FLAG_CHILD);
             return dispInfo;
         }
 

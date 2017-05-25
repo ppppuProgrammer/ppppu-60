@@ -24,7 +24,7 @@ package
 		//public var playOneSongForAllCharacters:Boolean = false;
 		public var globalSongTitle:String = "Beep Block Skyway";
 		//The latest version of the user settings. Change this whenever there is a modification with the class properties (renaming, adding/removing)
-		public const SAVE_VERSION:int = 1;
+		public const SAVE_VERSION:int = 2;
 		//The version of the settings that this settings object was created for.
 		public var version:int = SAVE_VERSION;
 		
@@ -156,7 +156,12 @@ package
 			characterSettings[characterName].graphicSettings[actorName][layer] = setName;
 		}*/
 		
-		public function UpdateGraphicSettingsForCharacter(characterName:String, actorName:String, setName:String, layer:int):void
+		public function UpdateAllGraphicSettingsForCharacter(characterName:String, graphicData:Object):void
+		{
+			characterSettings[characterName].graphicSettings = graphicData;
+		}
+		
+		public function UpdateGraphicSettingForCharacter(characterName:String, actorName:String, setName:String, layer:int):void
 		{
 			if (!(actorName in characterSettings[characterName].graphicSettings))
 			{

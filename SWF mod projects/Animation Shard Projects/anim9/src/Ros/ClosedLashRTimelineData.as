@@ -1,4 +1,4 @@
-package Ros 
+package Ros
 {
 	import animations.TimelineDefinition
 	public class ClosedLashRTimelineData extends TimelineDefinition

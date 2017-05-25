@@ -1,0 +1,20 @@
+<comps>
+	<PushButton id="loadModBtn" x="00" y="0" width="70" label="Load mod swf" enabled="false" />
+	<PushButton id="loadBackgroundBtn" x="00" y="30" width="120" label="Load background image" enabled="false"/>
+		<!---<PushButton id="CharacterTab" x="15" y="0" width="70" label="Characters" />
+		<PushButton id="GraphicsTab" x="90" y="0" width="70" label="Customization" />
+		<PushButton id="MusicTab" x="165" y="0" width="70" label="Music" />
+		<PushButton id="LoadTab" x="240" y="0" width="70" label="Load" />
+		<PushButton id="AnimationTab" x="315" y="0" width="70" label="Animations" />
+		<PushButton id="DeveloperTab" x="390" y="0" width="70" label="Development" />
+
+	<Panel x ="0" y="0" width="480" height="70">
+		<PushButton id="CharacterTab" x="10" y="0" width="60" label="Characters" />
+		<PushButton id="GraphicsTab" x="80" y="0" width="60" label="Customization" />
+		<PushButton id="MusicTab" x="150" y="0" width="60" label="Music" />
+		<PushButton id="LoadTab" x="220" y="0" width="60" label="Load" />
+		<PushButton id="AnimationTab" x="290" y="0" width="60" label="Animations" />
+		<PushButton id="DeveloperTab" x="360" y="0" width="60" label="Development" />
+	</Panel>--->
+	
+</comps>
