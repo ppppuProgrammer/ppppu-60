@@ -23,11 +23,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.*;
 	import animations.background.*;
 	import menu.*;
+	import audio.MusicPlayer;
 	import flash.display.*;
 	import com.jacksondunstan.signals.*;
 	import flash.events.*;
 	import modifications.*;
 	import characters.*;
+	import org.libspark.betweenas3.core.easing.EaseNone;
+	import org.libspark.betweenas3.core.easing.ElasticEaseOut;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
 	import org.libspark.betweenas3.core.tweens.groups.SerialTween;
 	import flash.net.registerClassAlias;
@@ -37,6 +40,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import mx.utils.StringUtil;
 	import org.libspark.betweenas3.BetweenAS3;
 	import flash.net.SharedObject;
+	import org.libspark.betweenas3.easing.Back;
+	import org.libspark.betweenas3.easing.Circ;
+	import org.libspark.betweenas3.easing.Elastic;
+	import org.libspark.betweenas3.easing.Linear;
 	
 	/**
 	 * Responsible for all the various aspects of ppppuNX. 
@@ -60,6 +67,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private var animationNameIndexes:Vector.<String> = new Vector.< String > ();// ["Cowgirl", "LeanBack", "LeanForward", "Grind", "ReverseCowgirl", "Paizuri", "Blowjob", "SideRide", "Swivel", "Anal"];
 		//private var basisBodyTypes:Vector.<String> = new Vector.<String>();
 		private var characterManager:CharacterManager;
+		
+		private var musicPlayer:MusicPlayer;
 		
 		//Counter to see just how long the flash has been running in milliseconds. Used for timing purposes such as controlling when to change characters.
 		//public var ppppuRunTimeCounter:Number = 0;
@@ -88,6 +97,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		public var settingsSaveFile:SharedObject = SharedObject.getLocal("ppppuNX_Settings", "/");
 		
 		private var mainMenu:MainMenu;
+		//The tween used for moving the main menu out of view.
+		private var menuCloseTween:ParallelTween;
+		//The tween used for moving the main menu back into view.
+		private var menuOpenTween:ParallelTween;
 		}
 		//Indicates whether the program is in edit mode or play mode. Edit mode has the menus on screen. 
 		private var menuModeActive:Boolean = false;
@@ -102,6 +115,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private var modsLoadedAtStartUp:Array;
 		
 		private var graphicSets:Dictionary = new Dictionary();
+		
+		
 		
 		//Constructor
 		public function AppCore() 
@@ -135,6 +150,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			characterManager = new CharacterManager();
 			var director:Director = new Director(this, colorizer);
 			canvas.Initialize(shardLib, director);
+			
+			musicPlayer = new MusicPlayer();
+			
 			//Add the key listeners
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyPressCheck);
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyReleaseCheck);
@@ -200,8 +218,12 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				
 				//Create the main menu. 
 				mainMenu = new MainMenu();
+				//Create the tweens that are used to move the main menu and main stage around.
+				menuOpenTween = BetweenAS3.parallel(BetweenAS3.to(mainStage, { x:0 }, .25, Linear.linear), BetweenAS3.serial(BetweenAS3.addChild(mainMenu, this), BetweenAS3.to(mainMenu, { x:480 }, .25, Circ.easeIn))) as ParallelTween;
+				menuCloseTween = BetweenAS3.parallel(BetweenAS3.to(mainStage, { x:(stage.stageWidth - mainStage.DisplayArea.width) / 2 }, .25, Linear.linear), BetweenAS3.serial( BetweenAS3.to(mainMenu, { x:960 }, .25, Back.easeOut), BetweenAS3.removeFromParent(mainMenu))) as ParallelTween;
 				mainMenu.InitializeMainMenu(this, director);
 				mainMenu.x = 480;
+				
 			}
 			else
 			{
@@ -260,10 +282,18 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				canvas.visible = true;
 				firstTimeInLoop = false;
 				lastUpdateTime = getTimer();
+				
 				//previousUpdateTime = backgroundMasterTimeline.position;// .totalTime();//(getTimer() / 1000.0);
 				//ppppuRunTimeCounter = 0;
+				/*CONFIG::NX
+				{
+					musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName());
+				}*/
+				CONFIG::FPS60
+				{
+					musicPlayer.PlayMusic(0, 0);
+				}
 				
-				//musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName(currentCharacter.GetDefaultMusicName()));
 
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
@@ -272,7 +302,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			var animationPosition:Number = canvas.Update();	
 			CONFIG::NX
 			{
-			menuSignal2.dispatch("timeText", animationPosition);
+				if (animationPosition >= 0.0){
+					menuSignal2.dispatch("timeText", animationPosition);
+				}
 			}
 
 			var currentUpdateTime:Number = getTimer();
@@ -309,6 +341,15 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			totalRunTime += difference;
 			lastUpdateTime = currentUpdateTime;
 			
+			if (menuModeActive && !musicPlayer.IsBGMStopped())
+			{
+				musicPlayer.PauseMusic();
+				//musicPlayer.StopMusic();
+			}
+			else if (!menuModeActive && musicPlayer.IsBGMStopped())
+			{
+				musicPlayer.ResumeMusic(canvas.GetTimeInCurrentAnimation() * 1000);
+			}
 			
 			//
 			//canvas.CompileAnimation(characterManager.GetAnimationListForCurrentCharacter(animId), animationNameIndexes[animId]);
@@ -369,8 +410,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		it was an unintentional oversight at first, people were amused by this, so it has been kept as a feature.*/
 		private function KeyPressCheck(keyEvent:KeyboardEvent):void
 		{
-			//Check if the menus need input focus. If they do, then bail so there is no changes due to both this and the menu acting on the same input simultaneously.
-			//if (menu.MenuNeedsInputFocus()) { return; }
+			//Check if there isn't an interactive object that has keyboard focus.
+			if (stage.focus != null) { return; }
+			
 			
 			var keyPressed:int = keyEvent.keyCode;
 
@@ -433,17 +475,37 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		{
 		private function ToggleMenuMode():void
 		{
+			//Can not change menu mode if there one of the menu related tweens are running.
+			if ((menuCloseTween && menuCloseTween.isPlaying) || (menuOpenTween  && menuOpenTween.isPlaying)) { return; }
+			
 			menuModeActive = !menuModeActive;
+			
 			if (menuModeActive)
 			{
-				mainStage.x = 0;	
-				addChild(mainMenu);
+
+				if (!musicPlayer.IsBGMStopped())
+				{
+					//musicPlayer.PauseMusic();
+					//musicPlayer.StopMusic();
+				}
+				canvas.StopAnimation();
+				backgroundMasterTimeline.stop();
+				
+				menuOpenTween.play();
+				
 				//stage.focus = mainMenu;
 			}
 			else
 			{
-				mainStage.x = (stage.stageWidth - mainStage.DisplayArea.width) / 2;	
-				removeChild(mainMenu);
+
+				if (!canvas.IsAnimationFinished())
+				{
+					canvas.ResumePlayingAnimation();
+					backgroundMasterTimeline.play();
+				}
+				//musicPlayer.ResumeMusic(canvas.GetTimeInCurrentAnimation() * 1000);
+				//musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), canvas.GetTimeInCurrentAnimation() * 1000);
+				menuCloseTween.play();
 				stage.focus = null;
 			}
 		}
@@ -596,7 +658,11 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				var music:MusicMod = mod as MusicMod;
 				if (music)
 				{
-					//musicPlayer.AddMusic(music.GetMusicData(), music.GetName(), music.GetStartLoopTime(), music.GetEndLoopTime(), music.GetStartTime());
+					addedMod = musicPlayer.AddMusic(music.GetMusicData(), music.GetName(), music.GetDisplayInformation(), music.GetStartLoopTime(), music.GetEndLoopTime(), music.GetStartTime());
+					if (addedMod)
+					{
+						menuSignal2.dispatch("MusicMenu_AddMusicToSelectionList", music.GetName());
+					}
 				}
 			}
 			else if (modType == Mod.MOD_ASSET)
@@ -726,8 +792,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				//Change menu to reflect the loaded settings
 				CONFIG::NX
 				{
-				removeChild(mainMenu);				
+				removeChild(mainMenu);
+				musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), 0);
 				ToggleMenuMode();
+				
 				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
 				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
 				}
@@ -914,6 +982,25 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					
 				}
 			}
+			else if (targetName == "MusicMenu_ChangeMusicVolumeRequest")
+			{
+				musicPlayer.ControlBGMVolume(value as Number);
+			}
+			else if (targetName == "MusicMenu_PreviewMusic")
+			{
+				musicPlayer.PreviewMusic(value as int);
+			}
+			else if (targetName == "MusicMenu_TestMusicLoopPoint")
+			{
+				musicPlayer.TestMusicLoop(value as int);
+			}
+			else if (targetName == "MusicMenu_ChangeSelectedMusicRequest")
+			{
+				var idOfSelectedMusic:int = musicPlayer.GetMusicIdByName(value as String);
+				musicPlayer.ChangeMusicToPlay(idOfSelectedMusic);
+				//Don't assume that the title of the music is what was received from the message.  
+				userSettings.globalSongTitle = musicPlayer.GetNameOfCurrentMusic();
+			}
 		}
 		}
 		CONFIG::FPS60
@@ -928,6 +1015,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			ProcessStartupMods();	
 			System.gc();
 			System.gc();
+			musicPlayer.ControlVolume(1.0);
 			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
 			
 		}

@@ -81,7 +81,7 @@ package
 			return Math.round(value/roundTo)*roundTo;
 		}
 		
-		public static function TraceDispObjInfoVector(vector:Vector.<DispObjInfo>):void
+		/*public static function TraceDispObjInfoVector(vector:Vector.<DispObjInfo>):void
 		{
 			var output:String = "";
 			for (var i:int = 0, l:int = vector.length; i < l; i++) 
@@ -89,7 +89,7 @@ package
 				output += vector[i].GetControlObjectName() + " targets " + vector[i].GetTargetObjName() + " (flag: " + vector[i].GetTargetFlag() + ")\n";
 			}
 			trace(output);
-		}
+		}*/
 		
 		public static function CloneObject(obj:Object):Object
 		{

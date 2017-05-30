@@ -1,5 +1,7 @@
 package menu 
 {
+	import com.bit101.components.ComboBox;
+	import com.bit101.components.HUISlider;
 	import com.jacksondunstan.signals.Signal2;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -33,10 +35,10 @@ package menu
 			config = new MinimalConfigurator(this);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
-			CONFIG::NX
-			{
+
 			app.SetupMenuHooks(null, this);
-			}
+			signal2.addSlot(app);
+			
 			CONFIG::debug {
 				config.loadXML("../src/menu/MusicMenuDefinition.xml");
 			}
@@ -51,7 +53,82 @@ package menu
 		
 		public function onSignal2(targetName:*, value:*):void
 		{
-			
+			var command:String = targetName as String;
+			if (command == "ClickEvent")
+			{
+				if (!value) { return;}
+				var compName:String = (value as Object)["name"];
+				if (config.getCompById(compName) != null)
+				{
+					ClickEventHandler(value as Object);
+				}
+			}
+			else if (command == "ChangeEvent")
+			{
+				if (!value) { return;}
+				var compName:String = (value as Object)["name"];
+				if (config.getCompById(compName) != null)
+				{
+					ChangeEventHandler(value as Object);
+				}
+			}
+			else if (command == "SelectEvent")
+			{
+				if (!value) { return;}
+				var compName:String = (value as Object)["name"];
+				if (config.getCompById(compName) != null)
+				{
+					SelectEventHandler(value as Object);
+				}
+			}
+			else if (command == "MusicMenu_AddMusicToSelectionList")
+			{
+				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
+				if (musicSelectDroplist)
+				{
+					musicSelectDroplist.addItem(value as String);
+				}
+			}
+		}
+		
+		public function ClickEventHandler(target:Object):void
+		{
+			//var targetName:String = target["name"];
+			if (target.name == "testMusicLoopButton")
+			{
+				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
+				if (musicSelectDroplist)
+				{
+					signal2.dispatch("MusicMenu_TestMusicLoopPoint", musicSelectDroplist.selectedIndex);
+				}
+			}
+			else if (target.name == "previewMusicButton")
+			{
+				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
+				if (musicSelectDroplist)
+				{
+					signal2.dispatch("MusicMenu_PreviewMusic", musicSelectDroplist.selectedIndex);
+				}
+			}
+
+		}
+		
+		public function ChangeEventHandler(target:Object):void
+		{
+			//var targetName:String = target["name"];
+			if (target.name == "musicVolumeSlider")
+			{
+				var musicSlider:HUISlider = target as HUISlider;
+				signal2.dispatch("MusicMenu_ChangeMusicVolumeRequest", musicSlider.value/100.0);
+			}
+		}
+		public function SelectEventHandler(target:Object):void
+		{
+			if (target.name == "musicSelectDroplist")
+			{
+				var musicSelectDroplist:ComboBox = target as ComboBox;
+				signal2.dispatch("MusicMenu_ChangeSelectedMusicRequest", musicSelectDroplist.selectedItem);
+			}
 		}
 		
 		private function FailedLoadingXML(e:IOErrorEvent):void

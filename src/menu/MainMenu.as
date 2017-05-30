@@ -12,6 +12,7 @@ package menu
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
+	import flash.text.TextField;
 	/**
 	 *
 	 * @author 
@@ -66,7 +67,7 @@ package menu
 				
 				var button:PushButton = new PushButton(panel, x, 0, label);
 				//These menus are NYI so don't allow their buttons to be enabled.
-				if (tabsList[i].search(/Music|Load/) > -1)
+				if (tabsList[i].search(/Load/) > -1)
 				{
 					button.enabled = false;
 				}
@@ -132,6 +133,14 @@ package menu
 		private function ClickEventHandler(e:MouseEvent):void
 		{
 			var eventTarget:Object = e.target as Object;
+			if (eventTarget is TextField && (eventTarget as TextField).selectable == true)
+			{
+				stage.focus = eventTarget as TextField;
+			}
+			else
+			{
+				stage.focus = null;
+			}
 			if (buttonGroup.indexOf(eventTarget as PushButton) > -1)
 			{
 				var eventButton:PushButton = eventTarget as PushButton;

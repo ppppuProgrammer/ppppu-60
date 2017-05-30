@@ -1,8 +1,19 @@
 <comps>
-	<Window id="musicPlayerWindow" title="Music Player" x="0" y="0" width="480" height="200" enabled="false" draggable="false">
-	</Window>
-	
-	<Window id="charAudioWindow" title="Character Sounds" x="0" y="200" width="480" height="200" enabled="false" draggable="false">
-	</Window>
+	<VBox>
+		<Window id="musicPlayerWindow" title="Music Player" x="0" y="0" width="480" height="200" draggable="false">
+			<VBox x="5">
+				<HBox>
+					<!---<Label text="Selected" />--->
+					<ComboBox id="musicSelectDroplist"  width="300" height="20" defaultLabel="No Music Selected"/>	
+					<PushButton id="previewMusicButton" width="80" label="Preview Song"/>
+					<PushButton id="testMusicLoopButton" width="90" label="Test Song Loop"/>
+				</HBox>
+				<HUISlider id="musicVolumeSlider" width="200" value="100" maximum="100" minimum="0" label="Volume:" labelprecision="0" tick="1" />
+			</VBox>
+		</Window>
+		
+		<Window id="charAudioWindow" title="Character Sounds" x="0" y="200" width="480" height="200" enabled="false" draggable="false">
+		</Window>
+	</VBox>
 	
 </comps>

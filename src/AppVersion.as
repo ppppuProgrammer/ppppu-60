@@ -8,9 +8,9 @@ package
    public class AppVersion 
    {
       
-      public static const VERSION:String = "0.7.0";
-	  public static const BUILDNUMBER:String = "124"
-	  public static const BUILDDATE:String = "5/24/2017 7:53 PM";
+      public static const VERSION:String = "0.8.0";
+	  public static const BUILDNUMBER:String = "125"
+	  public static const BUILDDATE:String = "5/29/2017 8:27 AM";
       
    }
    

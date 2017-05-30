@@ -21,7 +21,9 @@ package audio
 		public var m_loopEndTime:Number; //Time position in milliseconds that is considered the end of the song. Upon reaching this time, the music will jump back to the indicated loop start time
 		public var m_loopEndSampleNumber:Number;
 		
-		private var m_title:String;
+		private var musicName:String;	
+		//Optional string that will be used instead of the name when the music player's menu gives information on the playing music.
+		private var m_displayInfo:String;
 		
 		private var m_sourceSound:Sound; //The Sound that contains audio data needed to play music
 		
@@ -30,9 +32,14 @@ package audio
 		private var m_extractedSamples:Number;
 		private var m_currentSamplePosition:Number;
 		
-		public function Music(sourceSound:Sound, musicTitle:String, loopStartPoint:Number = 0, loopEndPoint:Number = -1, musicStartPoint:Number = 0)
+		private var cachedMusicForLoopTest:MusicSnippit = null;
+		
+		private var TEST_sampleLock:Boolean = false;
+		
+		public function Music(sourceSound:Sound, musicTitle:String, musicInfo:String, loopStartPoint:Number = 0, loopEndPoint:Number = -1, musicStartPoint:Number = 0)
 		{
-			m_title = musicTitle;
+			musicName = musicTitle;
+			m_displayInfo = musicInfo;
 			m_sourceSound = sourceSound;
 			
 			if (loopEndPoint == -1)
@@ -68,10 +75,10 @@ package audio
 			m_loopStartSampleNumber = ConvertMillisecTimeToSample(m_loopStartTime);
 		}
 		
-		public function Equals(comparedPpppuMusicObject:Music):Boolean
+		public function Equals(otherMusicObject:Music):Boolean
 		{
-			if (this.m_sourceSound == comparedPpppuMusicObject.m_sourceSound && this.m_loopStartTime == comparedPpppuMusicObject.m_loopStartTime && 
-				this.m_loopEndTime == comparedPpppuMusicObject.m_loopEndTime && this.m_musicStartTime == comparedPpppuMusicObject.m_musicStartTime)
+			if (this.m_sourceSound == otherMusicObject.m_sourceSound && this.m_loopStartTime == otherMusicObject.m_loopStartTime && 
+				this.m_loopEndTime == otherMusicObject.m_loopEndTime && this.m_musicStartTime == otherMusicObject.m_musicStartTime)
 			{
 				return true;
 			}
@@ -88,15 +95,15 @@ package audio
 			return ConvertSampleTimeToMillisec(m_currentSamplePosition);
 		}
 		
-		public function GetSourceSound():Sound
+		/*public function GetSourceSound():Sound
 		{
 			return m_sourceSound;
-		}
+		}*/
 		
-		public function GetPlaySound():Sound
+		/*public function GetPlaySound():Sound
 		{
 			return m_playSound;
-		}
+		}*/
 		
 		//Returns the length of the music in milliseconds
 		public function GetMusicLength():Number 
@@ -107,23 +114,30 @@ package audio
 		{
 			return m_musicStartTime;
 		}
-		public function GetMusicTitle():String
+		public function GetMusicName():String
 		{
-			return m_title;
+			return musicName;
 		}
 		public function GetLoopStart():Number
 		{
 			return this.m_loopStartTime;
 		}
+		public function GetMusicInfo():String
+		{
+			return m_displayInfo;
+		}
 		public function Play():SoundChannel
 		{
+			TEST_sampleLock = false;
 			m_playSound.addEventListener(SampleDataEvent.SAMPLE_DATA, SendSampleData);
 			return m_playSound.play();
 		}
 		
 		public function Stop():void
 		{
+			TEST_sampleLock = true;
 			m_playSound.removeEventListener(SampleDataEvent.SAMPLE_DATA, SendSampleData);
+			if (cachedMusicForLoopTest) { cachedMusicForLoopTest.Stop()};
 		}
 		
 		public function SendSampleData(event:SampleDataEvent):void
@@ -143,7 +157,8 @@ package audio
 				}
 				m_extractedSamples +=  m_sourceSound.extract(m_soundData, SAMPLES_PER_REQUEST - m_extractedSamples, m_currentSamplePosition);
 			}
-			m_currentSamplePosition += m_extractedSamples;
+			if(!TEST_sampleLock){
+			m_currentSamplePosition += m_extractedSamples;}
 			
 			event.data.writeBytes(m_soundData);
 		}
@@ -158,6 +173,25 @@ package audio
 		private function ConvertSampleTimeToMillisec(timeSample:Number):Number
 		{
 			return (timeSample / FLASH_SOUND_OUTPUT_SAMPLE_RATE) * 1000.0;
+		}
+		
+		//Creates a shorten copy of the current Music object for the purpose of testing the loop point.
+		public function GetMusicCopyForLoopPointTesting():MusicSnippit
+		{
+			if (!cachedMusicForLoopTest)
+			{
+				var loopSoundData:ByteArray = new ByteArray();
+				
+				m_sourceSound.extract(loopSoundData, Music.FLASH_SOUND_OUTPUT_SAMPLE_RATE * 4, m_loopEndSampleNumber - (Music.FLASH_SOUND_OUTPUT_SAMPLE_RATE * 4));
+				m_sourceSound.extract(loopSoundData, Music.FLASH_SOUND_OUTPUT_SAMPLE_RATE * 4, m_loopStartSampleNumber);
+				loopSoundData.position = 0;
+				var loopSound:Sound = new Sound();
+				loopSound.loadPCMFromByteArray(loopSoundData, Music.FLASH_SOUND_OUTPUT_SAMPLE_RATE * 8);
+				//loopSound.loadCompressedDataFromByteArray(loopSoundData, loopSoundData.length);
+				cachedMusicForLoopTest = new MusicSnippit(loopSound);
+				//cachedMusicForLoopTest = loopSound;// new Music(loopSound, m_title+"_LoopTest");
+			}
+			return cachedMusicForLoopTest;
 		}
 	}
 }

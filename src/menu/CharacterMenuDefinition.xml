@@ -12,11 +12,11 @@
 		<VBox id="SelectCharSection" x="10" y="110" spacing="10">
 			<HBox y="40">
 				<Label text="Character: "/>
-				<TextArea id="selectedCharText" editable="false" height="20" autoHideScrollBar="true"/>
+				<TextArea id="selectedCharText" editable="false" selectable="false" height="20" autoHideScrollBar="true"/>
 			</HBox>
 			<HBox>
 				<Label text="Preferred Music: "/>
-				<TextArea id="charMusicText"  editable="false" height="20" autoHideScrollBar="true" />
+				<TextArea id="charMusicText"  editable="false" selectable="false" height="20" autoHideScrollBar="true" />
 			</HBox>
 			<HBox spacing="20">
 				<Label text="Status: "  />

@@ -1,6 +1,8 @@
 package  
 {
 	import characters.ColorValueHolder;
+	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.IGraphicsData;
 	import flash.display.GraphicsGradientFill;
 	import flash.display.Sprite;
@@ -17,6 +19,8 @@ package
 		
 		//A dictionary for holding groups of Sprites that can undergo color changes. Key is the group name and Value is a vector with Sprites.
 		private var colorizeGroups:Dictionary = new Dictionary();
+		//Holds references of sprites that contains a gradient fill as the key and the value is data there just to exist (an int of 0)
+		private var gradientSprites:Dictionary = new Dictionary();
 		public function Colorizer() 
 		{
 			
@@ -63,6 +67,11 @@ package
 						if (child != null && colorizeList.indexOf(child) == -1)
 						{
 							colorizeList[colorizeList.length] = child;
+							//Check to see if the sprite has a gradient fill.
+							if (CheckIfColorizeTargetHasGradientFill(child))
+							{
+								gradientSprites[child] = true;
+							}
 						}
 					}
 				}
@@ -72,6 +81,11 @@ package
 					if (child != null && colorizeList.indexOf(child) == -1)
 					{
 						colorizeList[colorizeList.length] = child;
+						//Check to see if the sprite has a gradient fill.
+						if (CheckIfColorizeTargetHasGradientFill(child))
+						{
+							gradientSprites[child] = true;
+						}
 					}
 				}
 			}
@@ -82,15 +96,15 @@ package
 		{
 			//Break down childName into parts. Periods are used as string seperators.
 			var searchTraversal:Array = childName.split(".");
-			var result:Sprite = null;
-			
+			var result:Sprite = sprite;
+			if (!result) { return null;}
 			//If the "childName" is "this" then the entire sprite will be colorized.
-			if (searchTraversal[0] == "this")
-			{return sprite; }	
+			if ((searchTraversal[0] as String).toLowerCase() == "this")
+			{return result; }	
 				
 			for (var i:int = 0, l:int = searchTraversal.length; i < l; i++) 
 			{
-				result = sprite.getChildByName(searchTraversal[i]) as Sprite;
+				result = result.getChildByName(searchTraversal[i]) as Sprite;
 				if (result == null)
 				{
 					//Child wasn't found
@@ -119,6 +133,44 @@ package
 			}
 		}
 		
+		private function CheckIfColorizeTargetHasGradientFill(sprite:Sprite):Boolean
+		{
+			var shapeToEdit:Shape = sprite as Shape;
+			var navSprite:Sprite = sprite;
+			var currentDispObject:DisplayObject;
+			while (navSprite && navSprite.numChildren >= 1)
+			{
+				currentDispObject = navSprite.getChildAt(0);
+				if (currentDispObject is DisplayObjectContainer)
+				{
+					navSprite = currentDispObject  as Sprite;
+				}
+				else if (currentDispObject is Shape)
+				{
+					shapeToEdit = currentDispObject as Shape;
+					navSprite = null;
+				}
+				else
+				{
+					navSprite = null;
+				}
+			}
+			if (!shapeToEdit) { return false; }
+			
+			var graphicsData:Vector.<IGraphicsData> = shapeToEdit.graphics.readGraphicsData(false);
+			
+			
+			
+			for (var i:uint = 0, l:uint = graphicsData.length; i < l; ++i)
+			{
+				if (graphicsData[i] is GraphicsGradientFill)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		
 		
 		/* Color Changing Functions */
 		//{
@@ -126,7 +178,7 @@ package
 		private function ModifyColorOfSprite(sprite:Sprite, colorValue:*):void
 		{
 			var color:uint;
-			if (colorValue is Array)
+			if (gradientSprites[sprite] && colorValue is Array)
 			{
 				GradientChange(sprite, colorValue as Array);
 			}

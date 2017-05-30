@@ -371,6 +371,9 @@ package animations
 				}
 				//position = masterTimeline.position;
 			}
+			else{
+				return -1;
+			}
 			if (masterTimeline)
 			{
 				position = masterTimeline.position;
