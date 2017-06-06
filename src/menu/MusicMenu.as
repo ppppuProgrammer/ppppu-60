@@ -89,6 +89,14 @@ package menu
 					musicSelectDroplist.addItem(value as String);
 				}
 			}
+			else if (command == "MusicMenu_ChangeSelectedMusicResult")
+			{
+				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
+				if (musicSelectDroplist)
+				{
+					musicSelectDroplist.selectedIndex = value as int;
+				}
+			}
 		}
 		
 		public function ClickEventHandler(target:Object):void

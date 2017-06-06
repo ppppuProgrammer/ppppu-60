@@ -85,6 +85,7 @@ package menu
 			if (cbox)
 			{
 				cbox.addItem(name);
+				cbox.items.sort();
 			}
 		}
 		
@@ -94,6 +95,7 @@ package menu
 			if (cbox && cbox.items.indexOf(name) == -1)
 			{
 				cbox.addItem(name);
+				cbox.items.sort();
 			}
 		}
 		
@@ -167,9 +169,9 @@ package menu
 				}
 				assetGuiSlider.selectedIndex = (assetGuiSlider.items.length > 0) ? 0 : -1;
 			}
-			else if (command == "SetNameOfAddedAsset")
+			else if (command == "AddedAssetToActorResult")
 			{
-				AddNewGraphicSet(value as String);
+				AddNewGraphicSet(value[0] as String);
 			}
 			
 		}

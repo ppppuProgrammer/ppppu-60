@@ -24,11 +24,13 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.background.*;
 	import menu.*;
 	import audio.MusicPlayer;
+	import com.lorentz.processing.ProcessExecutor;
 	import flash.display.*;
 	import com.jacksondunstan.signals.*;
 	import flash.events.*;
 	import modifications.*;
 	import characters.*;
+	import flash.geom.Point;
 	import org.libspark.betweenas3.core.easing.EaseNone;
 	import org.libspark.betweenas3.core.easing.ElasticEaseOut;
 	import org.libspark.betweenas3.core.tweens.groups.ParallelTween;
@@ -157,6 +159,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyPressCheck);
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyReleaseCheck);
 
+			ProcessExecutor.instance.initialize(stage); 
+			
 			//Disable mouse interaction for various objects
 			////mainStage.MenuLayer.mouseEnabled = true;
 			//Disable mouse interaction for various objects
@@ -289,10 +293,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName());
 				}*/
-				CONFIG::FPS60
+				/*CONFIG::FPS60
 				{
 					musicPlayer.PlayMusic(0, 0);
-				}
+				}*/
 				
 
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
@@ -341,15 +345,24 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			totalRunTime += difference;
 			lastUpdateTime = currentUpdateTime;
 			
-			if (menuModeActive && !musicPlayer.IsBGMStopped())
-			{
-				musicPlayer.PauseMusic();
+			//var idOfMusicToPlay:int = musicPlayer.GetMusicIdByName(musicPlayer.GetNameOfCurrentMusic());
+			//if (menuModeActive && !musicPlayer.IsBGMStopped())
+			//{
+				//musicPlayer.PauseMusic();
+				////musicPlayer.StopMusic();
+			//}
+			//else if (!menuModeActive && musicPlayer.IsBGMStopped() && idOfMusicToPlay > -1)
+			//{
+				//musicPlayer.ResumeMusic(canvas.GetTimeInCurrentAnimation() * 1000);
+			//}
+			//else if ()
+			//{
+				//musicPlayer.PlayMusic();
+			//}
+			//else if(!menuModeActive && musicPlayer.IsBGMStopped() && idOfMusicToPlay == -1)
+			//{
 				//musicPlayer.StopMusic();
-			}
-			else if (!menuModeActive && musicPlayer.IsBGMStopped())
-			{
-				musicPlayer.ResumeMusic(canvas.GetTimeInCurrentAnimation() * 1000);
-			}
+			//}
 			
 			//
 			//canvas.CompileAnimation(characterManager.GetAnimationListForCurrentCharacter(animId), animationNameIndexes[animId]);
@@ -476,18 +489,24 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private function ToggleMenuMode():void
 		{
 			//Can not change menu mode if there one of the menu related tweens are running.
-			if ((menuCloseTween && menuCloseTween.isPlaying) || (menuOpenTween  && menuOpenTween.isPlaying)) { return; }
+			if (menuCloseTween.isPlaying || menuOpenTween.isPlaying) { return; }
 			
 			menuModeActive = !menuModeActive;
+			
+			if (!musicPlayer.IsBGMStopped())
+			{
+				//musicPlayer.PauseMusic();
+				musicPlayer.StopMusic();
+			}
 			
 			if (menuModeActive)
 			{
 
-				if (!musicPlayer.IsBGMStopped())
+				/*if (!musicPlayer.IsBGMStopped())
 				{
 					//musicPlayer.PauseMusic();
-					//musicPlayer.StopMusic();
-				}
+					musicPlayer.StopMusic();
+				}*/
 				canvas.StopAnimation();
 				backgroundMasterTimeline.stop();
 				
@@ -504,7 +523,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					backgroundMasterTimeline.play();
 				}
 				//musicPlayer.ResumeMusic(canvas.GetTimeInCurrentAnimation() * 1000);
-				//musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), canvas.GetTimeInCurrentAnimation() * 1000);
+				musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), canvas.GetTimeInCurrentAnimation() * 1000);
 				menuCloseTween.play();
 				stage.focus = null;
 			}
@@ -789,13 +808,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				
 				ChangeCharacter(userSettings.currentCharacterName);
 				
-				//Change menu to reflect the loaded settings
+				//Change menus to reflect the loaded settings
 				CONFIG::NX
 				{
 				removeChild(mainMenu);
 				musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), 0);
 				ToggleMenuMode();
 				
+				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", musicPlayer.GetMusicIdByName(userSettings.globalSongTitle));
 				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
 				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
 				}
@@ -1000,6 +1020,67 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				musicPlayer.ChangeMusicToPlay(idOfSelectedMusic);
 				//Don't assume that the title of the music is what was received from the message.  
 				userSettings.globalSongTitle = musicPlayer.GetNameOfCurrentMusic();
+				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", musicPlayer.GetMusicIdByName(userSettings.globalSongTitle));
+			}
+			else if (targetName == "LoadMenu_LoadedSVGAsset")
+			{
+				var svgFileName:String = value[1] as String;
+				svgFileName = svgFileName.slice(0, svgFileName.indexOf(".svg"));
+				var svg:Sprite = value[0] as Sprite;
+				var nameParts:Array = svgFileName.split("_");
+				if (nameParts.length >= 3)
+				{
+					var svgSet:String = nameParts[0];
+					var svgActor:String = nameParts[1];
+					var svgLayer:int = int(nameParts[2]);
+					var svgActorExtensions:Array;
+					if (nameParts.length >= 4)
+					{
+						svgActorExtensions = (nameParts[3] as String).split("-");
+					}
+					if (svgActorExtensions)
+					{
+						for (var i:int = 0, l:int = svgActorExtensions.length; i < l; i++) 
+						{
+							canvas.AddAssetToActor(svgActor+svgActorExtensions[i], new AssetData(svgSet, svg, svgLayer, null));
+						}
+					}
+					else
+					{
+						canvas.AddAssetToActor(svgActor, new AssetData(svgSet, svg, svgLayer, null));
+					}
+					/*this.addChild(svg);
+					svg.x = 480/2;
+					svg.y = 720 / 2;
+					var regPoint:Point = UtilityFunctions.GetAnchorPoint(svg);
+					var spr:Sprite = new Sprite();
+					spr.graphics.clear();
+					spr.graphics.beginFill(0xFF0000);
+					spr.graphics.drawCircle(0, 0, 2);
+					spr.graphics.endFill();
+					svg.addChild(spr);
+					spr.x = regPoint.x;
+					spr.y = regPoint.y;*/
+					
+					
+				}
+			}
+			else if (targetName == "AddedAssetToActorResult")
+			{
+				var currentCharGraphicSettings:Object = userSettings.GetSettingsForCharacter(characterManager.GetCurrentCharacterName());
+				if (currentCharGraphicSettings)
+				{
+					var assetSetName:String = value[1] as String;
+					var actorName:String = value[0] as String;
+					
+					if (actorName in currentCharGraphicSettings.graphicSettings)
+					{
+						if (currentCharGraphicSettings.graphicSettings[actorName][value[2] as int] == assetSetName)
+						{
+							canvas.ChangeAssetForActor(actorName, assetSetName, value[2] as int);
+						}
+					}
+				}
 			}
 		}
 		}
@@ -1015,7 +1096,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			ProcessStartupMods();	
 			System.gc();
 			System.gc();
-			musicPlayer.ControlVolume(1.0);
+			//With all startup mods loaded 
+			//musicPlayer.ControlVolume(1.0);
 			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
 			
 		}

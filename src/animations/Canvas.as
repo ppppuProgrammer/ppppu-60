@@ -648,6 +648,11 @@ package animations
 			}
 		}
 		
+		public function ChangeAssetForActor(actor:String, asset:String, layer:int):void
+		{
+			director.ChangeAssetForActorBySetName(actor, asset, layer);
+		}
+		
 		public function ClearAllActors():void
 		{
 			director.ClearAllActors();

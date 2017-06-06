@@ -1,6 +1,10 @@
 <comps>
-	<PushButton id="loadModBtn" x="00" y="0" width="70" label="Load mod swf" enabled="false" />
-	<PushButton id="loadBackgroundBtn" x="00" y="30" width="120" label="Load background image" enabled="false"/>
+	<VBox>
+		<PushButton id="loadModBtn" width="70" label="Load mod swf" />
+		<PushButton id="loadSVGAssetBtn"  width="70" label="Load svg asset" />
+		<PushButton id="loadPNGAssetBtn"  width="70" label="Load png asset" />
+		<PushButton id="loadBackgroundBtn" width="120" label="Load background image" enabled="false"/>
+	</VBox>
 		<!---<PushButton id="CharacterTab" x="15" y="0" width="70" label="Characters" />
 		<PushButton id="GraphicsTab" x="90" y="0" width="70" label="Customization" />
 		<PushButton id="MusicTab" x="165" y="0" width="70" label="Music" />

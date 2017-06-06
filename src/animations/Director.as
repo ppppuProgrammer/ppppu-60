@@ -89,7 +89,7 @@ package animations
 			{
 				ChangeAssetForAllActorsBySetName(value[0] as String, value[1] as Boolean);
 			}
-			else if (commandStr == "SetNameOfAddedAsset")
+			else if (commandStr == "AddedAssetToActorResult")
 			{
 				appSignaller2.dispatch(command, value);
 			}
@@ -153,6 +153,12 @@ package animations
 		{
 			signal3.dispatch("ChangeAsset", actorName, assetId);
 		}		
+		
+		[inline]
+		public function ChangeAssetForActorBySetName(actorName:String, assetSet:String, layer:int):void
+		{
+			signal3.dispatch("ChangeAssetBySetName", actorName, [assetSet, layer]);
+		}	
 		
 		public function ClearAllActors():void
 		{

@@ -221,7 +221,7 @@ package animations
 			if (conflict == false)
 			{
 				assetList[assetList.length] = assetData;
-				signal2.dispatch("SetNameOfAddedAsset", assetData.setName);
+				signal2.dispatch("AddedAssetToActorResult", [this.name, assetData.setName, assetData.layer]);
 				if (assetData.properties != null && "Colorable" in assetData.properties)
 				{
 					signal3.dispatch("RegisterColorables", assetData.asset, assetData.properties.Colorable);
@@ -339,12 +339,12 @@ package animations
 					SelectAssetToUse(value2 as int);
 				}
 			}
-			/*else if (commandStr == "ChangeAssetByName")
+			else if (commandStr == "ChangeAssetBySetName")
 			{
 				var targetedActor:String = value as String;
 				if (this.name == targetedActor)
 				{
-					var setName:String = value2[0];					
+					var setName:String = value2[0] as String;					
 					var layer:int = value2[1];
 					if (setName == "")
 					{
@@ -362,7 +362,7 @@ package animations
 					}
 					
 				}
-			}*/
+			}
 			else if (commandStr == "ChangeAssetForAllActors")
 			{
 				var setName:String = value as String;

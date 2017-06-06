@@ -18,10 +18,11 @@ package io
 		 */
 		//private var handler:Function;
 		private var signal2:Signal2 = new Signal2();
-		public function FileReferenceLoadHelper(slot:Slot2, filterText:String = "Any", filterPattern:String = "*.*") 
+		private var finishedMesssage:String;
+		public function FileReferenceLoadHelper(slot:Slot2, filterText:String = "Any", filterPattern:String = "*.*", loadMessage:String="FileLoaded") 
 		{
 			//handler = _handler;
-
+			finishedMesssage = loadMessage;
 			fr.addEventListener(Event.SELECT, fileSelected);
 			var filter:FileFilter = new FileFilter(filterText, filterPattern);
 			signal2.addSlot(slot);
@@ -41,10 +42,11 @@ package io
 		{
 			fr.removeEventListener(Event.COMPLETE, fileLoaded);
 			
-			signal2.dispatch("FileLoaded", [fr.data,fr.name]);
+			signal2.dispatch(finishedMesssage, [fr.data,fr.name]);
 			fr = null;
 			signal2.removeAllSlots();
 			signal2 = null;
+			finishedMesssage = null;
 			//var bl:ByteLoader = new ByteLoader();
 			
 			//bl.addEventListener(ByteArrayLoadedEvent.LOADED, handler);

@@ -67,10 +67,10 @@ package menu
 				
 				var button:PushButton = new PushButton(panel, x, 0, label);
 				//These menus are NYI so don't allow their buttons to be enabled.
-				if (tabsList[i].search(/Load/) > -1)
+				/*if (tabsList[i].search(/Load/) > -1)
 				{
 					button.enabled = false;
-				}
+				}*/
 				button.toggle = true;
 				button.width = buttonWidth;
 				button.name = label + "Tab";

@@ -59,7 +59,7 @@ package
 		public function Preloader() 
 		{
 			//Prevent any sounds from being played globally. Done so any loaded mods with sounds embed in timeline will not be heard.
-			SoundMixer.soundTransform = new SoundTransform(0);
+			//SoundMixer.soundTransform = new SoundTransform(0);
 			//Initialize the logger for the program.
 			//var logWriter:LogWriter = new LogWriter("ppppuXi_Log");
 			/*if (Capabilities.isDebugger)

@@ -23,6 +23,8 @@ package audio
 		//private var initialMusicSetUsed:Boolean = false;
 		
 		private var currentlyPlayingMusicId:int = -1; //-1 means no song has been played yet, any other corresponds to an index for an object in m_characterMusic
+		//The id of the previous valid music object that was played. Used to keep track of the music playing when the mainmenu opens and interrupts playback so that the music can be resumed at the proper place when the mainmenu is closed.
+		private var previouslyPlayedMusicId:int = -1; 
 		private var mainSoundChannel:SoundChannel; //Sound channel used by the currently playing Sound
 
 		private var bgmSoundTransform:SoundTransform = new SoundTransform();
@@ -148,7 +150,11 @@ package audio
 				//Here's how to visualize how animation and music timing works. [] represents a 4 second blocks of time for the music
 				//[0-4][4-8][8-12][12-16][16-20]
 				//Animation time is how far into a 4 second block that an animation is in.
-				if (musicPositionInAnimation <= currentTimeIntoAnimation)
+				if (previouslyPlayedMusicId == musicId && musicPositionInAnimation > currentTimeIntoAnimation)
+				{
+					bgm.SetPlayheadPosition(playheadPosition - (musicPositionInAnimation - currentTimeIntoAnimation));
+				}
+				else if (musicPositionInAnimation <= currentTimeIntoAnimation)
 				{
 					//Music's (last) position into the animation is less than the current time the animation is into.
 					//Only need to move up the music's position a bit. To help visualize:
@@ -172,6 +178,7 @@ package audio
 				}
 				mainSoundChannel = bgm.Play();
 				currentlyPlayingMusicId = musicId;	
+				previouslyPlayedMusicId = musicId;
 			}
 			else if(musicId == -2)
 			{
@@ -217,7 +224,7 @@ package audio
 					mainSoundChannel = null;
 				}
 				//If music can't play then don't change the currently playing music
-				//m_currentlyPlayingMusicId = -1;
+				//currentlyPlayingMusicId = -1;
 			}
 			if (mainSoundChannel)
 			{
@@ -228,7 +235,7 @@ package audio
 			{
 				if (currentlyPlayingMusicId == -1)
 				{
-					return "No Music Selected";
+					return null;
 				}
 				else
 				{
@@ -237,7 +244,7 @@ package audio
 			}
 			else
 			{
-				return "Music Off";
+				return null;
 			}
 		}
 		
@@ -256,7 +263,7 @@ package audio
 			}
 		}
 		
-		public function PauseMusic():void
+		/*public function PauseMusic():void
 		{
 			if (currentlyPlayingMusicId > -1 )
 			{
@@ -269,38 +276,38 @@ package audio
 				
 				//trace(musicCollection[currentlyPlayingMusicId].GetPlayheadPosition());
 			}
-		}
+		}*/
 		
-		public function ResumeMusic(currentTimeIntoAnimation:Number=0.0):void
-		{
-			if (currentlyPlayingMusicId > -1)
-			{
-				if (mainSoundChannel != null){
-					mainSoundChannel.stop;
-				}
-				var bgm:Music = musicCollection[currentlyPlayingMusicId];
-				var playheadPosition:Number = bgm.GetPlayheadPosition();
-				//Round down the playhead position to the last frame.
-				var musicPositionInAnimation:Number = playheadPosition % MUSICSEGMENTTIMEMILLI;
-
-				/*if (musicPositionInAnimation <= currentTimeIntoAnimation){
-					bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
-				}
-				else{
-					bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
-				}*/
-				/*if (musicPositionInAnimation <= currentTimeIntoAnimation){
-					bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
-				}
-				else */if (musicPositionInAnimation > currentTimeIntoAnimation)
-				{
-					bgm.SetPlayheadPosition(playheadPosition - (musicPositionInAnimation - currentTimeIntoAnimation));
-				}
-				//trace(bgm.GetPlayheadPosition());
-				mainSoundChannel = bgm.Play();
-				
-			}
-		}
+		//public function ResumeMusic(currentTimeIntoAnimation:Number=0.0):void
+		//{
+			//if (currentlyPlayingMusicId > -1)
+			//{
+				//if (mainSoundChannel != null){
+					//mainSoundChannel.stop;
+				//}
+				//var bgm:Music = musicCollection[currentlyPlayingMusicId];
+				//var playheadPosition:Number = bgm.GetPlayheadPosition();
+				////Round down the playhead position to the last frame.
+				//var musicPositionInAnimation:Number = playheadPosition % MUSICSEGMENTTIMEMILLI;
+//
+				///*if (musicPositionInAnimation <= currentTimeIntoAnimation){
+					//bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
+				//}
+				//else{
+					//bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
+				//}*/
+				///*if (musicPositionInAnimation <= currentTimeIntoAnimation){
+					//bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
+				//}
+				//else */if (musicPositionInAnimation > currentTimeIntoAnimation)
+				//{
+					//bgm.SetPlayheadPosition(playheadPosition - (musicPositionInAnimation - currentTimeIntoAnimation));
+				//}
+				////trace(bgm.GetPlayheadPosition());
+				//mainSoundChannel = bgm.Play();
+				//
+			//}
+		//}
 		
 		[inline]
 		private function AlignMusicToAnimationPosition(currentTimeIntoAnimation:Number):void
@@ -345,6 +352,8 @@ package audio
 		
 		public function GetMusicIdByName(name:String):int
 		{
+			if (name == null) { return -1; }
+			
 			var musicNum:int = musicCollection.length;	// SMLSE OPTIMIZE ATTEMPT
 			for (var i:int = 0; i < musicNum; ++i)
 			{
@@ -371,7 +380,7 @@ package audio
 		
 		public function GetNameOfCurrentMusic():String
 		{
-			if (currentlyPlayingMusicId < 0 || currentlyPlayingMusicId > musicCollection.length){return "Music not found";}
+			if (currentlyPlayingMusicId < 0 || currentlyPlayingMusicId > musicCollection.length){return null;}
 			return musicCollection[currentlyPlayingMusicId].GetMusicName();
 		}
 		
