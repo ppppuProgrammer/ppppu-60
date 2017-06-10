@@ -171,7 +171,8 @@ package menu
 			}
 			else if (command == "AddedAssetToActorResult")
 			{
-				AddNewGraphicSet(value[0] as String);
+				
+				AddNewGraphicSet(value[1] as String);
 			}
 			
 		}

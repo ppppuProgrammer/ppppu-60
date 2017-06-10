@@ -632,6 +632,15 @@ package animations
 			}
 		}
 		
+		public function ChangeActorAssetsUsingSetNames(setNamesList:Array):void
+		{
+			if (setNamesList == null) { return;}
+			for (var i:int = 0, l:int = setNamesList.length; i < l; i++) 
+			{
+				director.ChangeAssetForAllActorsBySetName(setNamesList[i], true);
+			}
+		}
+		
 		public function ChangeActorAssetsUsingCharacterData(data:Object):void
 		{
 			if (data)
@@ -658,7 +667,7 @@ package animations
 			director.ClearAllActors();
 		}
 		
-		public function ChangeActorAssetsUsingSetNames(data:Object):void
+		/*public function ChangeActorAssetsUsingSetNames(data:Object):void
 		{
 			var setList:Array = data as Array;
 			if (setList)
@@ -668,7 +677,7 @@ package animations
 					director.ChangeAssetForAllActorsBySetName(setList[i] as String, true);
 				}
 			}
-		}
+		}*/
 		
 		/* Animation Creation Functions */
 		//{

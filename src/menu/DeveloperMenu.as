@@ -56,7 +56,7 @@ package menu
 		}*/
 		
 		//var currentTimelineSet:Vector.<SerialTween>;
-		private var serialTweenDict:Dictionary = new Dictionary();
+		//private var serialTweenDict:Dictionary = new Dictionary();
 		
 		public function DeveloperMenu(/*app:AppCore, director:Director*/) 
 		{			

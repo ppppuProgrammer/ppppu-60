@@ -2,8 +2,10 @@ package menu
 {
 	import com.lorentz.SVG.display.SVGDocument;
 	import com.lorentz.SVG.display.base.SVGElement;
+	import flash.display.DisplayObject;
 	import flash.display.Graphics;
 	import flash.display.IGraphicsData;
+	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import com.bit101.utils.MinimalConfigurator;
@@ -13,8 +15,12 @@ package menu
 	import com.jacksondunstan.signals.Slot2;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
-	import flash.utils.ByteArray;
+	import flash.utils.*;
+	import flash.net.FileReference;
 	import io.FileReferenceLoadHelper;
+	import io.FileReferenceListLoadHelper;
+	import io.LoadedFileData;
+	import modifications.Mod;
 	/**
 	 * ...
 	 * @author 
@@ -90,39 +96,95 @@ package menu
 			}
 			else if (command == "SVGLoaded")
 			{
-				var fileBytes:ByteArray = value[0] as ByteArray;
-				var fileName:String = value[1] as String;
-				if (fileBytes && fileName)
+				var svgFileData:Vector.<LoadedFileData> = value as Vector.<LoadedFileData>;
+				if (svgFileData == null) { return; }
+				
+				var file:LoadedFileData;
+				for (var j:int = 0,k:int = svgFileData.length; j < k; j++) 
 				{
-					var svgString:String = fileBytes.readUTFBytes(fileBytes.length);
-					var svg:SVGDocument = new SVGDocument();  
-					svg.forceSynchronousParse = true;
-					svg.autoAlign = true;
-					//svg.svgTransform
-					svg.parse(svgString);  
-					//var svgE:SVGElement = svg.getElementAt(0);
-					//svgE.viewPortElement.svgX = "-245";
-					//svgE.viewPortElement.svgY = "-24";
-					//svg.getChildAt(0).x = -245/2;
-					//svg.getChildAt(0).y = -24/2;
-					//svg.x = -245/2;
-					//svg.y = -24/2;
-					//stage.addChild(svg);
-					//var gfx:Vector.<IGraphicsData> = svg.graphics.readGraphicsData();
-					//stage.removeChild(svg);
-					var matrix:Matrix = new Matrix(1, 0, 0, 1, -245.05, -27.6);
-					svg.transform.matrix = matrix;
-					var spr:Sprite = new Sprite;
-					spr.addChild(svg);
-					//stage.addChild(svg);
-					//stage.removeChild(svg);
-					//var sprite:Sprite = new Sprite();
-					//sprite.addChild(svg);
-					var rect:Rectangle = spr.getBounds(spr);
-					signal2.dispatch("LoadMenu_LoadedSVGAsset", [spr, fileName]);
-					//addChild(svg);  
+					file = svgFileData[j] as LoadedFileData;
+					var fileBytes:ByteArray = file.data;
+					var fileName:String = file.name;
+					if (fileBytes && fileName)
+					{
+						var svgString:String = fileBytes.readUTFBytes(fileBytes.length);
+						
+						//var rect:Rectangle = spr.getBounds(spr);
+						var signalData:MessageData = new MessageData();
+						//var svgFileName:String = value[1] as String;
+						fileName = fileName.slice(0, fileName.indexOf(".svg"));
+						var nameParts:Array = fileName.split("_");
+						if (nameParts.length >= 3)
+						{
+							//set name for the svg
+							signalData.stringData[0] = nameParts[0] as String;
+							var svgActor:String = nameParts[1];
+							//signalData.stringData[1] = nameParts[1] as String;
+							//layer that the asset will be assigned to for their actor
+							signalData.intData[0] = int(nameParts[2]);
+							
+							if (nameParts.length >= 4)
+							{
+								var svgActorExtensions:Array;
+								svgActorExtensions = (nameParts[3] as String).split("-");
+								for (var i:int = 0,l:int = svgActorExtensions.length; i < l; i++) 
+								{
+									var svg:SVGDocument = new SVGDocument();  
+									svg.parse(svgString);  
+									
+									signalData.stringData[signalData.stringData.length] = svgActor + svgActorExtensions[i];
+									signalData.spriteData[signalData.spriteData.length] = svg;
+								}
+							}
+							else
+							{
+								var svg:SVGDocument = new SVGDocument();  
+
+								svg.parse(svgString);  
+								signalData.stringData[signalData.stringData.length] = svgActor;
+								signalData.spriteData[signalData.spriteData.length] = svg;
+							}
+						}
+						
+						signal2.dispatch("LoadMenu_LoadedSVGAsset", signalData);
+					}
 				}
 			}
+			else if (command == "SWFModLoaded")
+			{
+				var swfFileData:Vector.<LoadedFileData> = value as Vector.<LoadedFileData>;
+				if (swfFileData == null) { return; }
+				
+				var file:LoadedFileData;
+				
+				for (var i:int = 0,l:int = swfFileData.length; i < l; i++) 
+				{
+					file = swfFileData[i];
+					var fileBytes:ByteArray = file.data;
+					if (fileBytes)
+					{
+						var swfLoader:Loader = new Loader();
+						swfLoader.loadBytes(fileBytes);
+						swfLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedAsyncSWFLoading);
+					}
+				}
+			}
+		}
+		
+		private function FinishedAsyncSWFLoading(e:Event):void
+		{
+			var content:DisplayObject = e.target.content;
+			var loader:Loader = e.target.loader as Loader;
+			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, FinishedAsyncSWFLoading);
+			
+			if (content is Mod)
+			{
+				//Allow mod to do any first frame activities.
+				addChild(content);
+				removeChild(content);
+				signal2.dispatch("LoadMenu_ProcessMod", content);				
+			}
+			loader.unload();
 		}
 		
 		public function ClickEventHandler(target:Object):void
@@ -130,16 +192,12 @@ package menu
 			//var targetName:String = target["name"];
 			if (target.name == "loadSVGAssetBtn")
 			{
-				var svgFile:FileReferenceLoadHelper = new FileReferenceLoadHelper(this, "Scalable Vector Graphics (*.svg)", "*.svg", "SVGLoaded");
+				var svgFile:FileReferenceListLoadHelper = new FileReferenceListLoadHelper(this, "Scalable Vector Graphics files (*.svg)", "*.svg", "SVGLoaded");
 			}
-			/*else if (target.name == "previewMusicButton")
+			else if (target.name == "loadModBtn")
 			{
-				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
-				if (musicSelectDroplist)
-				{
-					signal2.dispatch("MusicMenu_PreviewMusic", musicSelectDroplist.selectedIndex);
-				}
-			}*/
+				var modFile:FileReferenceListLoadHelper = new FileReferenceListLoadHelper(this, "PPPPU NX SWF Mod (*.swf)", "*.swf", "SWFModLoaded");
+			}
 
 		}
 		

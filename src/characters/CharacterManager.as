@@ -498,12 +498,12 @@ package characters
 			return null;
 		}
 		
-		public function GetCharacterGraphicSets(charId:int):Object
+		public function GetCharacterGraphicSets(charId:int):Array
 		{
 			var characterData:Object = m_Characters[charId].data;
 			if (characterData && "GraphicSets" in characterData)
 			{
-				return characterData.GraphicSets;
+				return characterData.GraphicSets as Array;
 			}
 			return null;
 		}

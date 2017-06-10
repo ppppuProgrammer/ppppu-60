@@ -138,7 +138,7 @@ package menu
 			if (currentSelectedShardName == null) return;
 			
 			
-			var animList:List = config.getCompById("animList") as List
+			var animList:List = config.getCompById("animList") as List;
 			//Check to make sure the shard isn't already on the list.
 			var listItems:Array = animList.items;
 			for (var i:int = 0, l:int = listItems.length; i < l; i++) 
@@ -147,7 +147,7 @@ package menu
 					return;
 			}
 			
-			animList.addItem({name: currentSelectedShardName/*, shard: currentSelectedShard*/, type: currentSelectedShardTypeIsBase});
+			animList.addItem({name: currentSelectedShardName, type: currentSelectedShardTypeIsBase});
 			//if(animList.items.indexOf(
 			
 		}
@@ -229,7 +229,7 @@ package menu
 			}
 			else if (command == "SetShardDescription")
 			{
-				SetSelectedShard(value as String/*value[0] as AnimateShard, value[1] as String*/);
+				SetSelectedShard(value as String);
 			}
 			else if (command == "SetupShardsList")
 			{

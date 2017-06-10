@@ -24,6 +24,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 	import animations.background.*;
 	import menu.*;
 	import audio.MusicPlayer;
+	import com.lorentz.SVG.display.SVGDocument;
 	import com.lorentz.processing.ProcessExecutor;
 	import flash.display.*;
 	import com.jacksondunstan.signals.*;
@@ -59,8 +60,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		private var canvas:Canvas;// = new MasterTemplate();
 		
 		
-		private var layerInfoDict:Dictionary = new Dictionary();
-		private var animInfoDict:Dictionary = new Dictionary();
+		//private var layerInfoDict:Dictionary = new Dictionary();
+		//private var animInfoDict:Dictionary = new Dictionary();
 		//Main Stage is the movie clip where a major of the graphics are displayed
 		public var mainStage:MainStage;
 		//Keeps track of what keys were pressed and/or held down
@@ -116,7 +117,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var modsLoadedAtStartUp:Array;
 		
-		private var graphicSets:Dictionary = new Dictionary();
+		//private var graphicSets:Dictionary = new Dictionary();
 		
 		
 		
@@ -293,10 +294,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				{
 					musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName());
 				}*/
-				/*CONFIG::FPS60
-				{
-					musicPlayer.PlayMusic(0, 0);
-				}*/
+				
 				
 
 				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
@@ -340,6 +338,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					CompileAndSwitchAnimation(characterManager.GetAnimationListForCurrentCharacter(animId));
 					canvas.PlayAnimation(0);
 					backgroundMasterTimeline.gotoAndPlay(0);
+					CONFIG::FPS60
+					{
+						if (musicPlayer.IsBGMStopped())
+						{
+							musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), canvas.GetTimeInCurrentAnimation() * 1000);
+						}
+					}
+					
 				}
 			}
 			totalRunTime += difference;
@@ -985,10 +991,9 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 					UpdateAnimationMenuShardsList(charAnimationList);
 				}
 			}
-			else if (targetName == "FileLoaded")
+			else if (targetName == "LoadMenu_ProcessMod")
 			{
-				//Things may happen here but for now they don't.
-				
+				ProcessMod(value as Mod);				
 			}
 			else if (targetName == "Actor_ReportingAssetChanged")
 			{
@@ -1024,46 +1029,25 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			}
 			else if (targetName == "LoadMenu_LoadedSVGAsset")
 			{
-				var svgFileName:String = value[1] as String;
-				svgFileName = svgFileName.slice(0, svgFileName.indexOf(".svg"));
-				var svg:Sprite = value[0] as Sprite;
-				var nameParts:Array = svgFileName.split("_");
-				if (nameParts.length >= 3)
+				var messageData:MessageData = value as MessageData;
+				var svgSet:String = messageData.stringData[0];
+				var assetLayer:int = messageData.intData[0];
+				for (var i:int = 1, l:int = messageData.stringData.length; i < l; i++) 
 				{
-					var svgSet:String = nameParts[0];
-					var svgActor:String = nameParts[1];
-					var svgLayer:int = int(nameParts[2]);
-					var svgActorExtensions:Array;
-					if (nameParts.length >= 4)
-					{
-						svgActorExtensions = (nameParts[3] as String).split("-");
-					}
-					if (svgActorExtensions)
-					{
-						for (var i:int = 0, l:int = svgActorExtensions.length; i < l; i++) 
-						{
-							canvas.AddAssetToActor(svgActor+svgActorExtensions[i], new AssetData(svgSet, svg, svgLayer, null));
-						}
-					}
-					else
-					{
-						canvas.AddAssetToActor(svgActor, new AssetData(svgSet, svg, svgLayer, null));
-					}
-					/*this.addChild(svg);
-					svg.x = 480/2;
-					svg.y = 720 / 2;
-					var regPoint:Point = UtilityFunctions.GetAnchorPoint(svg);
-					var spr:Sprite = new Sprite();
-					spr.graphics.clear();
-					spr.graphics.beginFill(0xFF0000);
-					spr.graphics.drawCircle(0, 0, 2);
-					spr.graphics.endFill();
-					svg.addChild(spr);
-					spr.x = regPoint.x;
-					spr.y = regPoint.y;*/
-					
-					
+					canvas.AddAssetToActor(messageData.stringData[i], new AssetData(svgSet, messageData.spriteData[i-1], assetLayer, null));
 				}
+				/*this.addChild(svg);
+				svg.x = 480/2;
+				svg.y = 720 / 2;
+				var regPoint:Point = UtilityFunctions.GetAnchorPoint(svg);
+				var spr:Sprite = new Sprite();
+				spr.graphics.clear();
+				spr.graphics.beginFill(0xFF0000);
+				spr.graphics.drawCircle(0, 0, 2);
+				spr.graphics.endFill();
+				svg.addChild(spr);
+				spr.x = regPoint.x;
+				spr.y = regPoint.y;*/
 			}
 			else if (targetName == "AddedAssetToActorResult")
 			{
@@ -1249,10 +1233,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				for (var i:int = 0, l:int = Math.min(names.length, types.length); i < l; i++) 
 				{
 					//Verify that the shard exists
-					shard = shardLib.GetShard(animationId, (types[i] as Boolean/* == "Base"*/)/* ? true : false*/, names[i]);
+					shard = shardLib.GetShard(animationId, (types[i] as Boolean), names[i]);
 					if (shard)
 					{
-						shardsData[shardsData.length] = [names[i], types[i]/*, shard*/];
+						shardsData[shardsData.length] = [names[i], types[i]];
 					}
 				}
 				menuSignal2.dispatch("AnimMenu_ChangeAnimationSelected", list.TargetAnimationName);

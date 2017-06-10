@@ -367,7 +367,7 @@ package audio
 		}
 		
 		//returns whether any music is allowed to be played/heard
-		public function IsMusicPlaying():Boolean
+		public function IsMusicEnabled():Boolean
 		{
 			return canPlayMusic;
 		}
