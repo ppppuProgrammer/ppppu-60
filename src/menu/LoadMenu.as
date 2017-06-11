@@ -217,6 +217,16 @@ package menu
 			config = null;
 			dispatchEvent(e);
 		}
+		
+		CONFIG::debug
+		{
+		//Used when the reload menu button is pressed, allows the menu to clean up before it's removed and garbage collected.
+		public function Reset():void
+		{
+			this.removeChildren();
+			config = null;
+		}
+		}
 	}
 
 }

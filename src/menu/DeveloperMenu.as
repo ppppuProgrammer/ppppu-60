@@ -89,6 +89,7 @@ package menu
 		
 		public function RegisterDirectorForMessages(director:Director):void
 		{
+			if (director == null) { return;}
 			//Allow the director and menu to communicate with each other
 			signal2.addSlot(director);
 			director.RegisterMenuForMessaging(this);
@@ -118,7 +119,11 @@ package menu
 		
 		public function ClickEventHandler(target:Object/*e:MouseEvent*/):void
 		{
-			
+			var targetName:String = target["name"];
+			if (targetName == "reloadMenuBtn")
+			{
+				signal1.dispatch("DevMenu_ReloadSubMenus");
+			}
 		/*	if (targetName != "setFrameButton")
 			{
 				signal1.dispatch(targetName);
@@ -131,9 +136,9 @@ package menu
 			
 		}
 		
-		public function ChangeEventHandler(e:Event):void
+		public function ChangeEventHandler(target:Object):void
 		{
-			
+			var targetName:String = target["name"];
 			/*if (e.target.name == "tweenSelectSlider")
 			{
 				var serialTweenForElement:SerialTween = serialTweenDict[(config.getCompById("elementSelector") as ComboBox).selectedItem];
@@ -159,35 +164,17 @@ package menu
 			}*/
 		}
 		
-		public function SelectEventHandler(e:Event):void
+		public function SelectEventHandler(target:Object):void
 		{
-
+			var targetName:String = target["name"];
 			{
-				try
+				/*try
 				{
 				signal2.dispatch(e.target.name, e.target.selectedIndex);
 				}
-				catch (e:Error){}
+				catch (e:Error){}*/
 			}
 		}
-		
-		
-		
-		
-		
-		/*public function CompileShardsIntoAnimation():void
-		{
-			var shardsToCompile:Vector.<AnimateShard> = new Vector.<AnimateShard>();
-			var animList:List = config.getCompById("animList") as List
-			//Check to make sure the shard isn't already on the list.
-			var listItems:Array = animList.items;
-			
-			for (var i:int = 0, l:int = listItems.length; i < l; i++) 
-			{
-				shardsToCompile[shardsToCompile.length] = listItems[i].shard;
-			}
-			signal2.dispatch("CompileShards", shardsToCompile);
-		}*/
 		
 		public function FinishedLoadingXML(e:Event):void
 		{
@@ -207,29 +194,6 @@ package menu
 			//signal1.dispatch("MenuFinishedInitializing");
 		}
 		
-		
-		/*public function AddNewBodyType(name:String):void
-		{
-			var cbox:ComboBox = config.getCompById("bodyTypeSelector") as ComboBox;
-			if (cbox)
-			{
-				cbox.addItem(name);
-			}
-		}*/
-		
-		/*public function AddNewCharacter(name:String):void
-		{
-			var cbox:ComboBox = config.getCompById("characterSelector") as ComboBox;
-			if (cbox)
-			{
-				cbox.addItem(name);
-			}
-		}*/
-		
-		
-		
-		
-		
 		private function WriteToDebugOutput(textToAdd:String):void
 		{
 			var output:TextArea = config.getCompById("debugOutput") as TextArea;
@@ -247,8 +211,40 @@ package menu
 		public function onSignal2(targetName:*, value:*):void
 		{
 			var command:String = targetName as String;
+			if (command == "ClickEvent")
+			{
+				var compName:String = (value as Object)["name"];
+				if (config.getCompById(compName) != null)
+				{
+					ClickEventHandler(value as Object);
+				}
+			}
+			else if (command == "ChangeEvent")
+			{
+				var compName:String = (value as Object)["name"];
+				if (config.getCompById(compName) != null)
+				{
+					ChangeEventHandler(value as Object);
+				}
+			}
+			else if (command == "SelectEvent")
+			{
+				var compName:String = (value as Object)["name"];
+				if (config.getCompById(compName) != null)
+				{
+					SelectEventHandler(value as Object);
+				}
+			}
 		}
 		
-		
+		CONFIG::debug
+		{
+		//Used when the reload menu button is pressed, allows the menu to clean up before it's removed and garbage collected.
+		public function Reset():void
+		{
+			this.removeChildren();
+			config = null;
+		}
+		}
 	}
 }

@@ -7,7 +7,7 @@ package animations.background
 		{
 			timelineData = new Object();
 			timelineData.TIME_PER_FRAME = 0.03333333333333333;
-			timelineData.targetName = "Backlight";
+			timelineData.targetName = "BGLayer3";
 			var tweenPropVector:Vector.<Object> = new Vector.<Object>();
 			tweenPropVector[tweenPropVector.length]= {visible:false};
 			tweenPropVector[tweenPropVector.length]= {duration:59,transformMatrix:{a:1.037322998046875,b:0,c:0,d:0.986572265625,tx:69.75,ty:210.2}, colorTransform:{alphaMultiplier:0.5}};

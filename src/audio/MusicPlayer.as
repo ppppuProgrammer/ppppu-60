@@ -454,5 +454,15 @@ package audio
 				//trace(m_mainSoundChannel.position);
 			}
 		}
+		
+		public function GetListOfMusicNames():Vector.<String>
+		{
+			var musicList:Vector.<String> = new Vector.<String>();
+			for (var i:int = 0, l:int = musicCollection.length; i < l; i++) 
+			{
+				musicList[i] = musicCollection[i].GetMusicName();
+			}
+			return musicList;
+		}
 	}
 }

@@ -9,22 +9,33 @@ package animations
 	public class ExchangeableBackground extends Sprite 
 	{
 		public var currentlyUsedImage:Sprite;
-		public var spriteList:Vector.<Sprite> = new Vector.<Sprite>();
+		protected var spriteList:Vector.<Sprite> = new Vector.<Sprite>();
 		public function ExchangeableBackground() 
 		{
 			super();
 			
 		}
 		
+		public function GetSpriteList():Vector.<Sprite>
+		{
+			return spriteList;
+		}
+		
 		public function AddNewBackgroundAsset(asset:Sprite):Boolean
 		{
 			//var assetName:String = asset.name;
-			if (spriteList.indexOf(asset) == -1)
+			for (var i:int = 0, l:int = spriteList.length; i < l; i++) 
 			{
-				spriteList[spriteList.length] = asset;
-				return true;
+				if (spriteList[i].name == asset.name)
+				{
+					return false;
+				}
 			}
-			return false;
+
+			spriteList[spriteList.length] = asset;
+			return true;
+
+
 		}
 		
 		public function SelectBackgroundAsset(assetId:int):void
@@ -39,6 +50,7 @@ package animations
 				currentlyUsedImage = addChild(spriteList[assetId]) as Sprite;
 			}
 		}
+		
 		
 	}
 

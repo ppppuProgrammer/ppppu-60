@@ -2,8 +2,11 @@
 		
 		
 		<!-- Window 4 Debug output -->
-		<Window id="consoleWindow" title="NX developer debug output" x="0" y="0" width="480" height="300" hasMinimizeButton="false" minimized="false">
-			<TextArea id="debugOutput" x="0" y="0" width="480" height="280" editable="false"/>
+		<Window id="consoleWindow" title="NX developer debug output" x="0" y="0" width="480" height="300" hasMinimizeButton="false" minimized="false" draggable="false">
+			<VBox>
+				<TextArea id="debugOutput" width="480" height="250" editable="false"/>
+				<PushButton id="reloadMenuBtn" width="80" label="Reload Menu"/>
+			</VBox>
 		</Window>
 	
 </comps>

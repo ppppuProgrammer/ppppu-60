@@ -91,6 +91,7 @@ package animations
 		private var elementDict:Dictionary = new Dictionary();
 		private var actorDict:Dictionary = new Dictionary();
 		private var containers:Vector.<Sprite> = new Vector.<Sprite>();
+		private var knownGraphicSetNames:Vector.<String> = new Vector.<String>();
 		
 
 		//public var currentGraphicSets:Vector.<GraphicSet> = new Vector.<GraphicSet>();
@@ -425,6 +426,7 @@ package animations
 		{
 			var actor:Actor = actorDict[actorName];
 
+			
 			if (actor)
 			{
 				actor.AddAsset(data);
@@ -443,6 +445,10 @@ package animations
 				
 				//If an empty space didn't exist, add to the end of the vector
 				assetsInStorage[assetsInStorage.length] = [actorName, data];
+			}
+			if (knownGraphicSetNames.indexOf(data.setName) == -1)
+			{
+				knownGraphicSetNames[knownGraphicSetNames.length] = data.setName;
 			}
 		}
 		
@@ -937,6 +943,26 @@ package animations
 			}
 			return false;
 		}
+		
+		public function GetListOfActors():Vector.<String>
+		{
+			var actorNames:Vector.<String> = new Vector.<String>();
+			for (var name:String in actorDict) 
+			{
+				var actor:Actor = actorDict[name] as Actor;
+				if (actor)
+				{
+					actorNames[actorNames.length] = name;
+				}
+			}
+			return actorNames;
+		}
+		
+		public function GetListOfGraphicSetNames():Vector.<String>{
+			return knownGraphicSetNames;
+		}
+		
+		
 	}
 
 }

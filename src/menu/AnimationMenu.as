@@ -359,6 +359,14 @@ package menu
 				}
 				
 			}
+			else if (command == "AnimMenu_AddAnimationNamesToDropList")
+			{
+				var animationList:Vector.<String> = (value as MessageData).stringData;
+				for (var i:int = 0, l:int = animationList.length; i < l; i++) 
+				{
+					AddNewAnimation(animationList[i]);
+				}
+			}
 			else if (command == "FileLoaded")
 			{
 				var charAnimationList:List = config.getCompById("charAnimationsSelector") as List;
@@ -653,6 +661,16 @@ package menu
 			{
 				cbox.defaultLabel = defaultLabel;					
 			}
+		}
+		
+		CONFIG::debug
+		{
+		//Used when the reload menu button is pressed, allows the menu to clean up before it's removed and garbage collected.
+		public function Reset():void
+		{
+			this.removeChildren();
+			config = null;
+		}
 		}
 		
 	}

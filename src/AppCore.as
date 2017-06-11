@@ -1,25 +1,5 @@
 package  
 {
-	/*body type > animation > variation
-
-Currently:
-animation > body > timelines
-animation > character > timelines
-
-animation:
-character:
-body:
-variant:
-
-goals:
-There should be a base animation that a complete animation is built off of
-
-base + character specific body parts + character hair
-
-how to accomplish base + rosa body parts + peach hair (char is peach)
-* Can't have timelines tied to character.
-Need to set base. Need to add/replace with rosa body parts timelines. Need to then add peach hair timelines.*/
-	//import AnimationSettings.CowgirlInfo;
 	import animations.*;
 	import animations.background.*;
 	import menu.*;
@@ -58,10 +38,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		//A movie clip that holds all the body elements used to create an animation. This is to be a reference to a canvas instance created in the main stage (this is done for performance reasons, performance tanks if the canvas was created in as3.)
 		private var canvas:Canvas;// = new MasterTemplate();
-		
-		
-		//private var layerInfoDict:Dictionary = new Dictionary();
-		//private var animInfoDict:Dictionary = new Dictionary();
+
 		//Main Stage is the movie clip where a major of the graphics are displayed
 		public var mainStage:MainStage;
 		//Keeps track of what keys were pressed and/or held down
@@ -73,10 +50,7 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		
 		private var musicPlayer:MusicPlayer;
 		
-		//Counter to see just how long the flash has been running in milliseconds. Used for timing purposes such as controlling when to change characters.
-		//public var ppppuRunTimeCounter:Number = 0;
-		//private var previousUpdateTime:Number;
-		//private var runTimer:Timer;
+
 		private var firstTimeInLoop:Boolean = true;
 		/*Timing*/
 		private var totalRunTime:Number = 0;
@@ -126,8 +100,8 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 		{
 			//Create the "main stage" that holds the character template and various other movieclips such as the transition and backlight 
 			mainStage = new MainStage();
-			mainStage.Backlight.visible = mainStage.OuterDiamond.visible = mainStage.InnerDiamond.visible = 
-			mainStage.TransitionDiamond.visible = mainStage.DisplayArea.visible = mainStage.Compositor.visible = false;
+			mainStage.BGLayer1.visible = mainStage.BGLayer2.visible = mainStage.BGLayer3.visible = 
+			mainStage.BGLayer4.visible = mainStage.DisplayArea.visible = mainStage.Compositor.visible = false;
 			
 			//Hide the master template until everything is initialized
 			addChild(mainStage);
@@ -168,16 +142,14 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			mainStage.mouseEnabled = false;
 			mainStage.DisplayArea.mouseEnabled = false;
 			mainStage.DisplayArea.mouseChildren = false;
-			//mainStage.HelpLayer.mouseEnabled = false;
-			//mainStage.HelpLayer.mouseChildren = false;
-			mainStage.Backlight.mouseEnabled = false;
-			mainStage.Backlight.mouseChildren = false;
-			mainStage.InnerDiamond.mouseEnabled = false;
-			mainStage.InnerDiamond.mouseChildren = false;
-			mainStage.OuterDiamond.mouseChildren = false;
-			mainStage.OuterDiamond.mouseEnabled = false;
-			mainStage.TransitionDiamond.mouseChildren = false;
-			mainStage.TransitionDiamond.mouseEnabled = false;
+			mainStage.BGLayer1.mouseEnabled = false;
+			mainStage.BGLayer1.mouseChildren = false;
+			mainStage.BGLayer2.mouseEnabled = false;
+			mainStage.BGLayer2.mouseChildren = false;
+			mainStage.BGLayer3.mouseChildren = false;
+			mainStage.BGLayer3.mouseEnabled = false;
+			mainStage.BGLayer4.mouseChildren = false;
+			mainStage.BGLayer4.mouseEnabled = false;
 			
 			//Master template mouse event disabling
 			canvas.mouseChildren = false;
@@ -196,22 +168,23 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			backgroundMasterTimeline = BetweenAS3.parallelTweens(bg) as ParallelTween;
 			//backgroundMasterTimeline.stopOnComplete = false;
 			
-			var planetBGMod:BackgroundAssetMod = new BackgroundAssetMod(new PlanetBackground, "Standard", "Background", null);
-		var outerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new OuterDiamondBG, "Standard", "OuterDiamond", {Colorable:{Group: "ODiamondColor1", Target:"this"}});
+			var planetBGMod:BackgroundAssetMod = new BackgroundAssetMod(new PlanetBackground, "Standard", "BGLayer0", null);
+		var outerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new OuterDiamondBG, "Standard", "BGLayer4", {Colorable:{Group: "ODiamondColor1", Target:"this"}});
 			
-			var innerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new InnerDiamondBG, "Standard", "InnerDiamond", {Colorable: { Group: ["IDiamondColor1", "IDiamondColor2", "IDiamondColor3", "IDiamondColor4"], Target: ["Color1", "Color2", "Color3", "Color4"] }});
-		var transitionBGMod:BackgroundAssetMod = new BackgroundAssetMod(new TransitionDiamondBG, "Standard", "TransitionDiamond", {Colorable:{ Group: ["TDiamondColor1", "TDiamondColor2", "TDiamondColor3", "TDiamondColor4", "TDiamondColor5"], Target: ["Color1", "Color2", "Color3", "Color4", "Color5"] }});
-	var lightBGMod:BackgroundAssetMod = new BackgroundAssetMod(new Light, "Standard", "Backlight", {Colorable:{ Group: "BackLight", Target: "this" }});
+			var innerBGMod:BackgroundAssetMod = new BackgroundAssetMod(new InnerDiamondBG, "Standard", "BGLayer1", {Colorable: { Group: ["IDiamondColor1", "IDiamondColor2", "IDiamondColor3", "IDiamondColor4"], Target: ["Color1", "Color2", "Color3", "Color4"] }});
+		var transitionBGMod:BackgroundAssetMod = new BackgroundAssetMod(new TransitionDiamondBG, "Standard", "BGLayer2", {Colorable:{ Group: ["TDiamondColor1", "TDiamondColor2", "TDiamondColor3", "TDiamondColor4", "TDiamondColor5"], Target: ["Color1", "Color2", "Color3", "Color4", "Color5"] }});
+	var lightBGMod:BackgroundAssetMod = new BackgroundAssetMod(new Light, "Standard", "BGLayer3", {Colorable:{ Group: "BackLight", Target: "this" }});
+	
 			ProcessMod(planetBGMod);
 			ProcessMod(outerBGMod);
 			ProcessMod(innerBGMod);
 			ProcessMod(transitionBGMod);
 			ProcessMod(lightBGMod);
-			mainStage.InnerDiamond.SelectBackgroundAsset(0);
-			mainStage.OuterDiamond.SelectBackgroundAsset(0);
-			mainStage.TransitionDiamond.SelectBackgroundAsset(0);
-			mainStage.Background.SelectBackgroundAsset(0);
-			mainStage.Backlight.SelectBackgroundAsset(0);
+			mainStage.BGLayer1.SelectBackgroundAsset(0);
+			mainStage.BGLayer4.SelectBackgroundAsset(0);
+			mainStage.BGLayer2.SelectBackgroundAsset(0);
+			mainStage.BGLayer0.SelectBackgroundAsset(0);
+			mainStage.BGLayer3.SelectBackgroundAsset(0);
 			
 			registerClassAlias("AnimationList", animations.AnimationList);
 			
@@ -275,29 +248,10 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			{
 				System.pauseForGCIfCollectionImminent(1);
 				System.pauseForGCIfCollectionImminent(1);
-				//SwitchCharacter(0);
-				//SwitchTemplateAnimation(0);
-				//backgroundMasterTimeline.gotoAndPlay(0);
-				//var bgTimelines:Array = backgroundMasterTimeline.getChildren(true, false);
-				/*for each (var tl:TimelineLite in bgMasterTimelineChildren)
-				{
-					tl.play(0);
-				}*/
-				//masterTemplate.PlayAnimation(0);
+
 				canvas.visible = true;
 				firstTimeInLoop = false;
 				lastUpdateTime = getTimer();
-				
-				//previousUpdateTime = backgroundMasterTimeline.position;// .totalTime();//(getTimer() / 1000.0);
-				//ppppuRunTimeCounter = 0;
-				/*CONFIG::NX
-				{
-					musicPlayer.PlayMusic(musicPlayer.GetIdOfMusicByName());
-				}*/
-				
-				
-
-				//trace("bg:" + backgroundMasterTimeline.time() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
 			}
 			
 			
@@ -351,71 +305,6 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 			totalRunTime += difference;
 			lastUpdateTime = currentUpdateTime;
 			
-			//var idOfMusicToPlay:int = musicPlayer.GetMusicIdByName(musicPlayer.GetNameOfCurrentMusic());
-			//if (menuModeActive && !musicPlayer.IsBGMStopped())
-			//{
-				//musicPlayer.PauseMusic();
-				////musicPlayer.StopMusic();
-			//}
-			//else if (!menuModeActive && musicPlayer.IsBGMStopped() && idOfMusicToPlay > -1)
-			//{
-				//musicPlayer.ResumeMusic(canvas.GetTimeInCurrentAnimation() * 1000);
-			//}
-			//else if ()
-			//{
-				//musicPlayer.PlayMusic();
-			//}
-			//else if(!menuModeActive && musicPlayer.IsBGMStopped() && idOfMusicToPlay == -1)
-			//{
-				//musicPlayer.StopMusic();
-			//}
-			
-			//
-			//canvas.CompileAnimation(characterManager.GetAnimationListForCurrentCharacter(animId), animationNameIndexes[animId]);
-			//Need to get the index that targets the given animation id. 
-			//var currentCharacterIdTargets:Vector.<int> = characterManager.GetIdTargetsOfCurrentCharacter();
-			//var target:int = currentCharacterIdTargets.indexOf(animId);
-			//mainMenu.UpdateAnimationIndexSelected(target, charsWereSwitched);
-			
-			/*else
-			{
-				var latestUpdateTime:Number = backgroundMasterTimeline.totalTime();// (getTimer() / 1000.0);
-				ppppuRunTimeCounter += (latestUpdateTime - previousUpdateTime);
-				//trace(ppppuRunTimeCounter);
-				previousUpdateTime = latestUpdateTime;
-				//trace("bg:" + backgroundMasterTimeline.totalTime() + " char:" +masterTemplate.GetTimeInCurrentAnimation() + " run: " + ppppuRunTimeCounter);
-			}
-			
-			//Note: This assumes that master timeline's time and the run loop's time are sync'd. Worse case might require accessing the master timeline's time every update.
-			if (ppppuRunTimeCounter >= animationDuration)
-			{
-				//Time to switch to a random animation and the other character
-				//Hardcoded for 60 fps test. Do not do this for the NX version
-				var currentCharID:int = currentCharacter.GetID();
-				if (currentCharID == 1)
-				{
-					SwitchCharacter(0);
-				}
-				else
-				{
-					SwitchCharacter(++currentCharID);
-				}
-				
-				var randomAnimSelect:int = Math.floor((Math.random() * animationNameIndexes.length));
-				while (!timelineLib.DoesBaseTimelinesForAnimationExist(randomAnimSelect))
-				{
-					randomAnimSelect = Math.floor((Math.random() * animationNameIndexes.length));
-				}
-				System.pauseForGCIfCollectionImminent(1);
-				//var startFuncTime:int = getTimer();
-				SwitchTemplateAnimation(randomAnimSelect);
-				//trace("SwitchTemplateAnimation complete time(ms): " + (getTimer() - startFuncTime));
-				ppppuRunTimeCounter -= animationDuration;
-			}
-				//if (playSounds)
-				//{
-					//charVoiceSystem.Tick(animationFrame);
-				//}*/
 		}
 		
 		//Activated if a key is detected to be released. Sets the keys "down" status to false
@@ -826,6 +715,38 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
 				}
 			}
+			else if (target == "DevMenu_ReloadSubMenus")
+			{
+				mainMenu.ReloadSubMenus(this);
+			}
+			else if (target == "MainMenu_MenuReloadFinished")
+			{
+				//Repopulate the Character Sub Menu 
+				var messsageData:MessageData = new MessageData();
+				var i:int = 0; var l:int = characterManager.GetTotalNumOfCharacters();
+				for (i; i < l; i++) 
+				{
+					messsageData.stringData[messsageData.stringData.length] = characterManager.GetCharacterNameById(i);
+				}
+				menuSignal2.dispatch("CharMenu_ListOfCharactersToAdd", messsageData);
+				
+				//Add Music Names to music menu
+				//var musicList:MessageData = new MessageData();
+				messsageData.stringData = musicPlayer.GetListOfMusicNames();
+				menuSignal2.dispatch("MusicMenu_ListOfMusicToAdd", messsageData);
+				
+				//Add Animation names to animation menu
+				messsageData.stringData = GetListOfAnimationNames();
+				menuSignal2.dispatch("AnimMenu_AddAnimationNamesToDropList", messsageData);
+				
+				//Add actor names to custom menu
+				messsageData.stringData = canvas.GetListOfActors();
+				menuSignal2.dispatch("CustomMenu_AddActorNames", messsageData);
+				
+				messsageData.stringData = canvas.GetListOfGraphicSetNames();
+				menuSignal2.dispatch("CustomMenu_AddGraphicSetNames", messsageData);
+				
+			}
 		}
 		
 		public function onSignal2(targetName:*, value:*):void
@@ -1064,6 +985,20 @@ Need to set base. Need to add/replace with rosa body parts timelines. Need to th
 							canvas.ChangeAssetForActor(actorName, assetSetName, value[2] as int);
 						}
 					}
+				}
+			}
+			else if (targetName == "CustomMenu_GetBackgroundLayerAssetsRequest")
+			{
+				var bgData:MessageData = value as MessageData;
+				
+				var bgLayer:ExchangeableBackground = mainStage["BGLayer" + String(bgData.intData[0])] as ExchangeableBackground;
+				
+				if (bgLayer)
+				{
+					//var bgResponseData:MessageData = new MessageData;
+					//Recycling's pretty cool, so reuse the message data that came with the request
+					bgData.spriteData = bgLayer.GetSpriteList();
+					menuSignal2.dispatch("CustomMenu_GetBackgroundLayerAssetsResponse", bgData);
 				}
 			}
 		}

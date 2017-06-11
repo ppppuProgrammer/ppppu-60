@@ -105,7 +105,13 @@ package menu
 			signal1 = new Signal1;
 			signal1.addSlot(app);
 			signal2 = new Signal2;
+			CreateSubmenus(app, director);
 			
+		}
+		
+		
+		private function CreateSubmenus(app:AppCore, director:Director):void
+		{
 			CONFIG::debug 
 			{
 				developerMenu = CreateSubmenu(DeveloperMenu) as DeveloperMenu;
@@ -310,6 +316,95 @@ package menu
 				--submenuCreated;
 			}
 			return submenu;
+		}
+		
+		CONFIG::debug {
+			private function ResetSubMenus():void
+			{
+				submenuLoadFinishedCount = 0;
+				ResetSubMenu(characterMenu);
+				ResetSubMenu(customizationMenu);
+				ResetSubMenu(musicMenu);
+				ResetSubMenu(loadMenu);
+				ResetSubMenu(animationMenu);
+				ResetSubMenu(developerMenu);
+			}
+			
+			private function ResetSubMenu(submenu:ISubMenu):void
+			{
+				if (submenu)
+				{
+					submenu.Reset();
+					//Need submenu to be on the display list for events
+					addChild(submenu as DisplayObject);
+				}
+			}
+			
+			public function ReloadSubMenus(app:AppCore):void
+			{
+				ResetSubMenus();
+				addEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
+				addEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
+				InitializeAllSubmenus(app, null);
+			}
+			
+			private function MenuReloadFailed(e:IOErrorEvent):void
+			{
+				++submenuLoadFinishedCount;
+				DidSubmenuReloadSuccessfully(e.target as ISubMenu, false);
+				removeChild(e.target as DisplayObject);
+				if (submenuLoadFinishedCount >= submenuCreated)	{
+					RemoveReloadEventListeners();
+				}
+			}
+			
+			private function DidSubmenuReloadSuccessfully(submenu:ISubMenu, success:Boolean):void
+			{
+				switch(submenu)
+				{
+					case characterMenu:
+						buttonGroup[0].enabled = success;					
+						break;
+					case musicMenu: 
+						buttonGroup[1].enabled = success;	
+						break;
+					case animationMenu: 
+						buttonGroup[2].enabled = success;	
+						break;
+					case customizationMenu:
+						buttonGroup[3].enabled = success;	
+						break;
+					case loadMenu: 
+						buttonGroup[4].enabled = success;	
+						break;
+					case developerMenu:
+						buttonGroup[5].enabled = success;	
+						break;					
+				}
+			}
+			
+			private function MenusReloadReadyCheck(e:Event):void
+			{
+				++submenuLoadFinishedCount;
+				DidSubmenuReloadSuccessfully(e.target as ISubMenu, true);
+				removeChild(e.target as DisplayObject);
+				if (submenuLoadFinishedCount >= submenuCreated)
+				{
+					RemoveReloadEventListeners();
+				}
+			}
+			
+			private function RemoveReloadEventListeners():void
+			{
+				removeEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
+				removeEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
+				this.visible = true;
+				if (currentSubmenu && currentSubmenu.parent == null)
+				{
+					addChild(currentSubmenu);
+				}
+				signal1.dispatch("MainMenu_MenuReloadFinished");
+			}
 		}
 	}
 

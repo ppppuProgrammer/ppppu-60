@@ -83,11 +83,7 @@ package menu
 			}
 			else if (command == "MusicMenu_AddMusicToSelectionList")
 			{
-				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
-				if (musicSelectDroplist)
-				{
-					musicSelectDroplist.addItem(value as String);
-				}
+				AddMusicNameToDropList(value as String);
 			}
 			else if (command == "MusicMenu_ChangeSelectedMusicResult")
 			{
@@ -95,6 +91,14 @@ package menu
 				if (musicSelectDroplist)
 				{
 					musicSelectDroplist.selectedIndex = value as int;
+				}
+			}
+			else if (command == "MusicMenu_ListOfMusicToAdd")
+			{
+				var musicList:MessageData = value as MessageData;
+				for (var i:int = 0, l:int = musicList.stringData.length; i < l; i++) 
+				{
+					AddMusicNameToDropList(musicList.stringData[i]);
 				}
 			}
 		}
@@ -157,6 +161,24 @@ package menu
 			dispatchEvent(e);
 		}
 		
+		[inline]
+		private function AddMusicNameToDropList(musicName:String):void
+		{
+			var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
+			if (musicSelectDroplist){
+				musicSelectDroplist.addItem(musicName);
+			}	
+		}
+		
+		CONFIG::debug
+		{
+		//Used when the reload menu button is pressed, allows the menu to clean up before it's removed and garbage collected.
+		public function Reset():void
+		{
+			this.removeChildren();
+			config = null;
+		}
+		}
 	}
 
 }

@@ -44,6 +44,7 @@ package menu
 		{
 			config = new MinimalConfigurator(this);
 			app.SetupMenuHooks(null, this);
+			signal2.addSlot(app);
 			config.addEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.addEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
 			CONFIG::debug {
@@ -59,6 +60,7 @@ package menu
 		
 		public function RegisterDirectorForMessages(director:Director):void
 		{
+			if (director == null) { return;}
 			//Allow the director and menu to communicate with each other
 			signal2.addSlot(director);
 			director.RegisterMenuForMessaging(this);
@@ -102,6 +104,7 @@ package menu
 		public function onSignal2(targetName:*, value:*):void
 		{
 			var command:String = targetName as String;
+			var messageData:MessageData = value as MessageData;
 			if (command == "ClickEvent")
 			{
 				var compName:String = (value as Object)["name"];
@@ -134,6 +137,22 @@ package menu
 					AddNewActor(actorName);
 				}
 			}
+			else if (command == "CustomMenu_AddActorNames")
+			{
+				var actorList:Vector.<String> = (value as MessageData).stringData;
+				for (var i:int = 0, l:int = actorList.length; i < l; i++) 
+				{
+					AddNewActor(actorList[i]);
+				}
+			}
+			else if (command == "CustomMenu_AddGraphicSetNames")
+			{
+				var gfxSetNameList:Vector.<String> = (value as MessageData).stringData;
+				for (var i:int = 0, l:int = gfxSetNameList.length; i < l; i++) 
+				{
+					AddNewGraphicSet(gfxSetNameList[i]);
+				}
+			}
 			else if (command == "AssetListDelivery")
 			{
 				
@@ -141,27 +160,20 @@ package menu
 				var assetGuiSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;	
 				
 				var assetList:Vector.<Object> = value as Vector.<Object>;
+				//var assetListSprites:Vector.<Sprite> = new Vector.<Sprite>;
 				if (!assetGuiSlider || !assetList) { return; }
 				assetGuiSlider.removeAll();
-				var items:Array = [];
+				//var items:Array = [];
 				
+				
+				//var previews:Vector.<Sprite> = RetrieveListOfPreviewSprites(assetList);
 				for (var y:int = 0, z:int = assetList.length; y < z; y++) 
 				{
+					
 					if (assetList[y] != null)
 					{
 						var item:Object = { };
-						var spriteClass:Class = (assetList[y] as Object).AssetClass as Class;
-						if (!(spriteClass in assetPreviewSprites))
-						{
-							var previewSprite:Sprite = new spriteClass();
-
-							assetPreviewSprites[spriteClass] = previewSprite;
-							
-							//the preview sprite isn't (or at least shouldn't be) subject to changes it can be cached as a bitmap for performance.
-							previewSprite.cacheAsBitmap = true;
-							previewSprite.mouseEnabled = previewSprite.mouseChildren = false;
-						}
-						item.displayImage = assetPreviewSprites[spriteClass];
+						item.displayImage = CreateSpritePreview((assetList[y] as Object).AssetClass);
 						item.displayName = (assetList[y] as Object).AssetSet as String;
 						item.layer = (assetList[y] as Object).AssetLayer as int;
 						assetGuiSlider.addItem(item);
@@ -173,6 +185,23 @@ package menu
 			{
 				
 				AddNewGraphicSet(value[1] as String);
+			}
+			else if (command == "CustomMenu_GetBackgroundLayerAssetsResponse")
+			{
+				var bgAssets:Vector.<Sprite> = messageData.spriteData;
+				var assetGuiSlider:HGUISlider = config.getCompById("backgroundAssetSelectSlider") as HGUISlider;
+				if (!assetGuiSlider || !bgAssets) { return; }
+				assetGuiSlider.removeAll();
+				
+				var previews:Vector.<Sprite> = RetrieveListOfPreviewSprites(bgAssets);
+				
+				for (var i:int = 0,l:int = bgAssets.length; i < l; i++) 
+				{
+					var item:Object = { };
+					item.displayImage = previews[i];
+					item.displayName = bgAssets[i].name;
+					assetGuiSlider.addItem(item);
+				}
 			}
 			
 		}
@@ -251,6 +280,20 @@ package menu
 				}
 				
 			}
+			else if (target.name == "backgroundAssetInformation")
+			{
+				var assetText:TextArea = config.getCompById("backgroundAssetInformation") as TextArea;
+				var item:Object;
+				var hguiSlider:HGUISlider = (target as HGUISlider);
+				if (hguiSlider.selectedItem != null)
+				{
+					item = hguiSlider.selectedItem;
+				}
+				if (item)
+				{
+					assetText.text = StringUtil.substitute("Name: {0}", item.displayName);
+				}
+			}
 			
 		}
 		
@@ -265,6 +308,16 @@ package menu
 					signal2.dispatch("ActorAssetListRequest", actorName);
 				}			
 			}
+			else if (target.name == "backgroundSelector")
+			{	
+				var backgroundSelector:ComboBox = config.getCompById("backgroundSelector") as ComboBox;
+				if (backgroundSelector)
+				{
+					var bgSelectData:MessageData = new MessageData();
+					bgSelectData.intData[0] = backgroundSelector.selectedIndex;
+					signal2.dispatch("CustomMenu_GetBackgroundLayerAssetsRequest", bgSelectData);
+				}
+			}
 			
 		}
 		
@@ -274,6 +327,20 @@ package menu
 		{
 			config.removeEventListener(Event.COMPLETE, FinishedLoadingXML);
 			config.removeEventListener(IOErrorEvent.IO_ERROR, FailedLoadingXML);
+			var backgroundSelector:ComboBox = config.getCompById("backgroundSelector") as ComboBox;
+			if (backgroundSelector)
+			{
+				backgroundSelector.addItem("BGLayer0");
+				backgroundSelector.addItem("BGLayer1");
+				backgroundSelector.addItem("BGLayer2");
+				backgroundSelector.addItem("BGLayer3");
+				backgroundSelector.addItem("BGLayer4");
+				//backgroundSelector.addItem("BG Layer 0");
+				//backgroundSelector.addItem("InnerDiam");
+				//backgroundSelector.addItem("InnerDiam");
+				//backgroundSelector.addItem("InnerDiam");
+				//backgroundSelector.addItem("InnerDiam");
+			}
 			dispatchEvent(e);
 		}
 		
@@ -285,6 +352,51 @@ package menu
 			signal2 = null;
 			config = null;
 			dispatchEvent(e);
+		}
+		
+		private function CreateSpritePreview(spriteClass:Class):Sprite
+		{
+			if (!(spriteClass in assetPreviewSprites))
+			{
+				var previewSprite:Sprite = new spriteClass();
+
+				assetPreviewSprites[spriteClass] = previewSprite;
+				
+				//the preview sprite isn't (or at least shouldn't be) subject to changes it can be cached as a bitmap for performance.
+				previewSprite.cacheAsBitmap = true;
+				previewSprite.mouseEnabled = previewSprite.mouseChildren = false;
+				return previewSprite;
+			}
+			return assetPreviewSprites[spriteClass];
+		}
+		
+		private function RetrieveListOfPreviewSprites(displayObjects:Vector.<Sprite>):Vector.<Sprite>
+		{
+			var previewList:Vector.<Sprite> = new Vector.<Sprite>;
+			var displayObject:DisplayObject;
+			for (var y:int = 0, z:int = displayObjects.length; y < z; y++) 
+			{
+				displayObject = displayObjects[y] as DisplayObject;
+				if (displayObject != null)
+				{
+					var item:Object = { };
+					var spriteClass:Class = (displayObject as Object).constructor as Class;					
+					
+					
+					previewList[previewList.length] = CreateSpritePreview(spriteClass);
+				}
+			}
+			return previewList;
+		}
+		
+		CONFIG::debug
+		{
+		//Used when the reload menu button is pressed, allows the menu to clean up before it's removed and garbage collected.
+		public function Reset():void
+		{
+			this.removeChildren();
+			config = null;
+		}
 		}
 		
 	}

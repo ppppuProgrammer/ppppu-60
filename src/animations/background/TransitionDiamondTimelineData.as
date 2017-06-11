@@ -7,7 +7,7 @@ package animations.background
 		{
 			timelineData = new Object();
 			timelineData.TIME_PER_FRAME = 0.03333333333333333;
-			timelineData.targetName = "TransitionDiamond";
+			timelineData.targetName = "BGLayer2";
 			var tweenPropVector:Vector.<Object> = new Vector.<Object>();
 			tweenPropVector[tweenPropVector.length]= {visible:true,transformMatrix:{a:1.79998779296875,b:0,c:0,d:1.79998779296875,tx:-99.099,ty:95.3}};
 			tweenPropVector[tweenPropVector.length]= {duration:1,visible:false,transformMatrix:{a:1.7199859619140625,b:0,c:0,d:1.7199859619140625,tx:-83.949,ty:105.75}};

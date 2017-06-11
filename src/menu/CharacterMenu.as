@@ -108,8 +108,7 @@ package menu
 			}
 			else if (command == "AddNewCharacter")
 			{
-				var charList:List = config.getCompById("charSelectList") as List;
-				charList.addItem(value as String);
+				AddCharacter(value as String);
 			}
 			else if (command == "CharMenu_CharacterInfoDelivery")
 			{
@@ -217,6 +216,20 @@ package menu
 				//unlockRadioBtn.draw();
 					//lockRadioBtn.draw();
 			}
+			else if (command == "CharMenu_ListOfCharactersToAdd")
+			{
+				var characterList:MessageData = value as MessageData;
+				for (var i:int = 0, l:int = characterList.stringData.length; i < l; i++) {
+					AddCharacter(characterList.stringData[i]);
+				}
+			}
+		}
+		
+		[inline]
+		private function AddCharacter(charName:String):void
+		{
+			var charList:List = config.getCompById("charSelectList") as List;
+			charList.addItem(charName);
 		}
 		
 		public function ClickEventHandler(target:Object):void
@@ -302,7 +315,15 @@ package menu
 			}
 		}
 		
-		
+		CONFIG::debug
+		{
+		//Used when the reload menu button is pressed, allows the menu to clean up before it's removed and garbage collected.
+		public function Reset():void
+		{
+			this.removeChildren();
+			config = null;
+		}
+		}
 	}
 
 }

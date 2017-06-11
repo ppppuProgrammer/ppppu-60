@@ -1,5 +1,5 @@
 <comps>
-	<!-- Window 3 Actor window -->
+	<!-- Window 1 Actor window -->
 	 <Window id="actorWindow" title="Graphic select" x="0" y="0" width="480" height="170" hasMinimizeButton="false" minimized="false" draggable="false">
 		<ComboBox id="actorSelector" x="0" y="00" width="140" height="20"/>
 		<HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="0" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
@@ -250,6 +250,9 @@
 		</HBox>
 	</Window>
 	
-	<Window id="backgroundWindow" title="Background Editor" x="0" y="500" width="480" height="200" enabled="false" draggable="false">
+	<Window id="backgroundWindow" title="Background Editor" x="0" y="500" width="480" height="200" draggable="false">
+			<ComboBox id="backgroundSelector" x="0" y="0" width="140" height="20"/>
+			<HGUISlider id="backgroundAssetSelectSlider" x="210" y="0" width="300" minimum ="0" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
+			<TextArea id="backgroundAssetInformation" x="219" y="15" width="250" height="50" editable="false"/>
 	</Window>
 </comps>
