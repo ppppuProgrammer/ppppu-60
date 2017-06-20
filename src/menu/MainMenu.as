@@ -37,6 +37,7 @@ package menu
 		//private 
 		private var submenuLoadFinishedCount:int = 0;
 		private var submenuCreated:int;
+		private var creatingSubmenus:Boolean = false;
 		
 		private var buttonGroup:Vector.<PushButton> = new Vector.<PushButton>();
 		private var signal1:Signal1;
@@ -112,6 +113,7 @@ package menu
 		
 		private function CreateSubmenus(app:AppCore, director:Director):void
 		{
+			creatingSubmenus = true;
 			CONFIG::debug 
 			{
 				developerMenu = CreateSubmenu(DeveloperMenu) as DeveloperMenu;
@@ -196,10 +198,7 @@ package menu
 					eventButton.selected = true;
 				}
 				
-				if (currentSubmenu != null)
-				{
-					submenuContainer.addChild(currentSubmenu);
-				}
+				
 			}
 			else
 			{
@@ -228,6 +227,7 @@ package menu
 					currentSubmenu.parent.removeChild(currentSubmenu);
 				}
 				currentSubmenu = submenu;
+				submenuContainer.addChild(currentSubmenu);
 			}
 		}
 		
@@ -285,7 +285,7 @@ package menu
 			
 			if (submenuLoadFinishedCount >= submenuCreated)
 			{
-				RemoveEventListeners();
+				RemoveEventListeners(false);
 			}
 		}
 		
@@ -295,16 +295,29 @@ package menu
 			this.removeChild(e.target as DisplayObject);
 			if (submenuLoadFinishedCount >= submenuCreated)
 			{
-				RemoveEventListeners();
+				RemoveEventListeners(false);
 			}
 		}	
 		
-		private function RemoveEventListeners():void
+		private function RemoveEventListeners(reloadVersion:Boolean):void
 		{
-			removeEventListener(Event.COMPLETE, MenusReadyCheck, true);
-			removeEventListener(IOErrorEvent.IO_ERROR, MenuLoadFailed, true);
 			this.visible = true;
-			signal1.dispatch("MenuFinishedInitializing");
+			creatingSubmenus = false;
+			
+			if (reloadVersion)
+			{
+				removeEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
+				removeEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
+				SwitchSubmenu(currentSubmenu);
+				signal1.dispatch("MainMenu_MenuReloadFinished");
+			}
+			else
+			{
+				removeEventListener(Event.COMPLETE, MenusReadyCheck, true);
+				removeEventListener(IOErrorEvent.IO_ERROR, MenuLoadFailed, true);
+				signal1.dispatch("MenuFinishedInitializing");
+			}
+			
 		}
 		
 		private function CreateSubmenu(menuClass:Class):ISubMenu
@@ -319,6 +332,15 @@ package menu
 		}
 		
 		CONFIG::debug {
+			public function ReloadSubMenus(app:AppCore):void
+			{
+				if (creatingSubmenus) { return; }
+				ResetSubMenus();
+				addEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
+				addEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
+				InitializeAllSubmenus(app, null);
+			}
+			
 			private function ResetSubMenus():void
 			{
 				submenuLoadFinishedCount = 0;
@@ -338,15 +360,7 @@ package menu
 					//Need submenu to be on the display list for events
 					addChild(submenu as DisplayObject);
 				}
-			}
-			
-			public function ReloadSubMenus(app:AppCore):void
-			{
-				ResetSubMenus();
-				addEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
-				addEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
-				InitializeAllSubmenus(app, null);
-			}
+			}	
 			
 			private function MenuReloadFailed(e:IOErrorEvent):void
 			{
@@ -354,7 +368,7 @@ package menu
 				DidSubmenuReloadSuccessfully(e.target as ISubMenu, false);
 				removeChild(e.target as DisplayObject);
 				if (submenuLoadFinishedCount >= submenuCreated)	{
-					RemoveReloadEventListeners();
+					RemoveEventListeners(true);
 				}
 			}
 			
@@ -386,25 +400,26 @@ package menu
 			private function MenusReloadReadyCheck(e:Event):void
 			{
 				++submenuLoadFinishedCount;
-				DidSubmenuReloadSuccessfully(e.target as ISubMenu, true);
-				removeChild(e.target as DisplayObject);
+				var subMenu:DisplayObject = (e.target as DisplayObject);
+				DidSubmenuReloadSuccessfully(subMenu as ISubMenu, true);
+				if (subMenu.parent != null){
+					subMenu.parent.removeChild(subMenu);
+				}
 				if (submenuLoadFinishedCount >= submenuCreated)
 				{
-					RemoveReloadEventListeners();
+					RemoveEventListeners(true);
 				}
 			}
 			
-			private function RemoveReloadEventListeners():void
-			{
-				removeEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
-				removeEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
-				this.visible = true;
-				if (currentSubmenu && currentSubmenu.parent == null)
-				{
-					addChild(currentSubmenu);
-				}
-				signal1.dispatch("MainMenu_MenuReloadFinished");
-			}
+			//private function RemoveReloadEventListeners():void
+			//{
+				//removeEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
+				//removeEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
+				//this.visible = true;
+				//creatingSubmenus = false;
+				//SwitchSubmenu(currentSubmenu);
+				//signal1.dispatch("MainMenu_MenuReloadFinished");
+			//}
 		}
 	}
 

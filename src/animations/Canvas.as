@@ -471,7 +471,7 @@ package animations
 			return result;
 		}
 		
-		public function ChangeGraphicSets(gfxSetList:Array):void
+		/*public function ChangeGraphicSets(gfxSetList:Array):void
 		{
 			if (gfxSetList)
 			{
@@ -481,7 +481,7 @@ package animations
 				}
 			}
 			
-		}
+		}*/
 		
 		[Inline]
 		//final public function ChangeElementDepths(depthLayout:Object):void
@@ -640,11 +640,16 @@ package animations
 		
 		public function ChangeActorAssetsUsingSetNames(setNamesList:Array):void
 		{
-			if (setNamesList == null) { return;}
+			if (setNamesList == null) { return; }
+			
+			var messageData:MessageData = new MessageData;
+			
 			for (var i:int = 0, l:int = setNamesList.length; i < l; i++) 
 			{
-				director.ChangeAssetForAllActorsBySetName(setNamesList[i], true);
+				messageData.stringData[i] = setNamesList[i];
+				messageData.boolData[i] = true;
 			}
+			director.ChangeAssetForAllActorsBySetName(messageData);
 		}
 		
 		public function ChangeActorAssetsUsingCharacterData(data:Object):void
@@ -664,7 +669,7 @@ package animations
 		}
 		
 		public function ChangeAssetForActor(actor:String, asset:String, layer:int):void
-		{
+		{	
 			director.ChangeAssetForActorBySetName(actor, asset, layer);
 		}
 		

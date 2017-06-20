@@ -2,9 +2,14 @@
 	<!-- Window 1 Actor window -->
 	 <Window id="actorWindow" title="Graphic select" x="0" y="0" width="480" height="170" hasMinimizeButton="false" minimized="false" draggable="false">
 		<ComboBox id="actorSelector" x="0" y="00" width="140" height="20"/>
-		<HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="0" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
+		<HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="-1" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
 		<TextArea id="assetInformation" x="219" y="15" width="250" height="50" editable="false"/>
-		<PushButton id="applyAssetToActorButton" x="250" y="70" label="Set/Unset graphic for selected actor" width="180"/>
+		<HBox x="250" y="75" spacing="10">
+			<RadioButton id="bottomLayerAssetsButton" label="Bottom" width="60" groupName="ActorAssetLayerGroup" />
+			<RadioButton id="mainLayerAssetsButton" label="Main" width="60" groupName="ActorAssetLayerGroup" selected="true" />
+			<RadioButton id="topLayerAssetsButton" label="Top" width="60" groupName="ActorAssetLayerGroup"/>
+		</HBox>
+		<!---<PushButton id="applyAssetToActorButton" x="250" y="70" label="Set/Unset graphic for selected actor" width="180"/>--->
 		 
 		<Label id="graphicSetLabel" x="145" y="100" text="Graphic Set"/>
 		<ComboBox id="gfxSetSelector" x="145" y="120" width="140" height="20" openPosition="top"/>
@@ -13,246 +18,67 @@
 	</Window>
 	
 	<Window id="colorWindow" title="Color Editor" x="0" y="170" width="480" height="300" enabled="false" draggable="false">
-		<HBox spacing="70" x="10">
-			<VBox>
-				<!---<ComboBox id="colorGroupSelector" x="0" y="00" width="140" height="20"/>
-				<List id="charAnimationsSelector" x="0" width="48" height="480" scaleX="-1" rotation="270" listItemHeight="48"/>--->
-				<HBox>
-					<Label text="Base Skin"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Skin Highlight"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Face"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Lips"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Hair"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Nipple"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Areola"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Ear"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Breast"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Vulva"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Anus"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Line"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-			</VBox>			
-			<VBox>
-				
-				<HBox>
-					<Label text="Place holder"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Legging"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Headwear"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Left Earring"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Right Earring"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Custom 1"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Custom 2"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Custom 3"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Custom 4"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Custom 5"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Custom 6"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-			</VBox>
-			<VBox>
-				<HBox>
-					<Label text="Left Eye"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Right Eye"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Sclera"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Eyelid"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Hair HSV"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Female Skin HSV"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Male Skin HSV"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Male base skin"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-				<HBox>
-					<Label text="Place holder"/>
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-					<PushButton label="" width="16" height="16" y="2" />
-				</HBox>
-			</VBox>
-		</HBox>
+		<VBox spacing="25">	
+			<HBox spacing="20" x="10">
+				<VBox>				
+					<PushButton label="Base Skin"/>
+					<PushButton id="" label="Skin Highlight"/>
+					<PushButton id="" label="Face"/>
+					<PushButton id="" label="Lips"/>
+					<PushButton id="" label="Hair"/>
+					<PushButton id="" label="Nipple"/>
+					<PushButton id="" label="Areola"/>
+					<PushButton id="" label="Ear"/>					
+				</VBox>			
+				<VBox>
+					<PushButton id="" label="Breast"/>
+					<PushButton id="" label="Vulva"/>
+					<PushButton id="" label="Anus"/>
+					<PushButton id="" label="Line"/>							
+					<PushButton id="" label="Legging"/>
+					<PushButton id="" label="Headwear"/>
+					<PushButton id="" label="Left Earring"/>
+					<PushButton id="" label="Right Earring"/>				
+				</VBox>
+				<VBox>				
+					<PushButton id="" label="Left Eye"/>
+					<PushButton id="" label="Right Eye"/>
+					<PushButton id="" label="Sclera"/>
+					<PushButton id="" label="Eyelid"/>
+					<PushButton id="" label="Hair HSV"/>
+					<PushButton id="" label="Female Skin HSV"/>
+					<PushButton id="" label="Male Skin HSV"/>
+					<PushButton id="" label="Male base skin"/>					
+				</VBox>
+				<VBox>
+					<PushButton id="" label="Custom 1"/>
+					<PushButton id="" label="Custom 2"/>
+					<PushButton id="" label="Custom 3"/>
+					<PushButton id="" label="Custom 4"/>
+					<PushButton id="" label="Custom 5"/>
+					<PushButton id="" label="Custom 6"/>
+					<PushButton id="" label="Place holder"/>
+					<PushButton id="" label="Place holder2"/>	
+				</VBox>
+			</HBox>
+			<Panel id="TempWindow" title="Color Editor" width="480" height="80" draggable="false">
+				<VBox>
+					<HBox spacing="10">
+						<TextArea id="currentColorGroupText" width="250" height="20" editable="false" autoHideScrollBar="true" />
+					
+						<PushButton id="Color1" label="C1" width="20" />
+						<PushButton id="Color2" label="C2" width="20" />
+						<PushButton id="Color3" label="C3" width="20" />
+						<PushButton id="Color4" label="C4" width="20" />
+					</HBox>
+				</VBox>	
+			</Panel>
+		</VBox>			
 	</Window>
 	
-	<Window id="backgroundWindow" title="Background Editor" x="0" y="500" width="480" height="200" draggable="false">
-			<ComboBox id="backgroundSelector" x="0" y="0" width="140" height="20"/>
-			<HGUISlider id="backgroundAssetSelectSlider" x="210" y="0" width="300" minimum ="0" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
+	<Window id="backgroundWindow" title="Background Editor" x="0" y="500" width="480" height="100" draggable="false">
+			<ComboBox id="backgroundSelector" x="0" y="0" width="140" height="20" numVisibleItems="3" />
+			<HGUISlider id="backgroundAssetSelectSlider" x="210" y="0" width="300" minimum ="-1" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
 			<TextArea id="backgroundAssetInformation" x="219" y="15" width="250" height="50" editable="false"/>
 	</Window>
 </comps>

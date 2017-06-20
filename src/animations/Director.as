@@ -1,7 +1,7 @@
 package animations 
 {
 	import com.jacksondunstan.signals.Signal2;
-	import com.jacksondunstan.signals.Signal3;
+	//import com.jacksondunstan.signals.Signal3;
 	import com.jacksondunstan.signals.Slot2;
 	import com.jacksondunstan.signals.Slot3;
 	import flash.display.Sprite;
@@ -15,7 +15,7 @@ package animations
 		private var colorizer:Colorizer;
 		private var appSignaller2:Signal2 = new Signal2;
 		private var actorSignaller2:Signal2 = new Signal2;
-		private var signal3:Signal3 = new Signal3;
+		//private var signal3:Signal3 = new Signal3;
 		private var currentAnimationName:String;
 		public function Director(appCore:Slot2, assetColorizer:Colorizer) 
 		{
@@ -33,6 +33,7 @@ package animations
 		public function onSignal2(command:*, value:*): void
 		{
 			var commandStr:String = command as String;
+			var messageData:MessageData = value as MessageData;
 			if (commandStr == "DisableActorsRequest")
 			{
 				//Got the request, now send the vector list to all listening actors as a command.
@@ -81,13 +82,13 @@ package animations
 				appSignaller2.dispatch(command, value);
 			}
 			else if (commandStr == "ApplyAssetToActor")
-			{
-				ChangeAssetForActor(value[0] as String, value[1] as int);
+			{				
+				ChangeAssetForActor(messageData);
 				//signal3.dispatch();
 			}
 			else if (commandStr == "ApplySetToAllActors")
 			{
-				ChangeAssetForAllActorsBySetName(value[0] as String, value[1] as Boolean);
+				ChangeAssetForAllActorsBySetName(messageData/*value[0] as String, value[1] as Boolean*/);
 			}
 			else if (commandStr == "AddedAssetToActorResult")
 			{
@@ -115,7 +116,7 @@ package animations
 		public function RegisterActor(actor:Actor):void
 		{
 			actorSignaller2.addSlot(actor);
-			signal3.addSlot(actor);
+			//signal3.addSlot(actor);
 			actor.RegisterDirector(this);
 			//Send a message for any menus listening that a new actor was available for use. 
 			appSignaller2.dispatch("NewActorRegistered", actor.name);
@@ -133,9 +134,10 @@ package animations
 		}
 		
 		[inline]
-		public function ChangeAssetForAllActorsBySetName(setName:String, applyMode:Boolean):void
+		//public function ChangeAssetForAllActorsBySetName(setName:String, applyMode:Boolean):void
+		public function ChangeAssetForAllActorsBySetName(changeAllAssetsMessage:MessageData):void
 		{
-			signal3.dispatch("ChangeAssetForAllActors", setName, applyMode);
+			actorSignaller2.dispatch("ChangeAssetForAllActors", changeAllAssetsMessage);
 		}
 
 		[inline]
@@ -149,15 +151,23 @@ package animations
 		}*/	
 		
 		[inline]
-		public function ChangeAssetForActor(actorName:String, assetId:int):void
+		public function ChangeAssetForActor(assetChangeData:MessageData):void
+		{
+			actorSignaller2.dispatch("ChangeAsset", assetChangeData);
+		}
+		/*public function ChangeAssetForActor(actorName:String, assetId:int):void
 		{
 			signal3.dispatch("ChangeAsset", actorName, assetId);
-		}		
+		}*/		
 		
 		[inline]
 		public function ChangeAssetForActorBySetName(actorName:String, assetSet:String, layer:int):void
 		{
-			signal3.dispatch("ChangeAssetBySetName", actorName, [assetSet, layer]);
+			var changeAssetData:MessageData = new MessageData;
+			changeAssetData.stringData[0] = actorName;
+			changeAssetData.stringData[1] = assetSet;
+			changeAssetData.intData[0] = layer;
+			actorSignaller2.dispatch("ChangeAssetBySetName", changeAssetData);
 		}	
 		
 		public function ClearAllActors():void

@@ -2,10 +2,10 @@
 	<VBox x="5" y="10">
 		<PushButton id="loadModBtn" width="120" label="Load mod swfs" />
 		<PushButton id="loadSVGAssetBtn"  width="120" label="Load svg assets" />
-		<PushButton id="loadPNGAssetBtn"  width="120" label="Load png assets" enabled="false" />
+		<PushButton id="loadRasterAssetBtn"  width="120" label="Load png assets" enabled="false" />
 		<HBox>
-			<PushButton id="loadBackgroundSvgBtn" width="120" label="Load background svg" />
-			<PushButton id="loadBackgroundImageBtn" width="120" label="Load background image"/>
+			<PushButton id="loadSVGBackgroundBtn" width="120" label="Load background svg" />
+			<PushButton id="loadRasterBackgroundBtn" width="120" label="Load background image"/>
 		</HBox>
 	</VBox>
 		<!---<PushButton id="CharacterTab" x="15" y="0" width="70" label="Characters" />

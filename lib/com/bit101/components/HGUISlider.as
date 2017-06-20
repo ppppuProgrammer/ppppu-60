@@ -20,9 +20,10 @@ package com.bit101.components
 		protected var _displayBox:Sprite;
 		protected var _displaySize:Number = 32;
 		//protected var 
-		public function HGUISlider(parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, label:String="") 
+		public function HGUISlider(parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, label:String="", items:Array = null) 
 		{
 			super(parent, xpos, ypos, label, null);
+			_items = items;
 		}
 		
 		public override function draw():void
@@ -52,14 +53,14 @@ package com.bit101.components
 			_displayBox.y =  lineWidth;
 			
 			
-			_slider.maximum = _list.items.length;
-			_slider.minimum = (_slider.maximum > 0) ? 1 : 0;
+			maximum = _list.items.length-1;
+			//minimum = (_slider.maximum > 0) ? 1 : 0;
 			
-			if (_list.selectedIndex == -1)
+			/*if (_list.selectedIndex == -1)
 			{
 				_list.selectedIndex = (_slider.minimum > 0) ? 0 : -1;
 				value = _list.selectedIndex + 1;
-			}
+			}*/
 			//value = _list.selectedIndex + 1;
 			
 			_displayBox.removeChildren();
@@ -105,8 +106,11 @@ package com.bit101.components
 		 */
 		override public function set value(v:Number):void
 		{
+			if (v > _list.items.length - 1) v = _list.items.length-1;
 			_slider.value = v;
 			formatValueLabel();
+			selectedIndex = v;
+			invalidate();
 			//dispatchEvent(new Event(Event.CHANGE));
 		}
 		
@@ -155,6 +159,7 @@ package com.bit101.components
 		public function addItem(item:Object):void
 		{
 			_list.addItem(item);
+			_slider.maximum++;
 			invalidate();
 		}
 		
@@ -166,6 +171,7 @@ package com.bit101.components
 		public function addItemAt(item:Object, index:int):void
 		{
 			_list.addItemAt(item, index);
+			_slider.maximum++;
 			invalidate();
 		}
 		
@@ -176,6 +182,7 @@ package com.bit101.components
 		public function removeItem(item:Object):void
 		{
 			_list.removeItem(item);
+			_slider.maximum--;
 			invalidate();
 		}
 		
@@ -186,6 +193,7 @@ package com.bit101.components
 		public function removeItemAt(index:int):void
 		{
 			_list.removeItemAt(index);
+			_slider.maximum--;
 			invalidate();
 		}
 		
@@ -195,6 +203,7 @@ package com.bit101.components
 		public function removeAll():void
 		{
 			_list.removeAll();
+			_slider.maximum = 0;
 		}
 		
 		///////////////////////////////////
@@ -311,8 +320,10 @@ package com.bit101.components
 		public function set items(value:Array):void
 		{
 			_list.items = value;
-			//invalidate();
+			//_slider.maximum = value.length;
+			invalidate();
 		}
+		
 		public function get items():Array
 		{
 			return _list.items;
@@ -380,7 +391,7 @@ package com.bit101.components
 		{
 			//super.onSliderChange(event);
 			formatValueLabel();
-			selectedIndex = event.currentTarget.value - 1;
+			selectedIndex = event.currentTarget.value;
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 	}

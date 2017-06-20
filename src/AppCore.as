@@ -130,11 +130,8 @@ package
 			
 			musicPlayer = new MusicPlayer();
 			
-			//Add the key listeners
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyPressCheck);
-			stage.addEventListener(KeyboardEvent.KEY_UP, KeyReleaseCheck);
-
-			ProcessExecutor.instance.initialize(stage); 
+			
+			
 			
 			//Disable mouse interaction for various objects
 			////mainStage.MenuLayer.mouseEnabled = true;
@@ -180,6 +177,9 @@ package
 			ProcessMod(innerBGMod);
 			ProcessMod(transitionBGMod);
 			ProcessMod(lightBGMod);
+			
+			//var assetsMod:Mod = (new assetsSWF) as Mod;
+			
 			mainStage.BGLayer1.SelectBackgroundAsset(0);
 			mainStage.BGLayer4.SelectBackgroundAsset(0);
 			mainStage.BGLayer2.SelectBackgroundAsset(0);
@@ -193,7 +193,8 @@ package
 			LoadUserSettings();
 			if(CONFIG::NX)
 			{
-				
+				//Allows svg data to be used in flash
+				ProcessExecutor.instance.initialize(stage); 
 				//Create the main menu. 
 				mainMenu = new MainMenu();
 				//Create the tweens that are used to move the main menu and main stage around.
@@ -349,11 +350,19 @@ package
 				
 				CONFIG::NX
 				{
-				if (keyPressed == Keyboard.SPACE)
-				{
-					ToggleMenuMode();
+					if (keyPressed == Keyboard.SPACE)
+					{
+						ToggleMenuMode();
+						
+					}
 					
-				}
+					CONFIG::debug
+					{
+					if (keyPressed == Keyboard.R)
+					{
+						mainMenu.ReloadSubMenus(this);
+					}
+					}
 				}
 				
 				
@@ -600,7 +609,7 @@ package
 				{
 					if (bgAsset.asset && bgAsset.assetName && bgAsset.assetName.length > 0)
 					{
-						bgAsset.name = bgAsset.assetName;
+						bgAsset.asset.name = bgAsset.assetName;
 						var targetExBg:ExchangeableBackground = mainStage.getChildByName(bgAsset.targetSpriteName) as ExchangeableBackground;
 						if (targetExBg)
 						{
@@ -714,11 +723,7 @@ package
 				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
 				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
 				}
-			}
-			else if (target == "DevMenu_ReloadSubMenus")
-			{
-				mainMenu.ReloadSubMenus(this);
-			}
+			}			
 			else if (target == "MainMenu_MenuReloadFinished")
 			{
 				//Repopulate the Character Sub Menu 
@@ -747,10 +752,18 @@ package
 				menuSignal2.dispatch("CustomMenu_AddGraphicSetNames", messsageData);
 				
 			}
+			CONFIG::debug
+			{
+				if (target == "DevMenu_ReloadSubMenus")
+				{
+					mainMenu.ReloadSubMenus(this);
+				}
+			}
 		}
 		
 		public function onSignal2(targetName:*, value:*):void
 		{
+			var messageData:MessageData = value as MessageData;
 			if (targetName == "setFrameButton")
 			{
 				var position:Number = (value as int) * (1.0 / stage.frameRate);
@@ -950,25 +963,41 @@ package
 			}
 			else if (targetName == "LoadMenu_LoadedSVGAsset")
 			{
-				var messageData:MessageData = value as MessageData;
 				var svgSet:String = messageData.stringData[0];
 				var assetLayer:int = messageData.intData[0];
 				for (var i:int = 1, l:int = messageData.stringData.length; i < l; i++) 
 				{
 					canvas.AddAssetToActor(messageData.stringData[i], new AssetData(svgSet, messageData.spriteData[i-1], assetLayer, null));
 				}
-				/*this.addChild(svg);
-				svg.x = 480/2;
-				svg.y = 720 / 2;
-				var regPoint:Point = UtilityFunctions.GetAnchorPoint(svg);
-				var spr:Sprite = new Sprite();
-				spr.graphics.clear();
-				spr.graphics.beginFill(0xFF0000);
-				spr.graphics.drawCircle(0, 0, 2);
-				spr.graphics.endFill();
-				svg.addChild(spr);
-				spr.x = regPoint.x;
-				spr.y = regPoint.y;*/
+			}
+			else if (targetName == "LoadMenu_LoadedSVGBackgroundAsset")
+			{
+				for (var i:int = 0, l:int = messageData.stringData.length; i < l; i++) 
+				{
+					var backgroundLayer:ExchangeableBackground = mainStage.getChildByName("BGLayer" + messageData.stringData[i]) as ExchangeableBackground;
+					if (backgroundLayer)
+					{
+						backgroundLayer.AddNewBackgroundAsset(messageData.spriteData[i]);
+					}
+					
+				}
+			}
+			else if (targetName == "LoadMenu_LoadedRasterBackgroundAsset")
+			{
+				for (var i:int = 0, l:int = messageData.stringData.length; i < l; i++) 
+				{
+					var backgroundLayer:ExchangeableBackground = mainStage.getChildByName("BGLayer" + messageData.stringData[i]) as ExchangeableBackground;
+					//Raster backgrounds are moved to be centered on the display area of the main stage.
+					var bgAsset:Sprite = messageData.spriteData[i];
+					bgAsset.x =  mainStage.DisplayArea.x + (mainStage.DisplayArea.width - bgAsset.width) / 2;
+					//Also it's scaled vertically if it's less than 720 pixels tall.
+					if (bgAsset.height < mainStage.DisplayArea.height) {bgAsset.height = mainStage.DisplayArea.height;}
+					if (backgroundLayer) {
+						backgroundLayer.AddNewBackgroundAsset(bgAsset);
+						menuSignal2.dispatch("CustomMenu_AddedBackgroundLayers", null);
+					}
+					
+				}
 			}
 			else if (targetName == "AddedAssetToActorResult")
 			{
@@ -989,16 +1018,28 @@ package
 			}
 			else if (targetName == "CustomMenu_GetBackgroundLayerAssetsRequest")
 			{
-				var bgData:MessageData = value as MessageData;
+				//Used for generating previews for the background assets
 				
-				var bgLayer:ExchangeableBackground = mainStage["BGLayer" + String(bgData.intData[0])] as ExchangeableBackground;
+				var bgLayer:ExchangeableBackground = mainStage["BGLayer" + String(messageData.intData[0])] as ExchangeableBackground;
 				
 				if (bgLayer)
 				{
 					//var bgResponseData:MessageData = new MessageData;
 					//Recycling's pretty cool, so reuse the message data that came with the request
-					bgData.spriteData = bgLayer.GetSpriteList();
-					menuSignal2.dispatch("CustomMenu_GetBackgroundLayerAssetsResponse", bgData);
+					messageData.spriteData = bgLayer.GetSpriteList();
+					messageData.intData[0] = bgLayer.GetIdOfCurrentAsset();
+					menuSignal2.dispatch("CustomMenu_GetBackgroundLayerAssetsResponse", messageData);
+				}
+			}
+			else if (targetName == "CustomMenu_ChangeBackgroundAsset")
+			{
+				//Used to change the background asset used for a background layer
+				
+				var bgLayer:ExchangeableBackground = mainStage["BGLayer" + String(messageData.intData[0])] as ExchangeableBackground;
+				
+				if (bgLayer)
+				{
+					bgLayer.SelectBackgroundAsset(messageData.intData[1]);
 				}
 			}
 		}
@@ -1018,6 +1059,9 @@ package
 			//With all startup mods loaded 
 			//musicPlayer.ControlVolume(1.0);
 			mainStage.addEventListener(Event.ENTER_FRAME, RunLoop);
+			//Add the key listeners
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyPressCheck);
+			stage.addEventListener(KeyboardEvent.KEY_UP, KeyReleaseCheck);
 			
 		}
 		
@@ -1045,6 +1089,7 @@ package
 				{
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(characterName));
 				menuSignal2.dispatch("AnimMenu_UpdateAnimationListing", characterManager.GetCurrentCharacterAnimationStates());
+				menuSignal2.dispatch("CustomMenu_CharacterHasChanged", null);
 				}
 				userSettings.UpdateCurrentCharacterName(characterName);
 			}

@@ -37,6 +37,7 @@ package
 			characterData.Color.Breast = [0xFFDCC6FF,0xFFDCC6FF, {ID: "SkinGradientEnd", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//3
 			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
 			characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159, 255), 0xFFDCC6FF];//2
+			characterData.Color.SkinLine = 0x7A2810FF;
 			
 			characterData.GraphicSets = ["Standard", "Headwear_Rosalina", "Earring_Rosalina", "Hair_Rosalina"];
 			

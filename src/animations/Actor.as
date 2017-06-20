@@ -11,7 +11,7 @@ package animations
 	 * Actors are Sprites that are added to the Canvas. They are the actual sprites that are affected by DispObjInfo (for ordering) and tweens (for animation). Actors have 3 layers for placing graphics into. Think of these layers as costumes, they change the appearance of the actor. The layers are top, main, and bottom. Main is the primary layer that graphics are added to, top and bottom layers exist to add onto the main layer without actually modifying the graphics in the main layer, which could cause visual discrepancies later on. Once a graphic is set to it, the main layer must always have a graphic.
 	 * @author 
 	 */
-	public class Actor extends Sprite implements Slot2, Slot3
+	public class Actor extends Sprite implements Slot2
 	{
 		private var topLayer:Sprite;
 		private var mainLayer:Sprite;
@@ -29,7 +29,10 @@ package animations
 		private var disableRequestCount:int = 0;
 		
 		//A list of assets that can be applied to this particular actor and the data for utilizing them.
-		private var assetList:Vector.<AssetData> = new Vector.<AssetData>;
+		//private var assetList:Vector.<AssetData> = new Vector.<AssetData>;
+		private var bottomAssetList:Vector.<AssetData> = new Vector.<AssetData>;
+		private var mainAssetList:Vector.<AssetData> = new Vector.<AssetData>;
+		private var topAssetList:Vector.<AssetData> = new Vector.<AssetData>;
 		//Signals used to communicate with the director.
 		private var signal2:Signal2 = new Signal2;
 		private var signal3:Signal3 = new Signal3;
@@ -57,27 +60,20 @@ package animations
 			signal3.addSlot(director);
 		}
 		
-		public function SelectAssetToUse(assetId:int):void
+		public function SelectAssetToUse(layerNumber:int, assetId:int):void
 		{
-			var assetData:AssetData = assetList[assetId];
-			var assetCurrentlyUsed:AssetData = GetCurrentlyUsedAssetForLayer(assetData.layer);
-			
-			if (assetCurrentlyUsed == assetData) //Both are the same and i's already in use, so see if the asset should be removed from its layer.
-			{
-				//Main layer is not allowed to be empty once an asset is set to it.
-				
-				//Check that the layer is not main. If this is true, unset the asset
-				//if (assetData.layer != LAYER_MAIN)
-				//{
-					RemoveAssetFromUse(assetCurrentlyUsed);
-				//}
-			}
-			else //An unused asset was selected to be used
-			{
-				//Remove the currently used asset
+			var assetCurrentlyUsed:AssetData = GetCurrentlyUsedAssetForLayer(layerNumber);
+			if (assetId == -1) {
 				RemoveAssetFromUse(assetCurrentlyUsed);
-				SetAssetForUse(assetData);
+				return;
 			}
+			
+			var assetList:Vector.<AssetData> = GetAssetListByLayer(layerNumber);
+			var assetData:AssetData = assetList[assetId];		
+
+			//Remove the currently used asset
+			RemoveAssetFromUse(assetCurrentlyUsed);
+			SetAssetForUse(assetData);
 			
 		}
 		
@@ -208,7 +204,10 @@ package animations
 		
 		public function AddAsset(assetData:AssetData):void
 		{
-			if (assetData == null) { return;}
+			if (assetData == null) { return; }
+			var layer:int = assetData.layer;
+			//ternary chain to determine what assetlist the asset should be added to based on it's layer
+			var assetList:Vector.<AssetData> = GetAssetListByLayer(layer);
 			var conflict:Boolean = false;
 			//There can not be multiple assets in the same set for the same actor.
 			for (var i:int = 0, l:int = assetList.length; i < l; i++) 
@@ -232,7 +231,79 @@ package animations
 		public function onSignal2(command:*, value:*): void
 		{
 			var commandStr:String = command as String;
-			if (commandStr == "ChangeAssetByData")
+			var messageData:MessageData = value as MessageData;
+			if (commandStr == "ChangeAsset")
+			{
+				var targetedActor:String = messageData.stringData[0];
+				if (this.name == targetedActor)
+				{					
+					SelectAssetToUse(messageData.intData[0], messageData.intData[1]);
+				}
+			}
+			else if (commandStr == "ChangeAssetBySetName")
+			{
+				var targetedActor:String = messageData.stringData[0];
+				if (this.name == targetedActor)
+				{
+					var setName:String = messageData.stringData[1];					
+					var layer:int = messageData.intData[0];
+					if (setName == "")
+					{						
+						RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(layer));
+					}
+					var assetList:Vector.<AssetData> = GetAssetListByLayer(layer);
+					for (var j:int = 0, k:int = assetList.length; j < k; j++) 
+					{
+						if (assetList[j].layer == layer && assetList[j].setName == setName)
+						{
+							SetAssetForUse(assetList[j]);
+							//SelectAssetToUse(j);
+							break;
+						}
+					}
+					
+				}
+			}
+			else if (commandStr == "ChangeAssetForAllActors")
+			{
+				for (var n:int = 0,o:int = Math.min( messageData.stringData.length,  messageData.boolData.length); n < o; n++) 
+				{
+					var setName:String = messageData.stringData[n];
+					var applySet:Boolean = messageData.boolData[n];
+					/*var setName:String = value as String;
+					var applySet:Boolean = value2 as Boolean;*/
+					var asset:AssetData;
+					for (var m:int = 0; m < 3; m++) 
+					{
+						var assetList:Vector.<AssetData> = GetAssetListByLayer(m);
+					
+						for (var i:int = 0, l:int = assetList.length; i < l; i++) 
+						{
+							asset = assetList[i];
+							if (asset.setName == setName)
+							{
+								//Actor is to use the set
+								if (applySet)
+								{
+									RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(asset.layer));
+									SetAssetForUse(asset);
+								}
+								else
+								{
+									//Actor is to remove the set. 
+									//Main layer assets can not be removed unless there is another asset ready to take its place.
+									//if (asset.layer != LAYER_MAIN)
+									//{
+										RemoveAssetFromUse(asset);
+									//}
+									
+								}
+							}
+						}
+					}
+				}				
+			}
+			else if (commandStr == "ChangeAssetByData")
 			{
 				var data:Object = value as Object;
 				var actorData:Array = data[this.name];
@@ -249,6 +320,7 @@ package animations
 						else
 						{
 							var asset:AssetData;
+							var assetList:Vector.<AssetData> = GetAssetListByLayer(i);
 							for (var j:int = 0, k:int = assetList.length; j < k; j++) 
 							{
 								asset = assetList[j];
@@ -296,11 +368,20 @@ package animations
 			
 			else if (commandStr == "ActorAssetListRequest")
 			{
-				var actorName:String = value as String;
+				var actorName:String = messageData.stringData[0];
+				var layer:int = messageData.intData[0];
+				var assetList:Vector.<AssetData> = GetAssetListByLayer(layer);
+				//var actorName:String = value as String;
+				
 				if (actorName == this.name)
 				{
-					var assetPayload:Vector.<Object> = new Vector.<Object>();
+					var assetListMessage:MessageData = new MessageData;
+					//var assetPayload:Vector.<Object> = new Vector.<Object>();
 					var showAssetInList:Boolean = true;
+					if (assetList.length == 0)
+					{
+						assetListMessage.intData[0] = -1;
+					}
 					for (var j:int = 0, k:int = assetList.length; j < k; j++) 
 					{
 						if (assetList[j].properties && ("ShowInMenus" in assetList[j].properties))
@@ -309,13 +390,24 @@ package animations
 						}
 						if (showAssetInList)
 						{
-							assetPayload[assetPayload.length] = { AssetSet: assetList[j].setName, AssetClass: Object(assetList[j].asset).constructor, AssetLayer: assetList[j].layer };
+							assetListMessage.stringData[assetListMessage.stringData.length] = assetList[j].setName;
+							assetListMessage.spriteData[assetListMessage.spriteData.length] = assetList[j].asset;
+							if (assetList[j] == GetCurrentlyUsedAssetForLayer(layer))
+							{
+								assetListMessage.intData[0] = j;
+							}
+							else
+							{
+								assetListMessage.intData[0] = -1;
+							}
+							//assetListMessage.intData[0] = assetList[j].layer;
+							//assetPayload[assetPayload.length] = { AssetSet: assetList[j].setName, AssetClass: Object(assetList[j].asset).constructor, AssetLayer: assetList[j].layer };
 						}
 						//reset the value so the next asset isn't affected if there the ShowInMenus property isn't found in the assetdata.
 						showAssetInList = true;
 					}
 					
-					signal2.dispatch("AssetListDelivery", assetPayload);
+					signal2.dispatch("AssetListDelivery", assetListMessage);
 				}
 			}
 			else if (commandStr == "ClearAllAssets")
@@ -328,72 +420,12 @@ package animations
 			
 		}
 		
-		public function onSignal3(command:*, value:*, value2:*): void
+		private function GetAssetListByLayer(layerNumber:int):Vector.<AssetData>
 		{
-			var commandStr:String = command as String;
-			if (commandStr == "ChangeAsset")
-			{
-				var targetedActor:String = value as String;
-				if (this.name == targetedActor)
-				{
-					SelectAssetToUse(value2 as int);
-				}
-			}
-			else if (commandStr == "ChangeAssetBySetName")
-			{
-				var targetedActor:String = value as String;
-				if (this.name == targetedActor)
-				{
-					var setName:String = value2[0] as String;					
-					var layer:int = value2[1];
-					if (setName == "")
-					{
-						
-						RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(layer));
-					}
-					for (var j:int = 0, k:int = assetList.length; j < k; j++) 
-					{
-						if (assetList[j].layer == layer && assetList[j].setName == setName)
-						{
-							SetAssetForUse(assetList[j]);
-							//SelectAssetToUse(j);
-							break;
-						}
-					}
-					
-				}
-			}
-			else if (commandStr == "ChangeAssetForAllActors")
-			{
-				var setName:String = value as String;
-				var applySet:Boolean = value2 as Boolean;
-				var asset:AssetData;
-				for (var i:int = 0, l:int = assetList.length; i < l; i++) 
-				{
-					asset = assetList[i];
-					if (asset.setName == setName)
-					{
-						//Actor is to use the set
-						if (applySet)
-						{
-							RemoveAssetFromUse(GetCurrentlyUsedAssetForLayer(asset.layer));
-							SetAssetForUse(asset);
-						}
-						else
-						{
-							//Actor is to remove the set. 
-							//Main layer assets can not be removed unless there is another asset ready to take its place.
-							//if (asset.layer != LAYER_MAIN)
-							//{
-								RemoveAssetFromUse(asset);
-							//}
-							
-						}
-					}
-				}
-			}
-			
+			if (layerNumber < 0 || layerNumber > 2) return null;
+			return (layerNumber==1) ? mainAssetList : (layerNumber==2) ? topAssetList : bottomAssetList;
 		}
+		
 		//Called when an asset for an actor was changed and sends a requests for other actors to be disabled. Since actors do not know what the current animation is, the director will need to do some additional checks to see if the actors should be disabled.
 		/*private function DisableActorsCheck_OnAssetSwitch(assetData:AssetData)
 		{

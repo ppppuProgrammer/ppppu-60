@@ -17,6 +17,8 @@ builtFileName = sys.argv[2]
 buildConfig = sys.argv[3]
 timeStamp = sys.argv[4]
 
+projectVersionFile = "AppVersionNX.as" if (builtFileName == "ppppuNX.swf")  else "AppVersion60.as"  
+
 buildRepositoryPath = buildPath + "/builds/"
 
 versionFileFound = False
@@ -35,7 +37,7 @@ currentDirectory = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
 srcPath = currentDirectory.joinpath("src")
 #print(srcPath)
 if srcPath.is_dir():
-    versionFilePath = srcPath.joinpath("AppVersion.as")
+    versionFilePath = srcPath.joinpath(projectVersionFile)
     #print(versionFilePath)
     if versionFilePath.exists() == True:
         with versionFilePath.open('r') as file:

@@ -49,6 +49,11 @@ package
 		CONFIG::debug
 		private const modLoadList:String = "DebugModsList.txt" ;
 		
+		//CONFIG::FPS60
+		//{
+			//[Embed Source=""]
+			//private const modLoadList:String = "ppppu60ModsList.txt";
+		//}
 		private var majorVer:int;
 		private var minorVer:int;
 		
@@ -303,6 +308,9 @@ package
 		private function ReadModsList(e:LoaderEvent):void
 		{
 			var listText:String = e.target.content[0] as String;
+			if (listText == null){
+				listText="";
+			}
 			//var modsToLoad:Array = [];
 			//Will split the list's contents by the 3 EOL styles, /r/n, /r, and /n
 			var endOfLineRegEx:RegExp = /\r\n|\r|\n/;

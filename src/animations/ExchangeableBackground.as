@@ -8,7 +8,8 @@ package animations
 	 */
 	public class ExchangeableBackground extends Sprite 
 	{
-		public var currentlyUsedImage:Sprite;
+		protected var currentlyUsedImage:Sprite;
+		protected var currentImageId:int =-1;
 		protected var spriteList:Vector.<Sprite> = new Vector.<Sprite>();
 		public function ExchangeableBackground() 
 		{
@@ -19,6 +20,11 @@ package animations
 		public function GetSpriteList():Vector.<Sprite>
 		{
 			return spriteList;
+		}
+		
+		public function GetIdOfCurrentAsset():int
+		{
+			return currentImageId;
 		}
 		
 		public function AddNewBackgroundAsset(asset:Sprite):Boolean
@@ -41,9 +47,11 @@ package animations
 		public function SelectBackgroundAsset(assetId:int):void
 		{
 			if (assetId >= spriteList.length || assetId < -1) { return; }
+			currentImageId = assetId;
 			if (currentlyUsedImage)
 			{
 				this.removeChild(currentlyUsedImage);
+				currentlyUsedImage = null;
 			}
 			if (assetId > -1)
 			{

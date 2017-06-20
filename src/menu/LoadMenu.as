@@ -2,6 +2,7 @@ package menu
 {
 	import com.lorentz.SVG.display.SVGDocument;
 	import com.lorentz.SVG.display.base.SVGElement;
+	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.Graphics;
 	import flash.display.IGraphicsData;
@@ -17,6 +18,7 @@ package menu
 	import flash.geom.Rectangle;
 	import flash.utils.*;
 	import flash.net.FileReference;
+	import io.ByteArrayLoadedEvent;
 	import io.FileReferenceLoadHelper;
 	import io.FileReferenceListLoadHelper;
 	import io.LoadedFileData;
@@ -94,12 +96,13 @@ package menu
 					//SelectEventHandler(value as Object);
 				}
 			}
-			else if (command == "SVGLoaded")
+			else if (command == "SVG_AssetLoaded")
 			{
 				var svgFileData:Vector.<LoadedFileData> = value as Vector.<LoadedFileData>;
 				if (svgFileData == null) { return; }
 				
 				var file:LoadedFileData;
+				var signalData:MessageData = new MessageData();
 				for (var j:int = 0,k:int = svgFileData.length; j < k; j++) 
 				{
 					file = svgFileData[j] as LoadedFileData;
@@ -110,7 +113,7 @@ package menu
 						var svgString:String = fileBytes.readUTFBytes(fileBytes.length);
 						
 						//var rect:Rectangle = spr.getBounds(spr);
-						var signalData:MessageData = new MessageData();
+						
 						//var svgFileName:String = value[1] as String;
 						fileName = fileName.slice(0, fileName.indexOf(".svg"));
 						var nameParts:Array = fileName.split("_");
@@ -129,26 +132,95 @@ package menu
 								svgActorExtensions = (nameParts[3] as String).split("-");
 								for (var i:int = 0,l:int = svgActorExtensions.length; i < l; i++) 
 								{
-									var svg:SVGDocument = new SVGDocument();  
-									svg.parse(svgString);  
+									
 									
 									signalData.stringData[signalData.stringData.length] = svgActor + svgActorExtensions[i];
-									signalData.spriteData[signalData.spriteData.length] = svg;
+									signalData.spriteData[signalData.spriteData.length] = CreateSVGFromString(svgString);
 								}
 							}
 							else
-							{
-								var svg:SVGDocument = new SVGDocument();  
-
-								svg.parse(svgString);  
+							{ 
 								signalData.stringData[signalData.stringData.length] = svgActor;
-								signalData.spriteData[signalData.spriteData.length] = svg;
+								signalData.spriteData[signalData.spriteData.length] = CreateSVGFromString(svgString);
 							}
+						}				
+					}
+					signal2.dispatch("LoadMenu_LoadedSVGAsset", signalData);
+				}
+			}
+			else if (command == "SVG_BGAssetLoaded")
+			{
+				var svgFileData:Vector.<LoadedFileData> = value as Vector.<LoadedFileData>;
+				if (svgFileData == null) { return; }
+				
+				var file:LoadedFileData;
+				var signalData:MessageData = new MessageData();
+				for (var j:int = 0,k:int = svgFileData.length; j < k; j++) 
+				{
+					file = svgFileData[j] as LoadedFileData;
+					var fileBytes:ByteArray = file.data;
+					var fileName:String = file.name;
+					if (fileBytes && fileName)
+					{
+						var svgString:String = fileBytes.readUTFBytes(fileBytes.length);
+
+						var signalData:MessageData = new MessageData();
+						fileName = fileName.slice(0, fileName.indexOf(".svg"));
+						var nameParts:Array = fileName.split("_");
+						if (nameParts.length >= 2) //Expects a minimum of 2 parts, the first being a number from 0 to 4 and the name of the background asset.
+						{
+							var layerPart:String = (nameParts[0] as String);
+							var bgName:String = (nameParts[1] as String);
+							signalData.stringData[signalData.stringData.length] = layerPart.substr(layerPart.search(/d/), 1);
+							var svg:SVGDocument = CreateSVGFromString(svgString);
+							svg.name = bgName;
+							signalData.spriteData[signalData.spriteData.length] = svg;
 						}
-						
-						signal2.dispatch("LoadMenu_LoadedSVGAsset", signalData);
 					}
 				}
+				signal2.dispatch("LoadMenu_LoadedSVGBackgroundAsset", signalData);
+			}
+			else if (command == "Raster_AssetLoaded")
+			{
+				var rasterFileData:Vector.<LoadedFileData> = value as Vector.<LoadedFileData>;
+				if (rasterFileData == null) { return; }
+				
+				var file:LoadedFileData;
+				var signalData:MessageData = new MessageData();
+				for (var j:int = 0,k:int = rasterFileData.length; j < k; j++) 
+				{
+					file = rasterFileData[j] as LoadedFileData;
+					var fileBytes:ByteArray = file.data;
+					var fileName:String = file.name;
+					if (fileBytes && fileName)
+					{
+						
+					}
+				}
+				signal2.dispatch("LoadMenu_LoadedRasterAsset", signalData);
+			}
+			else if (command == "Raster_BGAssetLoaded")
+			{
+				var rasterFileData:Vector.<LoadedFileData> = value as Vector.<LoadedFileData>;
+				if (rasterFileData == null) { return; }
+				
+				var file:LoadedFileData;
+				
+				for (var j:int = 0,k:int = rasterFileData.length; j < k; j++) 
+				{
+					file = rasterFileData[j] as LoadedFileData;
+					var fileBytes:ByteArray = file.data;
+					var fileName:String = file.name;
+					
+					if (fileBytes && fileName)
+					{
+						var imageLoader:Loader = new Loader();
+						//The image is loaded asynchronously, so give the loader the file name of the background asset so it can stay alive outside this else-if scope.
+						imageLoader.name = fileName;
+						imageLoader.loadBytes(fileBytes);
+						imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, FinishedAsyncImageLoading);
+					}
+				}				
 			}
 			else if (command == "SWFModLoaded")
 			{
@@ -187,12 +259,54 @@ package menu
 			loader.unload();
 		}
 		
+		private function FinishedAsyncImageLoading(e:Event):void
+		{
+			var content:DisplayObject = e.target.content;
+			var loader:Loader = e.target.loader as Loader;
+			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, FinishedAsyncImageLoading);	
+			var bitmap:Bitmap = content as Bitmap;
+			var signalData:MessageData = new MessageData();
+			var bgSprite:Sprite = new Sprite;
+			bgSprite.addChild(bitmap);
+			
+			var fileNameForBitmap:String = loader.name;
+
+
+			var signalData:MessageData = new MessageData();
+			fileNameForBitmap = fileNameForBitmap.slice(0, fileNameForBitmap.lastIndexOf("."));
+			var nameParts:Array = fileNameForBitmap.split("_");
+			if (nameParts.length >= 2) //Expects a minimum of 2 parts, the first being a number from 0 to 4 and the name of the background asset.
+			{
+				var layerPart:String = (nameParts[0] as String);
+				var bgName:String = (nameParts[1] as String);
+				signalData.stringData[signalData.stringData.length] = layerPart.substr(layerPart.search(/d/), 1);
+				bgSprite.name = bgName;
+				signalData.spriteData[0] = bgSprite;
+				signal2.dispatch("LoadMenu_LoadedRasterBackgroundAsset", signalData);
+			}
+			loader.name = "";
+			
+			loader.unload();
+		}
+		
 		public function ClickEventHandler(target:Object):void
 		{
 			//var targetName:String = target["name"];
 			if (target.name == "loadSVGAssetBtn")
 			{
-				var svgFile:FileReferenceListLoadHelper = new FileReferenceListLoadHelper(this, "Scalable Vector Graphics files (*.svg)", "*.svg", "SVGLoaded");
+				new FileReferenceListLoadHelper(this, "Scalable Vector Graphics files (*.svg)", "*.svg", "SVG_AssetLoaded");
+			}
+			else if (target.name == "loadRasterAssetBtn")
+			{
+				new FileReferenceListLoadHelper(this, "Supported Raster Images - bmp, gif, jpg, png", "*.jpg;*.gif;*.png;*.bmp", "Raster_AssetLoaded");
+			}
+			else if (target.name == "loadSVGBackgroundBtn")
+			{
+				new FileReferenceListLoadHelper(this, "Scalable Vector Graphics files (*.svg)", "*.svg", "SVG_BGAssetLoaded");
+			}
+			else if (target.name == "loadRasterBackgroundBtn")
+			{
+				new FileReferenceListLoadHelper(this, "Supported Raster Graphics files - bmp, gif, jpg, png", "*.jpg;*.gif;*.png;*.bmp", "Raster_BGAssetLoaded");
 			}
 			else if (target.name == "loadModBtn")
 			{
@@ -217,6 +331,16 @@ package menu
 			config = null;
 			dispatchEvent(e);
 		}
+		
+		[inline]
+		private function CreateSVGFromString(svgString:String):SVGDocument
+		{
+			var svg:SVGDocument = new SVGDocument();  
+			svg.parse(svgString);  
+			return svg;
+		}
+		
+		
 		
 		CONFIG::debug
 		{

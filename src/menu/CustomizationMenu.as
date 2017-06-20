@@ -159,15 +159,37 @@ package menu
 				//Got the asset list from the actor that was selected by the actorSelector combo box.
 				var assetGuiSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;	
 				
-				var assetList:Vector.<Object> = value as Vector.<Object>;
+				//var assetList:Vector.<Object> = value as Vector.<Object>;
 				//var assetListSprites:Vector.<Sprite> = new Vector.<Sprite>;
-				if (!assetGuiSlider || !assetList) { return; }
+				if (!assetGuiSlider) { return; }
 				assetGuiSlider.removeAll();
 				//var items:Array = [];
 				
+				var previews:Vector.<Sprite> = RetrieveListOfPreviewSprites(messageData.spriteData);
+				for (var y:int = 0, z:int = messageData.stringData.length; y < z; y++) 
+				{
+
+					var item:Object = { };
+					item.displayImage = previews[y];
+					item.displayName = messageData.stringData[y];
+					//item.layer = (assetList[y] as Object).AssetLayer as int;
+					assetGuiSlider.addItem(item);
+				}
+				if (messageData.intData.length > 0)
+				{
+					assetGuiSlider.value = messageData.intData[0];
+					var assetText:TextArea = config.getCompById("assetInformation") as TextArea;
+					if (assetGuiSlider.value == -1) {
+						
+						assetText.text = "Disabled";
+					}
+					else {
+						assetText.text = assetGuiSlider.selectedItem.displayName as String;
+					}
+				}
 				
 				//var previews:Vector.<Sprite> = RetrieveListOfPreviewSprites(assetList);
-				for (var y:int = 0, z:int = assetList.length; y < z; y++) 
+				/*for (var y:int = 0, z:int = assetList.length; y < z; y++) 
 				{
 					
 					if (assetList[y] != null)
@@ -178,8 +200,8 @@ package menu
 						item.layer = (assetList[y] as Object).AssetLayer as int;
 						assetGuiSlider.addItem(item);
 					}
-				}
-				assetGuiSlider.selectedIndex = (assetGuiSlider.items.length > 0) ? 0 : -1;
+				}*/
+				//assetGuiSlider.selectedIndex = (assetGuiSlider.items.length > 0) ? 0 : -1;
 			}
 			else if (command == "AddedAssetToActorResult")
 			{
@@ -202,6 +224,22 @@ package menu
 					item.displayName = bgAssets[i].name;
 					assetGuiSlider.addItem(item);
 				}
+				assetGuiSlider.value = messageData.intData[0];
+			}
+			else if (command == "CustomMenu_CharacterHasChanged")
+			{
+				SendActorAssetListRequest();
+				//var actorSelector:ComboBox = config.getCompById("actorSelector") as ComboBox;
+				//actorSelector.draw();
+				//actorSelector.selectedIndex = -1;
+			}
+			else if (command == "CustomMenu_AddedBackgroundLayers")
+			{
+				//var bgLayerSelector:ComboBox = config.getCompById("backgroundSelector") as ComboBox;
+				//if (bgLayerSelector == null) { return; }
+				//var currentSelectedIndex:int = bgLayerSelector.selectedIndex;
+				SendBackgroundAssetsRequest();
+
 			}
 			
 		}
@@ -210,24 +248,29 @@ package menu
 		private function ClickEventHandler(target:Object):void
 		{
 			var targetName:String = target["name"];
-			if (targetName == "applyAssetToActorButton")
-			{
+			/*if (targetName == "applyAssetToActorButton")
+			{				
 				//var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
 				var assetSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
 				var actorCBox:ComboBox = config.getCompById("actorSelector") as ComboBox;
 				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
 				if (assetSlider && actorCBox)
 				{
+					var messageData:MessageData = new MessageData;
 					//Asset slider needs to have an item to select.
 					if (assetSlider.selectedIndex > -1 && actorCBox.selectedIndex > -1)
 					{
-						signal2.dispatch("ApplyAssetToActor", [actorCBox.selectedItem ,assetSlider.selectedIndex]);
+						messageData.stringData[0] = actorCBox.selectedItem as String;
+						messageData.intData[0] = GetSelectedAssetLayerNumber();
+						messageData.intData[1] = assetSlider.selectedIndex;
+						signal2.dispatch("ApplyAssetToActor", messageData);
+						//signal2.dispatch("ApplyAssetToActor", [actorCBox.selectedItem ,assetSlider.selectedIndex]);
 					}
 				}
 				
 				//UpdateGraphicSetsUsed();
 			}
-			else if (targetName.search(/applySetToAllActorsButton|removeSetToAllActorsButton/) > -1)
+			else */if (targetName.search(/applySetToAllActorsButton|removeSetToAllActorsButton/) > -1)
 			{
 				var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
 				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
@@ -236,11 +279,19 @@ package menu
 					if (gfxSetCBox.selectedIndex != -1)
 					{
 						var applyingSet:Boolean = (targetName == "applySetToAllActorsButton") ? true : false;
-						signal2.dispatch("ApplySetToAllActors", [gfxSetCBox.selectedItem, applyingSet]);
+						var messageData:MessageData = new MessageData;
+						messageData.stringData[0] = gfxSetCBox.selectedItem as String;
+						messageData.boolData[0] = applyingSet;
+						signal2.dispatch("ApplySetToAllActors", messageData);
+						//signal2.dispatch("ApplySetToAllActors", [gfxSetCBox.selectedItem, applyingSet]);
 					}
 				}
 				
 				//UpdateGraphicSetsUsed();
+			}
+			else if (targetName.search(/bottomLayerAssetsButton|mainLayerAssetsButton|topLayerAssetsButton/) > -1)
+			{
+				SendActorAssetListRequest();
 			}
 		}
 		
@@ -249,50 +300,76 @@ package menu
 			if (target.name == "assetSelectSlider")
 			{
 				var assetText:TextArea = config.getCompById("assetInformation") as TextArea;
-				
+				var assetSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
 				var item:Object;
 				if ((target as HGUISlider).selectedItem != null)
 				{
-					item = (target as HGUISlider).selectedItem;
+					item = assetSlider.selectedItem;
 				}
+				
+				//var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
+				/*var assetSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
+				var actorCBox:ComboBox = config.getCompById("actorSelector") as ComboBox;
+				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
+				if (assetSlider && actorCBox)
+				{
+					var messageData:MessageData = new MessageData;
+					//Asset slider needs to have an item to select.
+					if (assetSlider.selectedIndex > -1 && actorCBox.selectedIndex > -1)
+					{
+						messageData.stringData[0] = actorCBox.selectedItem as String;
+						messageData.intData[0] = GetSelectedAssetLayerNumber();
+						messageData.intData[1] = assetSlider.selectedIndex;
+						signal2.dispatch("ApplyAssetToActor", messageData);
+						//signal2.dispatch("ApplyAssetToActor", [actorCBox.selectedItem ,assetSlider.selectedIndex]);
+					}
+				}*/
+				var actorCBox:ComboBox = config.getCompById("actorSelector") as ComboBox;
+				var messageData:MessageData = new MessageData;
 				if (item)
 				{
-					var layerText:String;
-					switch(item.layer)
-					{
-						case 0:
-							layerText = "Bottom";
-							break;
-						case 1:
-							layerText = "Main";
-							break;
-						case 2:
-							layerText = "Top";
-							break;
-						default:
-							layerText = "Invalid";
-					}
-					assetText.text = StringUtil.substitute("Set: {0}\nLayer: {1}", item.displayName, layerText);
+					assetText.text = StringUtil.substitute("Set: {0}", item.displayName);
+					messageData.stringData[0] = actorCBox.selectedItem as String;
+					messageData.intData[0] = GetSelectedAssetLayerNumber();
+					messageData.intData[1] = assetSlider.selectedIndex;
 				}
 				else
 				{
-					assetText.text = "Information unavailable";
+					assetText.text = "Disabled";
+					messageData.stringData[0] = actorCBox.selectedItem as String;
+					messageData.intData[0] = GetSelectedAssetLayerNumber();
+					messageData.intData[1] = -1;
 				}
+				signal2.dispatch("ApplyAssetToActor", messageData);
 				
 			}
-			else if (target.name == "backgroundAssetInformation")
+			else if (target.name == "backgroundAssetSelectSlider")
 			{
 				var assetText:TextArea = config.getCompById("backgroundAssetInformation") as TextArea;
+				var bgLayerSelector:ComboBox = config.getCompById("backgroundSelector") as ComboBox;
+				if (bgLayerSelector == null) { return; }
+				
 				var item:Object;
 				var hguiSlider:HGUISlider = (target as HGUISlider);
 				if (hguiSlider.selectedItem != null)
 				{
 					item = hguiSlider.selectedItem;
 				}
+				var messageData:MessageData = new MessageData;
 				if (item)
 				{
 					assetText.text = StringUtil.substitute("Name: {0}", item.displayName);
+					
+					messageData.intData[0] = bgLayerSelector.selectedIndex;
+					messageData.intData[1] = hguiSlider.selectedIndex;					
 				}
+				else
+				{
+					assetText.text = "Disabled";
+					messageData.intData[0] = bgLayerSelector.selectedIndex;
+					messageData.intData[1] = -1;
+				}
+				signal2.dispatch("CustomMenu_ChangeBackgroundAsset", messageData);
 			}
 			
 		}
@@ -301,27 +378,44 @@ package menu
 		{
 			if(target.name == "actorSelector")
 			{
-				
-				var actorName:String = (config.getCompById("actorSelector") as ComboBox).selectedItem as String;
-				if (actorName && actorName.length > 0)
-				{
-					signal2.dispatch("ActorAssetListRequest", actorName);
-				}			
+				SendActorAssetListRequest();		
 			}
 			else if (target.name == "backgroundSelector")
 			{	
-				var backgroundSelector:ComboBox = config.getCompById("backgroundSelector") as ComboBox;
-				if (backgroundSelector)
-				{
-					var bgSelectData:MessageData = new MessageData();
-					bgSelectData.intData[0] = backgroundSelector.selectedIndex;
-					signal2.dispatch("CustomMenu_GetBackgroundLayerAssetsRequest", bgSelectData);
-				}
+				SendBackgroundAssetsRequest();
+				
 			}
 			
 		}
 		
+		private function SendActorAssetListRequest():void
+		{
+			var actorName:String = (config.getCompById("actorSelector") as ComboBox).selectedItem as String;
+			if (actorName && actorName.length > 0)
+			{
+				var messageData:MessageData = new MessageData;					
+				
+				messageData.stringData[0] = actorName;
+				messageData.intData[0] = GetSelectedAssetLayerNumber();
+				signal2.dispatch("ActorAssetListRequest", messageData);
+			}
+		}
 		
+		private function GetSelectedAssetLayerNumber():int
+		{
+			var bottomButton:RadioButton;
+			bottomButton = (config.getCompById("bottomLayerAssetsButton") as RadioButton);
+			if (bottomButton && bottomButton.selected) return 0;
+			var mainButton:RadioButton;
+			mainButton = (config.getCompById("mainLayerAssetsButton") as RadioButton);
+			if (mainButton && mainButton.selected) return 1;
+			var topButton:RadioButton;
+			topButton = (config.getCompById("topLayerAssetsButton") as RadioButton);
+			if (topButton && topButton.selected) return 2;
+			
+			return -1;
+			
+		}
 		
 		private function FinishedLoadingXML(e:Event):void
 		{
@@ -387,6 +481,17 @@ package menu
 				}
 			}
 			return previewList;
+		}
+		
+		private function SendBackgroundAssetsRequest():void 
+		{
+			var backgroundSelector:ComboBox = config.getCompById("backgroundSelector") as ComboBox;
+			if (backgroundSelector)
+			{
+				var bgSelectData:MessageData = new MessageData();
+				bgSelectData.intData[0] = backgroundSelector.selectedIndex;
+				signal2.dispatch("CustomMenu_GetBackgroundLayerAssetsRequest", bgSelectData);
+			}
 		}
 		
 		CONFIG::debug
