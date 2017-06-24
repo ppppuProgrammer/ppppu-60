@@ -771,6 +771,22 @@ package
 				backgroundMasterTimeline.gotoAndStop(position);
 				//masterTemplate.ResumePlayingAnimation();
 			}
+			else if (targetName == "CustomMenu_ColorDataRequest")
+			{
+				var currentCharColorData:Object = characterManager.GetCharacterColorData(characterManager.GetCharacterIdByName(characterManager.GetCurrentCharacterName()));
+				if (currentCharColorData && messageData.stringData[0] in currentCharColorData)
+				{
+					var colorGroupData:Array = currentCharColorData[messageData.stringData[0]];
+					for (var j:int = 0; j < 4; j++) 
+					{
+						if (j < colorGroupData.length)
+							messageData.uintData[j] = colorGroupData[j];
+						else
+							messageData.uintData[j] = 0x00000000;
+					}
+					menuSignal2.dispatch("CustomMenu_ColorDataResponse", messageData);
+				}
+			}
 			else if (targetName == "setAnimationTime")
 			{
 				canvas.JumpToPosition(value as Number);
@@ -1041,6 +1057,14 @@ package
 				{
 					bgLayer.SelectBackgroundAsset(messageData.intData[1]);
 				}
+			}
+			else if (targetName == "CustomMenu_ChangeInCharacterColor")
+			{
+				var currentCharacter:String = characterManager.GetCurrentCharacterName();
+				var colorSettings:Object = userSettings.GetColorSettingsForCharacter(currentCharacter);
+				colorSettings[messageData.stringData[0]] = [messageData.uintData[0], messageData.uintData[1], messageData.uintData[2], messageData.uintData[3]];
+				userSettings.UpdateColorSettingsForCharacter(currentCharacter, colorSettings);
+				colorizer.ChangeColorsUsingCharacterData(colorSettings);
 			}
 		}
 		}

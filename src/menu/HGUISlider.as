@@ -1,4 +1,4 @@
-package com.bit101.components 
+package menu 
 {
 	import com.bit101.components.HUISlider;
 	import com.bit101.components.List;

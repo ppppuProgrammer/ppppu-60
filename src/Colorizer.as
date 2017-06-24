@@ -182,13 +182,13 @@ package
 			{
 				GradientChange(sprite, colorValue as Array);
 			}
-			else if ((colorValue as ColorTransform) != null)
+			else if ((colorValue[0] as ColorTransform) != null)
 			{
-				sprite.transform.colorTransform = colorValue as ColorTransform;
+				sprite.transform.colorTransform = colorValue[0] as ColorTransform;
 			}
-			else if (colorValue is uint)
+			else if (colorValue[0] is uint)
 			{
-				color = colorValue as uint;
+				color = colorValue[0] as uint;
 				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
 			}
 			else if ("Color" in colorValue)
@@ -227,10 +227,21 @@ package
 						return;
 					}
 					var color:uint;
+					var lastUsedColor:uint=0;
 					for (var x:int = 0, fillLength:int = gradientFill.colors.length; x < fillLength; ++x)
 					{
+						if (x < colorUIntValues.length && colorUIntValues[x] > 0)
+						{
+							color = colorUIntValues[x];
+							lastUsedColor = color;
+							
+						}
+						else //Ran out of value in colorUIntValues or color given was 0, keep feeding the gradientFill with the last good value used from colorUIntValues.
+						{
+							color = lastUsedColor;
+						}
 						
-						if (x < colorUIntValues.length)
+						/*if (x < colorUIntValues.length && colorUIntValues[x] > 0)
 						{
 							if ("Color" in colorUIntValues[x])
 							{
@@ -252,7 +263,7 @@ package
 							{
 								color = colorUIntValues[colorUIntValues.length];
 							}
-						}
+						}*/
 						gradientFill.colors[x] = color >>> 8; //Converts from RRGGBBAA to RRGGBB
 						//Extracts the alpha value via bitwise AND operation then multiplies the result so the value ranges from 0 to 1
 						gradientFill.alphas[x] = (color & 0xFF) * 0.3921568627450980392156862745098;

@@ -61,6 +61,27 @@
 			{
 				data = charData;
 			}
+			if (data && "Color" in data)
+			{
+				for (var colorGroup:String in data.Color) 
+				{
+					//Need to put the uint into a 4 index array as the color group may be used for gradients at a later time.
+					if (data.Color[colorGroup] is uint)
+					{
+						data.Color[colorGroup] = [data.Color[colorGroup], 0x00000000, 0x00000000, 0x00000000];
+					}
+					else if (data.Color[colorGroup] is Array)
+					{
+						if ((data.Color[colorGroup] as Array).length < 4)
+						{
+							for (var i:int = (data.Color[colorGroup] as Array).length; i < 4; i++) 
+							{
+								data.Color[colorGroup][i] = 0x00000000;
+							}
+						}
+					}
+				}
+			}
 			SetAnimationLists(presetAnimationLists);
 			//if(animationList
 			if (isPresetCharacter)

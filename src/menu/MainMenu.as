@@ -32,6 +32,7 @@ package menu
 		{
 		private var developerMenu:DeveloperMenu;
 		}
+		private var creditsMenu:CreditsMenu;
 		private var currentSubmenu:Sprite;
 		
 		//private 
@@ -47,7 +48,7 @@ package menu
 			name = "Main Menu";
 			
 			
-			var tabsList:Vector.<String> = Vector.<String>(["Characters", "Customization", "Animations", "Music", "Load"]);
+			var tabsList:Vector.<String> = Vector.<String>(["Characters", "Customization", "Animations", "Music", "Load", "Credits"]);
 			CONFIG::debug 
 			{
 				tabsList[tabsList.length] = "Development";
@@ -135,6 +136,9 @@ package menu
 			characterMenu = CreateSubmenu(CharacterMenu) as CharacterMenu;
 			addChild(characterMenu);
 			
+			creditsMenu = CreateSubmenu(CreditsMenu) as CreditsMenu;
+			addChild(creditsMenu);
+			
 			InitializeAllSubmenus(app, director);
 		}
 		
@@ -181,6 +185,9 @@ package menu
 						{
 						SwitchSubmenu(developerMenu);
 						}
+						break;
+					case "CreditsTab":
+						SwitchSubmenu(creditsMenu);
 						break;
 				}
 				
@@ -241,7 +248,8 @@ package menu
 			}
 			if (animationMenu != null) {animationMenu.InitializeMenu(app); RegisterSubmenu(animationMenu);}
 			if (customizationMenu != null) { customizationMenu.InitializeMenu(app); customizationMenu.RegisterDirectorForMessages(director); RegisterSubmenu(customizationMenu); }
-			if (loadMenu != null) {loadMenu.InitializeMenu(app); RegisterSubmenu(loadMenu);}
+			if (loadMenu != null) { loadMenu.InitializeMenu(app); RegisterSubmenu(loadMenu); }
+			if (creditsMenu != null) {creditsMenu.InitializeMenu(app);}	
 		}
 		
 		[inline]
@@ -273,6 +281,10 @@ package menu
 					break;
 				case loadMenu: 
 					loadMenu = null;
+					break;
+					
+				case creditsMenu: 
+					creditsMenu = null;
 					break;
 					
 				
@@ -350,6 +362,7 @@ package menu
 				ResetSubMenu(loadMenu);
 				ResetSubMenu(animationMenu);
 				ResetSubMenu(developerMenu);
+				ResetSubMenu(creditsMenu);
 			}
 			
 			private function ResetSubMenu(submenu:ISubMenu):void
@@ -391,9 +404,13 @@ package menu
 					case loadMenu: 
 						buttonGroup[4].enabled = success;	
 						break;
-					case developerMenu:
+					case creditsMenu:
 						buttonGroup[5].enabled = success;	
-						break;					
+						break;	
+					case developerMenu:
+						buttonGroup[6].enabled = success;	
+						break;	
+					
 				}
 			}
 			

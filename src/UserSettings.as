@@ -202,6 +202,15 @@ package
 			return null;
 		}
 		
+		public function GetColorSettingsForCharacter(characterName:String):Object
+		{
+			if (characterName in characterSettings)
+			{
+				return characterSettings[characterName].colors;
+			}
+			return null;
+		}
+		
 		public function ConvertFromObject(obj:Object):void
 		{ 
 			backlightOn = obj.backlightOn;

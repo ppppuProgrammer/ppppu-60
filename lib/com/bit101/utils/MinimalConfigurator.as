@@ -136,7 +136,19 @@ package com.bit101.utils
 			var specialProps:Object = {};
 			try
 			{
-				var classRef:Class = getDefinitionByName("com.bit101.components." + xml.name()) as Class;
+				//Edit, checks if a custom component is to be created. Requires the xml's name to start with "Custom:" followed by the full class name (Package + Class)
+				var classRef:Class;
+				if ((xml.name() as QName).localName.lastIndexOf("CUSTOM_", 0) > -1)
+				{
+					var xmlClassName:String = (xml.name() as QName).localName;
+					xmlClassName = xmlClassName.substring(xmlClassName.indexOf("CUSTOM_") + "CUSTOM_".length);
+					xmlClassName=xmlClassName.replace(/_/, ".");
+					classRef = getDefinitionByName(xmlClassName) as Class;
+				}
+				else
+				{
+					classRef = getDefinitionByName("com.bit101.components." + xml.name()) as Class;
+				}
 				compInst = new classRef();
 				
 				// id is special case, maps to name as well.
@@ -249,7 +261,6 @@ package com.bit101.utils
 		HRangeSlider;
 		HScrollBar;
 		HSlider;
-		HGUISlider;
 		HUISlider;
 		IndicatorLight;
 		InputText;

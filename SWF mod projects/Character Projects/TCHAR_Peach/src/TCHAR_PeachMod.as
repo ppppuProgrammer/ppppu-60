@@ -16,24 +16,24 @@ package
 		{
 			characterName = "Peach";
 			
-			characterData.Color.Iris = 0x3671C1FF;
-			characterData.Color.Skin = 0xFFDCC6FF;
-			characterData.Color.SkinHighlight = 0xFFFFFFFF;
-			characterData.Color.Hair = 0xFFE81AFF;
-			characterData.Color.HairAngled = 0xFEB60DFF;
-			characterData.Color.Lip = 0xFF99CCFF;
-			characterData.Color.Legging = [0xECC6FFFF, 0xE0A6FCFF];
+			characterData.Color.IrisColor = 0x3671C1FF;
+			characterData.Color.SkinColor = 0xFFDCC6FF;
+			characterData.Color.SkinHighlightColor = 0xFFFFFFFF;
+			characterData.Color.HairColor = 0xFFE81AFF;
+			characterData.Color.HairAngledColor = 0xFEB60DFF;
+			characterData.Color.LipColor = 0xFF99CCFF;
+			characterData.Color.LeggingColor = [0xECC6FFFF, 0xE0A6FCFF];
 			//var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243, 182, 154, 255));
 			
 			//var standardGradientEndPoint:uint = UtilityFunctions.GetColorUintFromRGB(243,182,154);
-			characterData.Color.Eyelid = 0xF0A586FF;
-			characterData.Color.Nipple = 0xFFAFFFFF;
-			characterData.Color.Areola = [0xFFAFFFFF, 0xFFAFFF00];
-			characterData.Color.Face = [0xFFDCC6FF, {ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//2
-			characterData.Color.Ear = [{ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}, 0xFFDCC6FF];//2
-			characterData.Color.Breast = [0xFFDCC6FF,0xFFDCC6FF, {ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//3
-			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
-			characterData.Color.SkinLine = 0x7A2810FF;
+			characterData.Color.EyelidColor = 0xF0A586FF;
+			characterData.Color.NippleColor = 0xFFAFFFFF;
+			characterData.Color.AreolaColor = [0xFFAFFFFF, 0xFFAFFF00];
+			characterData.Color.FaceColor = [0xFFDCC6FF, {ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//2
+			characterData.Color.EarColor = [{ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}, 0xFFDCC6FF];//2
+			characterData.Color.BreastColor = [0xFFDCC6FF,0xFFDCC6FF, {ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//3
+			characterData.Color.VulvaColor = [0xF3B69AFF,0xFFDCC6FF];//2
+			characterData.Color.SkinLineColor = 0x7A2810FF;
 			
 			//characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
 			

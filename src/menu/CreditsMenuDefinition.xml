@@ -1,0 +1,22 @@
+<comps>
+	<VBox spacing="15">
+		<Panel id="creditsPanel" x="0" y="0" width="480" height="700" hasMinimizeButton="false" draggable="false">
+			<VBox x="10" spacing="5">
+				<Label text="ppppu NX credits"/>
+				<Label text="Original ppppu Creator: minus8"/>
+				<Label text="Main Programmer: ppppuProgrammer"/>
+				<Label text="Programming Contributors:"/>
+				<Label text="	Purple Drank"/>
+				<Label text="	SMLSE26"/>
+				<Label text="Original Concept Creator: minus8"/>
+				<Label text="Special Thanks: "/>
+				<Label text="	General Scot "/>				
+				<Label text="	To the many ppppu Xi/NX mod creators"/>
+				<Label text="	Cubespoon"/>
+				<Label text="	Everyone who has followed the ppppu modification projects over the years"/>
+				<Label y="60" text="	And you"/>
+			</VBox>
+			<Label id="versionLabel" text="" x="10" y="660"/>
+		</Panel>
+	</VBox>	
+</comps>

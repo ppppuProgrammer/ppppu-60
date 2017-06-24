@@ -1,6 +1,5 @@
 package menu 
 {
-	import animations.Director;
 	
 	/**
 	 * ...

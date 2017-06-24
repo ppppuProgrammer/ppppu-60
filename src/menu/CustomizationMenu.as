@@ -5,6 +5,7 @@ package menu
 	import com.bit101.components.PushButton;
 	import com.bit101.utils.MinimalConfigurator;
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -12,6 +13,7 @@ package menu
 	import flash.events.IOErrorEvent;
 	import com.jacksondunstan.signals.Signal2;
 	import com.jacksondunstan.signals.Slot2;
+	import flash.geom.Point;
 	import mx.utils.StringUtil;
 	import flash.utils.Dictionary;
 	import flash.utils.ByteArray;
@@ -19,10 +21,14 @@ package menu
 	 *
 	 * @author 
 	 */
-	public class CustomizationMenu extends Sprite  implements Slot2, ISubMenu
+	public class CustomizationMenu extends Sprite implements Slot2, ISubMenu
 	{
 		private var config:MinimalConfigurator;
 		private var signal2:Signal2;
+		private var rgbaColorMenu:RGBAMenu = new RGBAMenu();
+		private var hsvcColorMenu:HSVCMenu = new HSVCMenu();
+		private var colorMode:int = -1;
+		private var currentColorPointsData:Vector.<uint>;
 		
 		private var assetPreviewSprites:Dictionary = new Dictionary();
 		
@@ -107,19 +113,24 @@ package menu
 			var messageData:MessageData = value as MessageData;
 			if (command == "ClickEvent")
 			{
-				var compName:String = (value as Object)["name"];
-				if (config.getCompById(compName) != null)
-				{
+				//var compName:String = (value as Object)["name"];
+				//if (config.getCompById(compName) != null)
+				//{
 					ClickEventHandler(value as Object);
-				}
+				/*}
+				else
+				{
+					ClickEventHandler(null);
+				}*/
 			}
 			else if (command == "ChangeEvent")
 			{
 				var compName:String = (value as Object)["name"];
-				if (config.getCompById(compName) != null)
+				if (config.getCompById(compName) != null || value is RGBAMenu || value is HSVCMenu)
 				{
 					ChangeEventHandler(value as Object);
 				}
+				
 			}
 			else if (command == "SelectEvent")
 			{
@@ -241,6 +252,14 @@ package menu
 				SendBackgroundAssetsRequest();
 
 			}
+			else if (command == "CustomMenu_ColorDataResponse")
+			{
+				currentColorPointsData = messageData.uintData;
+				var colorPoint = WhichColorPointIsChanging();
+				if (colorMode == 0 && rgbaColorMenu.visible && colorPoint < 4 && colorPoint > -1) {
+					rgbaColorMenu.setValueFromUint(currentColorPointsData[colorPoint]);
+				}
+			}
 			
 		}
 		
@@ -248,29 +267,59 @@ package menu
 		private function ClickEventHandler(target:Object):void
 		{
 			var targetName:String = target["name"];
-			/*if (targetName == "applyAssetToActorButton")
-			{				
-				//var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
-				var assetSlider:HGUISlider = config.getCompById("assetSelectSlider") as HGUISlider;
-				var actorCBox:ComboBox = config.getCompById("actorSelector") as ComboBox;
-				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
-				if (assetSlider && actorCBox)
+			if (targetName.indexOf("popup") > -1)
+			{
+				var colorEditor:Window = config.getCompById("colorEditWindow") as Window;
+				var textAreaForColorGroupName:TextArea = config.getCompById("currentColorGroupText") as TextArea;
+				if (colorEditor)
 				{
-					var messageData:MessageData = new MessageData;
-					//Asset slider needs to have an item to select.
-					if (assetSlider.selectedIndex > -1 && actorCBox.selectedIndex > -1)
-					{
-						messageData.stringData[0] = actorCBox.selectedItem as String;
-						messageData.intData[0] = GetSelectedAssetLayerNumber();
-						messageData.intData[1] = assetSlider.selectedIndex;
-						signal2.dispatch("ApplyAssetToActor", messageData);
-						//signal2.dispatch("ApplyAssetToActor", [actorCBox.selectedItem ,assetSlider.selectedIndex]);
+					var button:PushButton = target as PushButton;
+					var colorDataRequestMessage:MessageData = new MessageData();
+					if (textAreaForColorGroupName) {
+						var buttonNameParts:Array = button.name.split("_");
+						
+						//Test if the color edit window is already visible for the pressed button. If so, hide the color editor.
+						if (buttonNameParts[1] == textAreaForColorGroupName.text+"Color" && colorEditor.visible)
+						{
+							colorEditor.visible = colorEditor.mouseEnabled = false;
+							if (rgbaColorMenu.parent != null){
+								rgbaColorMenu.parent.removeChild(rgbaColorMenu);
+							}
+							
+							if (hsvcColorMenu.parent != null){
+								hsvcColorMenu.parent.removeChild(hsvcColorMenu);
+							}
+							return;
+						}
+						
+						textAreaForColorGroupName.text = (buttonNameParts[1] as String).replace("Color", "");
+	
+						
+						 
+						colorDataRequestMessage.stringData[0] = buttonNameParts[1];
+						if (buttonNameParts[2] == "RGBA")
+							colorMode = 0;
+						else if (buttonNameParts[2] == "HSVC")
+							colorMode = 1;
+						else 
+							colorMode = -1;
+						AddColorSubmenu(colorMode);
+						
 					}
+					colorEditor.visible = colorEditor.mouseEnabled = true;
+					
+					var editorPlacementPoint:Point = new Point(button.x, button.height + button.y);
+					editorPlacementPoint = this.globalToLocal(button.parent.localToGlobal(editorPlacementPoint));
+					colorEditor.x = editorPlacementPoint.x;
+					colorEditor.y =  editorPlacementPoint.y;
+					
+					
+					this.addChildAt(colorEditor, this.numChildren - 1);
+					signal2.dispatch("CustomMenu_ColorDataRequest", colorDataRequestMessage);
+					
 				}
-				
-				//UpdateGraphicSetsUsed();
-			}
-			else */if (targetName.search(/applySetToAllActorsButton|removeSetToAllActorsButton/) > -1)
+			}			
+			else if (targetName.search(/applySetToAllActorsButton|removeSetToAllActorsButton/) > -1)
 			{
 				var gfxSetCBox:ComboBox = config.getCompById("gfxSetSelector") as ComboBox;
 				//var gfxSetList:List = config.getCompById("gfxSetList") as List;
@@ -292,6 +341,53 @@ package menu
 			else if (targetName.search(/bottomLayerAssetsButton|mainLayerAssetsButton|topLayerAssetsButton/) > -1)
 			{
 				SendActorAssetListRequest();
+			}
+			else if (targetName.search(/Color1|Color2|Color3|Color4/) > -1)
+			{
+				//Needs to do something 
+				switch(targetName)
+				{
+					case "Color1":
+						if (colorMode == 0)
+							rgbaColorMenu.setValueFromUint(currentColorPointsData[0]);
+						break;
+					case "Color2":
+						if (colorMode == 0)
+							rgbaColorMenu.setValueFromUint(currentColorPointsData[1]);
+						break;
+					case "Color3":
+						if (colorMode == 0)
+							rgbaColorMenu.setValueFromUint(currentColorPointsData[2]);
+						break;
+					case "Color4":
+						if (colorMode == 0)
+							rgbaColorMenu.setValueFromUint(currentColorPointsData[3]);
+						break;
+				}
+			}
+			else //Test if the color edit window needs to be closed.
+			{
+				var colorEditor:Window = config.getCompById("colorEditWindow") as Window;
+				var targetSprite:Sprite = target as Sprite;
+				if (targetSprite && colorEditor)
+				{
+					while (targetSprite && targetSprite.parent != stage && targetSprite != colorEditor)
+					{
+						targetSprite = targetSprite.parent as Sprite;
+					}
+					if (targetSprite != colorEditor)
+					{
+						colorEditor.visible = colorEditor.mouseEnabled = false;
+						if (rgbaColorMenu.parent != null){
+							rgbaColorMenu.parent.removeChild(rgbaColorMenu);
+						}
+						
+						if (hsvcColorMenu.parent != null){
+							hsvcColorMenu.parent.removeChild(hsvcColorMenu);
+						}
+					}
+				}
+				
 			}
 		}
 		
@@ -371,7 +467,40 @@ package menu
 				}
 				signal2.dispatch("CustomMenu_ChangeBackgroundAsset", messageData);
 			}
-			
+			else if (target is RGBAMenu)
+			{
+				//Need to know what color point is being edited.
+				var colorPoint:int = WhichColorPointIsChanging();
+				var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
+				if (colorGroupText && colorPoint > -1 && colorPoint < 4)
+				{
+					currentColorPointsData[colorPoint] = (target as RGBAMenu).GetValue();
+					var colorChangeMessage:MessageData = new MessageData;
+					colorChangeMessage.stringData[0] = colorGroupText.text +"Color";
+					for (var j:int = 0; j < 4; j++) 
+					{
+						colorChangeMessage.uintData[j] = currentColorPointsData[j];
+					}
+					signal2.dispatch("CustomMenu_ChangeInCharacterColor", colorChangeMessage);
+				}
+			}
+		}
+		
+		private function WhichColorPointIsChanging():int
+		{
+			var colorButtonsHBox:HBox = config.getCompById("colorButtonHBox") as HBox;
+			if (colorButtonsHBox)
+			{
+				for (var i:int = 0, l:int = colorButtonsHBox.numChildren; i < l; i++) 
+				{
+					var colorRadioButton:RadioButton = colorButtonsHBox.getChildAt(i) as RadioButton;
+					if (colorRadioButton && colorRadioButton.selected == true)
+					{
+						return i;
+					}
+				}
+			}
+			return -1;
 		}
 		
 		public function SelectEventHandler(target:Object):void
@@ -390,7 +519,12 @@ package menu
 		
 		private function SendActorAssetListRequest():void
 		{
-			var actorName:String = (config.getCompById("actorSelector") as ComboBox).selectedItem as String;
+			var actorSelector:ComboBox = (config.getCompById("actorSelector") as ComboBox);
+			var actorName:String;
+			if (actorSelector)
+			{
+				actorName = actorSelector.selectedItem as String;
+			}
 			if (actorName && actorName.length > 0)
 			{
 				var messageData:MessageData = new MessageData;					
@@ -491,6 +625,23 @@ package menu
 				var bgSelectData:MessageData = new MessageData();
 				bgSelectData.intData[0] = backgroundSelector.selectedIndex;
 				signal2.dispatch("CustomMenu_GetBackgroundLayerAssetsRequest", bgSelectData);
+			}
+		}
+		
+		private function AddColorSubmenu(colorMode:int):void
+		{
+			if (colorMode == -1 || colorMode > 1) return;
+			var colorEditor:Window = config.getCompById("colorEditWindow") as Window;
+			//var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
+			var colorButtonsGrouping:HBox = config.getCompById("colorButtonHBox") as HBox;
+			if (colorEditor && colorButtonsGrouping)
+			{
+				var colorMenu:Sprite = (colorMode == 0) ? rgbaColorMenu : hsvcColorMenu
+				var menuToRemove:Sprite = (colorMode == 0) ? hsvcColorMenu : rgbaColorMenu;
+				if (menuToRemove.parent != null) menuToRemove.parent.removeChild(menuToRemove);
+				colorEditor.addChild(colorMenu);
+				colorMenu.x = 10;
+				colorMenu.y = colorButtonsGrouping.y + colorButtonsGrouping.height + 10;
 			}
 		}
 		

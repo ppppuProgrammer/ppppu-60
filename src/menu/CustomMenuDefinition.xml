@@ -2,7 +2,7 @@
 	<!-- Window 1 Actor window -->
 	 <Window id="actorWindow" title="Graphic select" x="0" y="0" width="480" height="170" hasMinimizeButton="false" minimized="false" draggable="false">
 		<ComboBox id="actorSelector" x="0" y="00" width="140" height="20"/>
-		<HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="-1" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
+		<CUSTOM_menu_HGUISlider id="assetSelectSlider" x="210" y="0" width="300" minimum ="-1" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
 		<TextArea id="assetInformation" x="219" y="15" width="250" height="50" editable="false"/>
 		<HBox x="250" y="75" spacing="10">
 			<RadioButton id="bottomLayerAssetsButton" label="Bottom" width="60" groupName="ActorAssetLayerGroup" />
@@ -17,68 +17,68 @@
 		<PushButton id="removeSetToAllActorsButton" x="380" y="120" label="Remove set" width="60"/>
 	</Window>
 	
-	<Window id="colorWindow" title="Color Editor" x="0" y="170" width="480" height="300" enabled="false" draggable="false">
+	<Window id="colorWindow" title="Edit Color Group" x="0" y="170" width="480" height="300" draggable="false">
 		<VBox spacing="25">	
 			<HBox spacing="20" x="10">
-				<VBox>				
-					<PushButton label="Base Skin"/>
-					<PushButton id="" label="Skin Highlight"/>
-					<PushButton id="" label="Face"/>
-					<PushButton id="" label="Lips"/>
-					<PushButton id="" label="Hair"/>
-					<PushButton id="" label="Nipple"/>
-					<PushButton id="" label="Areola"/>
-					<PushButton id="" label="Ear"/>					
+				<VBox id="ColorGrouping1">				
+					<PushButton id="popup_SkinColor_RGBA" label="Base Skin"/>
+					<PushButton id="popup_SkinHighlightColor_RGBA" label="Skin Highlight"/>
+					<PushButton id="popup_FaceColor_RGBA" label="Face"/>
+					<PushButton id="popup_LipColor_RGBA" label="Lips"/>
+					<PushButton id="popup_HairColor_HSVC" label="Hair"/>
+					<PushButton id="popup_NippleColor_RGBA" label="Nipple"/>
+					<PushButton id="popup_AreolaColor_RGBA" label="Areola"/>
+					<PushButton id="popup_EarColor_RGBA" label="Ear"/>					
 				</VBox>			
-				<VBox>
-					<PushButton id="" label="Breast"/>
-					<PushButton id="" label="Vulva"/>
-					<PushButton id="" label="Anus"/>
-					<PushButton id="" label="Line"/>							
-					<PushButton id="" label="Legging"/>
-					<PushButton id="" label="Headwear"/>
-					<PushButton id="" label="Left Earring"/>
-					<PushButton id="" label="Right Earring"/>				
+				<VBox id="ColorGrouping2" >
+					<PushButton id="popup_BreastColor_RGBA" label="Breast"/>
+					<PushButton id="popup_VulvaColor_RGBA" label="Vulva"/>
+					<PushButton id="popup_AnusColor_RGBA" label="Anus"/>
+					<PushButton id="popup_SkinLineColor_RGBA" label="Skin Line"/>
+					<PushButton id="popup_LeggingColor_RGBA" label="Legging"/>
+					<PushButton id="popup_HeadwearColor_RGBA" label="Headwear"/>
+					<PushButton id="popup_LeftEarringColor_RGBA" label="Left Earring"/>
+					<PushButton id="popup_RightEarringColor_RGBA" label="Right Earring"/>
 				</VBox>
-				<VBox>				
-					<PushButton id="" label="Left Eye"/>
-					<PushButton id="" label="Right Eye"/>
-					<PushButton id="" label="Sclera"/>
-					<PushButton id="" label="Eyelid"/>
-					<PushButton id="" label="Hair HSV"/>
-					<PushButton id="" label="Female Skin HSV"/>
-					<PushButton id="" label="Male Skin HSV"/>
-					<PushButton id="" label="Male base skin"/>					
+				<VBox id="ColorGrouping3">				
+					<PushButton id="popup_LeftEyeColor_RGBA" label="Left Eye"/>
+					<PushButton id="popup_RightEyeColor_RGBA" label="Right Eye"/>
+					<PushButton id="popup_ScleraColor_RGBA" label="Sclera"/>
+					<PushButton id="popup_EyelidColor_RGBA" label="Eyelid"/>
+					<PushButton id="popup_HairColor_HSVC" label="Hair HSV"/>
+					<PushButton id="popup_FemaleSkinTint_HSVC" label="UNUSED - Female Skin HSV"/>
+					<PushButton id="popup_MaleSkinTint_HSVC" label="UNUSED - Male Skin HSV"/>
+					<PushButton id="popup_MaleSkinColor_RGBA" label="Male base skin"/>
 				</VBox>
-				<VBox>
-					<PushButton id="" label="Custom 1"/>
-					<PushButton id="" label="Custom 2"/>
-					<PushButton id="" label="Custom 3"/>
-					<PushButton id="" label="Custom 4"/>
-					<PushButton id="" label="Custom 5"/>
-					<PushButton id="" label="Custom 6"/>
-					<PushButton id="" label="Place holder"/>
-					<PushButton id="" label="Place holder2"/>	
+				<VBox id="ColorGrouping4">
+					<PushButton id="popup_Custom1Color_RGBA" label="Custom 1"/>
+					<PushButton id="popup_Custom2Color_RGBA" label="Custom 2"/>
+					<PushButton id="popup_Custom3Color_RGBA" label="Custom 3"/>
+					<PushButton id="popup_Custom4Color_RGBA" label="Custom 4"/>
+					<PushButton id="popup_Custom5Color_RGBA" label="Custom 5"/>
+					<PushButton id="popup_Custom6Color_RGBA" label="Custom 6"/>
+					<PushButton id="popup_PlaceholderColor_RGBA" label="Place holder"/>
+					<PushButton id="popup_Placeholder2Color_RGBA" label="Place holder2"/>
 				</VBox>
-			</HBox>
-			<Panel id="TempWindow" title="Color Editor" width="480" height="80" draggable="false">
-				<VBox>
-					<HBox spacing="10">
-						<TextArea id="currentColorGroupText" width="250" height="20" editable="false" autoHideScrollBar="true" />
-					
-						<PushButton id="Color1" label="C1" width="20" />
-						<PushButton id="Color2" label="C2" width="20" />
-						<PushButton id="Color3" label="C3" width="20" />
-						<PushButton id="Color4" label="C4" width="20" />
-					</HBox>
-				</VBox>	
-			</Panel>
+			</HBox>			
 		</VBox>			
+	</Window>
+	
+	<Window id="colorEditWindow" title="Color Editor" width="170" height="220" draggable="false" visible="false">
+		<VBox>
+			<TextArea id="currentColorGroupText" width="150" height="20" x="10" editable="false" enabled="false" autoHideScrollBar="true" />
+			<HBox id="colorButtonHBox" x="20" spacing="15">
+				<RadioButton id="Color1" label="C1" width="20" groupName="ColorPointsGroup" />
+				<RadioButton id="Color2" label="C2" width="20" groupName="ColorPointsGroup"/>
+				<RadioButton id="Color3" label="C3" width="20" groupName="ColorPointsGroup"/>
+				<RadioButton id="Color4" label="C4" width="20" groupName="ColorPointsGroup"/>
+			</HBox>
+		</VBox>	
 	</Window>
 	
 	<Window id="backgroundWindow" title="Background Editor" x="0" y="500" width="480" height="100" draggable="false">
 			<ComboBox id="backgroundSelector" x="0" y="0" width="140" height="20" numVisibleItems="3" />
-			<HGUISlider id="backgroundAssetSelectSlider" x="210" y="0" width="300" minimum ="-1" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
+			<CUSTOM_menu_HGUISlider id="backgroundAssetSelectSlider" x="210" y="0" width="300" minimum ="-1" value="0" maximum="0" labelPrecision="0" tick="1.0" displaySize="64" />
 			<TextArea id="backgroundAssetInformation" x="219" y="15" width="250" height="50" editable="false"/>
 	</Window>
 </comps>
