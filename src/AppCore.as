@@ -1060,11 +1060,30 @@ package
 			}
 			else if (targetName == "CustomMenu_ChangeInCharacterColor")
 			{
-				var currentCharacter:String = characterManager.GetCurrentCharacterName();
-				var colorSettings:Object = userSettings.GetColorSettingsForCharacter(currentCharacter);
-				colorSettings[messageData.stringData[0]] = [messageData.uintData[0], messageData.uintData[1], messageData.uintData[2], messageData.uintData[3]];
-				userSettings.UpdateColorSettingsForCharacter(currentCharacter, colorSettings);
+				var currentCharacterId:int = characterManager.GetCurrentCharacterId();
+				//var colorSettings:Object = characterManager.GetCharacterColorData(characterManager.GetCharacterIdByName(currentCharacter));
+				var colorPointChanging:int = messageData.intData[0];
+				characterManager.ModifyColorDataForCharacter(currentCharacterId, messageData.stringData[0], messageData.uintData, colorPointChanging);
+				var colorSettings:Object = characterManager.GetCharacterColorData(currentCharacterId);
+				//var colorSettings:Object = userSettings.GetColorSettingsForCharacter(currentCharacter);
+				//colorSettings[messageData.stringData[0]] = [messageData.uintData[0], messageData.uintData[1], messageData.uintData[2], messageData.uintData[3]];
+				userSettings.UpdateColorSettingsForCharacter(characterManager.GetCurrentCharacterName(), colorSettings);
 				colorizer.ChangeColorsUsingCharacterData(colorSettings);
+				for (var j:int = 0; j < 4; j++) 
+				{
+					messageData.uintData[j] = colorSettings[messageData.stringData[0]][j];
+				}
+				menuSignal2.dispatch("CustomMenu_ColorDataResponse-NoMenuRedraw", messageData);
+			}
+			else if (targetName == "CustomMenu_GetLinkedColorGroupNumberRequest")
+			{
+				var groupNumber:int = characterManager.GetLinkedColorGroupNumberForCharacter(characterManager.GetCurrentCharacterId(), messageData.stringData[0], messageData.intData[0]);
+				//Reuse the message for the reply
+				messageData.intData[0] = groupNumber;
+				menuSignal2.dispatch("CustomMenu_GetLinkedColorGroupNumberResponse", messageData);
+			}
+			else if (targetName == "CustomMenu_ChangeLinkedColorGroupNumber") {
+				characterManager.ChangeLinkedColorGroupNumberForCharacter(characterManager.GetCurrentCharacterId(), messageData.stringData[0], messageData.intData[0], messageData.intData[1]);
 			}
 		}
 		}

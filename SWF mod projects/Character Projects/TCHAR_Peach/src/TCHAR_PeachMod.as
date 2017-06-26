@@ -29,11 +29,23 @@ package
 			characterData.Color.EyelidColor = 0xF0A586FF;
 			characterData.Color.NippleColor = 0xFFAFFFFF;
 			characterData.Color.AreolaColor = [0xFFAFFFFF, 0xFFAFFF00];
-			characterData.Color.FaceColor = [0xFFDCC6FF, {ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//2
-			characterData.Color.EarColor = [{ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}, 0xFFDCC6FF];//2
-			characterData.Color.BreastColor = [0xFFDCC6FF,0xFFDCC6FF, {ID: "SkinGradient", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//3
+			characterData.Color.FaceColor = [0xFFDCC6FF, UtilityFunctions.GetColorUintValue(243, 182, 154, 255)];//2
+			characterData.Color.EarColor = [UtilityFunctions.GetColorUintValue(243, 182, 154, 255), 0xFFDCC6FF];//2
+			characterData.Color.BreastColor = [0xFFDCC6FF,0xFFDCC6FF, UtilityFunctions.GetColorUintValue(243, 182, 154, 255)];//3
 			characterData.Color.VulvaColor = [0xF3B69AFF,0xFFDCC6FF];//2
 			characterData.Color.SkinLineColor = 0x7A2810FF;
+			
+			//linked color group 1 is for 243, 182, 154 or 0xF3B69A
+			characterData.LinkedColorGroup.FaceColor = [ 2, 1, -1, -1];
+			characterData.LinkedColorGroup.EarColor = [ 1, 2, -1, -1];
+			characterData.LinkedColorGroup.BreastColor = [ 2, 2, 1, -1];
+			//linked color group 2 is for 255, 220, 198 or 0xFFDCC6
+			characterData.LinkedColorGroup.VulvaColor = [1, 2, -1, -1];//2
+			characterData.LinkedColorGroup.SkinColor = [2, -1, -1, -1];
+			characterData.LinkedColorGroup.AnusColor = [ -1, 2, -1, -1];
+			//linked group 3 is 255, 175, 255
+			characterData.LinkedColorGroup.NippleColor = [3,-1,-1,-1];
+			characterData.LinkedColorGroup.AreolaColor = [3, 3,-1,-1];
 			
 			//characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
 			

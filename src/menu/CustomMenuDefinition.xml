@@ -74,6 +74,10 @@
 				<RadioButton id="Color4" label="C4" width="20" groupName="ColorPointsGroup"/>
 			</HBox>
 		</VBox>	
+		<HBox id="linkedColorHBox" x="15" y="170" spacing="10">
+			<Label text="Linked Color Group"/>
+			<ComboBox id="linkedColorGroupSelector" width="50" openPosition="TOP" numVisibleItems="5" />
+		</HBox>
 	</Window>
 	
 	<Window id="backgroundWindow" title="Background Editor" x="0" y="500" width="480" height="100" draggable="false">

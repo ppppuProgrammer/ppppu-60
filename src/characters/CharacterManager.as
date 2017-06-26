@@ -475,6 +475,15 @@ package characters
 			return null;
 		}
 		
+		public function GetCurrentCharacterId():int
+		{
+			if (m_currentCharacter)
+			{
+				return m_currentCharacter.GetID();
+			}
+			return -1;
+		}
+		
 		public function GetCharacterColorData(charId:int):Object
 		{
 			var characterData:Object = m_Characters[charId].data;
@@ -483,6 +492,24 @@ package characters
 				return characterData.Color;
 			}
 			return null;
+		}
+		
+		public function ModifyColorDataForCharacter(charId:int, colorGroupName:String, colorValues:Vector.<uint>, colorPointChanged:int):void
+		{
+			if (charId > -1 && charId < m_Characters.length)
+			{
+				m_Characters[charId].ModifyColorData(colorGroupName, colorValues, colorPointChanged);
+			}
+		}
+		
+		public function GetLinkedColorGroupNumberForCharacter(charId:int, colorGroup:String, colorPoint:int):int
+		{
+			return m_Characters[charId].GetLinkedColorGroupNumber(colorGroup, colorPoint);
+		}
+		
+		public function ChangeLinkedColorGroupNumberForCharacter(charId:int, colorGroupName:String, colorPoint:int, linkedGroupNumber:int):void
+		{
+			m_Characters[charId].ChangeLinkedColorGroupNumber(colorGroupName, colorPoint, linkedGroupNumber);
 		}
 		
 		public function GetCharacterGraphicSettings(charId:int):Object

@@ -109,7 +109,7 @@ package menu
 			sliders[0].value = ( color >> 24 ) & 0xFF;
 			sliders[1].value = ( color >> 16 ) & 0xFF;
 			sliders[2].value = (color >> 8) & 0xFF;
-			sliders[3].value = color;
+			sliders[3].value = color & 0xFF;
 			cc.value =  color >>> 8;
 			dispatchEvent(new Event(Event.CHANGE));
 		}

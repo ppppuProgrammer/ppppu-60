@@ -82,6 +82,24 @@
 					}
 				}
 			}
+			
+			if (data && "LinkedColorGroup" in data)
+			{
+				for (var colorGroup:String in data.LinkedColorGroup) 
+				{
+					if (data.Color[colorGroup] is Array)
+					{
+						if ((data.Color[colorGroup] as Array).length < 4)
+						{
+							for (var i:int = (data.Color[colorGroup] as Array).length; i < 4; i++) 
+							{
+								data.Color[colorGroup][i] = -1;
+							}
+						}
+					}
+				}
+			}
+			
 			SetAnimationLists(presetAnimationLists);
 			//if(animationList
 			if (isPresetCharacter)
@@ -174,6 +192,69 @@
 				data.graphicSettings[actorName] = ["", "", ""];
 			}
 			data.graphicSettings[actorName][layer] = setName;
+		}
+		
+		public function ChangeLinkedColorGroupNumber(colorGroupName:String, colorPoint:int, linkedGroupNumber:int):void {
+			data.LinkedColorGroup[colorGroupName][colorPoint] = linkedGroupNumber;
+		}
+		
+		public function ModifyColorData(colorGroupName:String, colorValues:Vector.<uint>, colorPointChanged:int):void
+		{
+			var colorGroupsToChange:Array = data.LinkedColorGroup[colorGroupName];
+			var linkedGroupFound:Boolean = false;
+			if (colorGroupsToChange != null) {
+				for (var i:int = 0,l:int = colorGroupsToChange.length; i < l; i++) {
+					if (colorGroupsToChange[i] > 0) {
+						linkedGroupFound = true;
+						break;
+					}
+				}
+			}
+			var colorSettings:Object = data.Color;
+			
+			if (!linkedGroupFound) {
+				colorSettings[colorGroupName][colorPointChanged] = colorValues[colorPointChanged];
+			} else {
+				var linkedColorGroupData:Object = data.LinkedColorGroup;
+				//Iterate through the linked color groups for all the color groups.
+				for (var currentGroup:String in linkedColorGroupData) 
+				{
+					var linkValues:Array = linkedColorGroupData[currentGroup];
+					//Iterate through the 4 linked group numbers for the current color group
+					for (var i:int = 0, l:int = linkValues.length; i < l; i++) 
+					{
+						
+						var linkedGroupNumber:int = linkValues[i];
+						//Check if one of the color values given to the function are to change 
+						/*var modifiedGroupNumberIndex:int = (linkedGroupNumber == -1)? -1 : colorGroupsToChange.indexOf(linkValues[i]);*/
+						
+						//Since this is the color value being directly edited by the user allow the alpha value to change
+						if (currentGroup == colorGroupName && currentGroup in colorSettings && i == colorPointChanged)
+						{
+							colorSettings[currentGroup][i] = colorValues[i];	
+						}
+						else if (linkedGroupNumber == colorGroupsToChange[colorPointChanged] && currentGroup in colorSettings) {
+							var originalColor:uint = colorSettings[currentGroup][i];
+							//Preserve the alpha value
+							var alpha:uint = originalColor & 0xFF;
+							//Get just the RGB value of the new color value
+							var rawNewColor:uint = colorValues[colorPointChanged];
+							var newRGBColor:uint =  (rawNewColor >>> 8);
+							var finalColor:uint = (newRGBColor << 8) | alpha;
+							colorSettings[currentGroup][i] = finalColor;							
+						}
+					}
+				}
+			}		
+		}
+		
+		public function GetLinkedColorGroupNumber(colorGroup:String, colorPoint:int):int
+		{
+			if (colorGroup in data.LinkedColorGroup)
+			{
+				return data.LinkedColorGroup[colorGroup][colorPoint];
+			}
+			return -1;
 		}
 		
 		public function SaveAnimationToSlot(index:int, animateList:AnimationList):void

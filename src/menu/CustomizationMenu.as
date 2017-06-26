@@ -255,9 +255,20 @@ package menu
 			else if (command == "CustomMenu_ColorDataResponse")
 			{
 				currentColorPointsData = messageData.uintData;
-				var colorPoint = WhichColorPointIsChanging();
+				var colorPoint = WhichColorPointIsSelected();
 				if (colorMode == 0 && rgbaColorMenu.visible && colorPoint < 4 && colorPoint > -1) {
 					rgbaColorMenu.setValueFromUint(currentColorPointsData[colorPoint]);
+				}
+			}
+			else if (command == "CustomMenu_ColorDataResponse-NoMenuRedraw")
+			{
+				currentColorPointsData = messageData.uintData;
+			}
+			else if (command == "CustomMenu_GetLinkedColorGroupNumberResponse")
+			{
+				var linkedColorGroupSelector:ComboBox = config.getCompById("linkedColorGroupSelector") as ComboBox;
+				if (linkedColorGroupSelector) {
+					linkedColorGroupSelector.selectedIndex = linkedColorGroupSelector.items.indexOf(messageData.intData[0]);
 				}
 			}
 			
@@ -293,9 +304,7 @@ package menu
 						}
 						
 						textAreaForColorGroupName.text = (buttonNameParts[1] as String).replace("Color", "");
-	
-						
-						 
+
 						colorDataRequestMessage.stringData[0] = buttonNameParts[1];
 						if (buttonNameParts[2] == "RGBA")
 							colorMode = 0;
@@ -316,6 +325,8 @@ package menu
 					
 					this.addChildAt(colorEditor, this.numChildren - 1);
 					signal2.dispatch("CustomMenu_ColorDataRequest", colorDataRequestMessage);
+					
+					
 					
 				}
 			}			
@@ -364,6 +375,7 @@ package menu
 							rgbaColorMenu.setValueFromUint(currentColorPointsData[3]);
 						break;
 				}
+				SendLinkedColorGroupRetrievalRequest(int(targetName.replace("Color", ""))-1);
 			}
 			else //Test if the color edit window needs to be closed.
 			{
@@ -467,10 +479,23 @@ package menu
 				}
 				signal2.dispatch("CustomMenu_ChangeBackgroundAsset", messageData);
 			}
+			else if (target.name == "linkedColorGroupSelector") {
+				var linkedGroupSelector:ComboBox = target as ComboBox;				
+				var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
+				if (colorGroupText && linkedGroupSelector)
+				{
+					var linkedColorGroupChangeMessage:MessageData = new MessageData;
+					linkedColorGroupChangeMessage.stringData[0] = colorGroupText.text + "Color";
+					linkedColorGroupChangeMessage.intData[0] = WhichColorPointIsSelected();
+					linkedColorGroupChangeMessage.intData[1] = linkedGroupSelector.selectedItem as int;
+					signal2.dispatch("CustomMenu_ChangeLinkedColorGroupNumber", linkedColorGroupChangeMessage);
+				}
+				
+			}
 			else if (target is RGBAMenu)
 			{
 				//Need to know what color point is being edited.
-				var colorPoint:int = WhichColorPointIsChanging();
+				var colorPoint:int = WhichColorPointIsSelected();
 				var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
 				if (colorGroupText && colorPoint > -1 && colorPoint < 4)
 				{
@@ -481,12 +506,14 @@ package menu
 					{
 						colorChangeMessage.uintData[j] = currentColorPointsData[j];
 					}
+					//which color point is changing
+					colorChangeMessage.intData[0] = WhichColorPointIsSelected();
 					signal2.dispatch("CustomMenu_ChangeInCharacterColor", colorChangeMessage);
 				}
 			}
 		}
 		
-		private function WhichColorPointIsChanging():int
+		private function WhichColorPointIsSelected():int
 		{
 			var colorButtonsHBox:HBox = config.getCompById("colorButtonHBox") as HBox;
 			if (colorButtonsHBox)
@@ -569,6 +596,15 @@ package menu
 				//backgroundSelector.addItem("InnerDiam");
 				//backgroundSelector.addItem("InnerDiam");
 			}
+			
+			var linkedColorGroupSelector:ComboBox = config.getCompById("linkedColorGroupSelector") as ComboBox;
+			linkedColorGroupSelector.addItem(-1);
+			if (linkedColorGroupSelector) {
+				for (var i:int = 1; i <= 20; i++) {
+					linkedColorGroupSelector.addItem(i);
+				}
+				
+			}
 			dispatchEvent(e);
 		}
 		
@@ -642,6 +678,32 @@ package menu
 				colorEditor.addChild(colorMenu);
 				colorMenu.x = 10;
 				colorMenu.y = colorButtonsGrouping.y + colorButtonsGrouping.height + 10;
+				
+				var linkedColorCompGroup:HBox = config.getCompById("linkedColorHBox") as HBox;
+				if (linkedColorCompGroup) {
+					linkedColorCompGroup.enabled = (colorMode == 0);
+				}
+				
+				var colorButtonGroup:HBox = config.getCompById("colorButtonHBox") as HBox;
+				if (colorButtonGroup) {
+					//linkedColorCompGroup.enabled = (colorMode == 0);
+					(colorButtonGroup.getChildAt(0) as RadioButton).selected = true;
+					SendLinkedColorGroupRetrievalRequest(0);
+				}
+			}
+		}
+		
+		public function SendLinkedColorGroupRetrievalRequest(colorPoint:int):void
+		{
+			var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
+			if (colorGroupText)
+			{
+				var colorGroupRequestMessage:MessageData = new MessageData;
+				//Remove "Color" from the target name to isolate the color point number then convert that number into a 0 based index value
+				colorGroupRequestMessage.intData[0] = colorPoint;
+				
+				colorGroupRequestMessage.stringData[0] = colorGroupText.text + "Color";
+				signal2.dispatch("CustomMenu_GetLinkedColorGroupNumberRequest", colorGroupRequestMessage);
 			}
 		}
 		
