@@ -38,11 +38,11 @@
 				<Label text="Character Name: "/>
 				<TextArea id="charNameEntry" editable="true" height="20" autoHideScrollBar="true"/>
 			</HBox>
-			<HBox x="10" spacing="10" enabled="false">
+			<!---<HBox x="10" spacing="10" enabled="false">
 				<Label text="Preferred Music: "/>
 				<TextArea id="charMusicEntry"  editable="true" height="20" autoHideScrollBar="true" />
 				<ComboBox id="charMusicRefCBox" width="140" />
-			</HBox>
+			</HBox>--->
 			<HBox x="190">
 				<PushButton id="saveCharButton"  width="70" label="Save changes" enabled="false" />
 			</HBox>

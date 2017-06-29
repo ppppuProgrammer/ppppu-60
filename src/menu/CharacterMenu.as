@@ -79,6 +79,7 @@ package menu
 		public function onSignal2(targetName:*, value:*):void
 		{
 			var command:String = targetName as String;
+			var recievedMessageData:MessageData = value as MessageData;
 			if (command == "ClickEvent")
 			{
 				if (!value) { return;}
@@ -155,12 +156,12 @@ package menu
 				var charList:List = config.getCompById("charSelectList") as List;
 				if (charList)
 				{
-					charList.selectedIndex = value as int;
+					charList.selectedIndex = recievedMessageData.intData[0];
 				}
 			}
 			else if (command == "CharMenu_UpdateSwitchMode")
 			{
-				var mode:int = value as int;
+				var mode:int = recievedMessageData.intData[0];
 				var modeRadioButton:RadioButton;
 				switch(mode)
 				{

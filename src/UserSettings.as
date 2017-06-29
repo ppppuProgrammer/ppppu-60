@@ -9,12 +9,12 @@ package
 	 */
 	public class UserSettings extends Object
 	{
-		public var backlightOn:Boolean=true;
+		//public var backlightOn:Boolean=true;
 		//public var limitRenderArea:Boolean=true;
-		public var showBackground:Boolean=true;
+		//public var showBackground:Boolean=true;
 		public var firstTimeRun:Boolean=true;
 		public var playMusic:Boolean=true;
-		public var showMenu:Boolean = true;
+		//public var showMenu:Boolean = true;
 		public var characterSettings:Object = new Object();
 		public var keyBindings:Object = new Object();
 		public var currentCharacterName:String = "";
@@ -23,8 +23,10 @@ package
 		//public var allowCharacterSwitches:Boolean = true;
 		//public var playOneSongForAllCharacters:Boolean = false;
 		public var globalSongTitle:String = "Beep Block Skyway";
+		public var musicVolume:int=100;
+		public var soundVolume:int=100;
 		//The latest version of the user settings. Change this whenever there is a modification with the class properties (renaming, adding/removing)
-		public const SAVE_VERSION:int = 2;
+		public const SAVE_VERSION:int = 3;
 		//The version of the settings that this settings object was created for.
 		public var version:int = SAVE_VERSION;
 		
@@ -34,7 +36,7 @@ package
 		public function UserSettings() 
 		{
 			//logger = Log.getLogger("UserSettings");
-			keyBindings.LockChar = new Object();
+			/*keyBindings.LockChar = new Object();
 			keyBindings.GotoChar = new Object();
 			keyBindings.CharCursorPrev = new Object();
 			keyBindings.CharCursorNext = new Object();
@@ -47,13 +49,11 @@ package
 			keyBindings.PrevAnimPage = new Object();
 			keyBindings.NextAnimPage = new Object();
 			keyBindings.Backlight = new Object();
-			//keyBindings.DisplayLimit = new Object();
 			keyBindings.Background = new Object();
 			keyBindings.Music = new Object();
 			keyBindings.CharPreferredMusic = new Object();
 			keyBindings.PrevMusic = new Object();
 			keyBindings.NextMusic = new Object();
-			//keyBindings.MusicForAll = new Object();
 			keyBindings.Activate = new Object();
 			//Set up default key bindings
 			keyBindings.LockChar.main = Keyboard.LEFT; keyBindings.LockChar.alt = -1;
@@ -69,34 +69,45 @@ package
 			keyBindings.PrevAnimPage.main = Keyboard.MINUS; keyBindings.PrevAnimPage.alt = Keyboard.NUMPAD_SUBTRACT;
 			keyBindings.NextAnimPage.main = Keyboard.EQUAL; keyBindings.NextAnimPage.alt = Keyboard.NUMPAD_ADD;
 			keyBindings.Backlight.main = Keyboard.L; keyBindings.Backlight.alt = -1;
-			//keyBindings.DisplayLimit.main = Keyboard.P; keyBindings.DisplayLimit.alt = -1;
 			keyBindings.Background.main = Keyboard.B; keyBindings.Background.alt = -1;
 			keyBindings.Music.main = Keyboard.M; keyBindings.Music.alt = -1;
 			keyBindings.CharPreferredMusic.main = Keyboard.N; keyBindings.CharPreferredMusic.alt = -1;
 			keyBindings.PrevMusic.main = Keyboard.X; keyBindings.PrevMusic.alt = -1;
 			keyBindings.NextMusic.main = Keyboard.C; keyBindings.NextMusic.alt = -1;
-			//keyBindings.MusicForAll.main = Keyboard.G; keyBindings.MusicForAll.alt = -1;
-			keyBindings.Activate.main = Keyboard.A; keyBindings.Activate.alt = -1;
+			keyBindings.Activate.main = Keyboard.A; keyBindings.Activate.alt = -1;*/
+			
 			//keyBindings..main = Keyboard; keyBindings..alt = -1;
 		}
 		
-		public function UpdateShowingBacklight(value:Boolean):void
+		public function UpdateMusicVolume(volume:int):void
+		{
+			musicVolume = volume;
+			//logger.debug("Current character is set to {0}", characterName);
+		}
+		
+		public function UpdateSoundVolume(volume:int):void
+		{
+			soundVolume = volume;
+			//logger.debug("Current character is set to {0}", characterName);
+		}
+		
+		/*public function UpdateShowingBacklight(value:Boolean):void
 		{
 			backlightOn = value;
 			//logger.debug("Backlight is being {0}", value ? "Shown" : "Hidden");
-		}
+		}*/
 		
-		public function UpdateShowBackground(value:Boolean):void
+		/*public function UpdateShowBackground(value:Boolean):void
 		{
 			showBackground = value;
 			//logger.debug("Background is being {0}", value ? "Shown" : "Hidden");
-		}
+		}*/
 		
-		public function UpdateMenuVisibility(value:Boolean):void
+		/*public function UpdateMenuVisibility(value:Boolean):void
 		{
 			showMenu = value;
 			//logger.debug("Menu is being {0}", value ? "Shown" : "Hidden");
-		}
+		}*/
 		
 		public function UpdateCharacterSwitchMode(value:int):void
 		{
@@ -130,6 +141,7 @@ package
 			characterSettings[charName].animationLocked = new Object();
 			characterSettings[charName].graphicSettings = new Object();
 			characterSettings[charName].colors = new Object();
+			characterSettings[charName].LinkedColorGroup = new Object();
 			//characterSettings[charName].playMusicTitle = globalSongTitle;
 			characterSettings[charName].animationSelect = "RANDOM"; //String of the class name for the animation. "RANDOM" is used when an animation is being randomly selected. //0 is randomly choose, value > 0 is a specific animation
 			characterSettings[charName].animationLists = null;
@@ -175,6 +187,11 @@ package
 			characterSettings[characterName].colors = colorSettings;
 		}
 		
+		public function UpdateLinkedColorGroupSettingsForCharacter(characterName:String, linkedColorSettings:Object):void
+		{
+			characterSettings[characterName].LinkedColorGroup = linkedColorSettings;
+		}
+		
 		public function UpdateSettingForCharacter_AnimationLists(characterName:String, value:ByteArray):void
 		{
 			characterSettings[characterName].animationLists = value;
@@ -213,28 +230,30 @@ package
 		
 		public function ConvertFromObject(obj:Object):void
 		{ 
-			backlightOn = obj.backlightOn;
+			//backlightOn = obj.backlightOn;
 			//limitRenderArea = obj.limitRenderArea;
-			showBackground = obj.showBackground;
+			//showBackground = obj.showBackground;
 			firstTimeRun = obj.firstTimeRun; 
 			playMusic = obj.playMusic;
-			showMenu = obj.showMenu;
+			//showMenu = obj.showMenu;
 			for (var charName:String in obj.characterSettings)
 			{
 				characterSettings[charName] = obj.characterSettings[charName];
 			}
 			currentCharacterName = obj.currentCharacterName;
 			characterSwitchMode = obj.characterSwitchMode;
+			UpdateMusicVolume(obj.musicVolume);
+			UpdateSoundVolume(obj.soundVolume);
 			//randomlySelectCharacter = obj.randomlySelectCharacter;
 			//allowCharacterSwitches = obj.allowCharacterSwitches;
-			keyBindings = obj.keyBindings;
-			if (keyBindings.Menu.main == -1 && keyBindings.Menu.alt == -1)
+			//keyBindings = obj.keyBindings;
+			/*if (keyBindings.Menu.main == -1 && keyBindings.Menu.alt == -1)
 			{
 				//Since the keybinding config can only be accessed from the menu, need to change a few things if the user did something to prevent them access to the config and menus.
 				showMenu = true;
-			}
+			}*/
 			//if ("playOneSongForAllCharacters" in obj) { playOneSongForAllCharacters = obj.playOneSongForAllCharacters; }
-			if ("globalSongTitle" in obj) { globalSongTitle = obj.globalSongTitle;}
+			globalSongTitle = obj.globalSongTitle;
 			// = obj.;
 		}
 		

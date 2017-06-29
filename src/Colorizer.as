@@ -1,6 +1,5 @@
 package  
 {
-	import characters.ColorValueHolder;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.IGraphicsData;
@@ -189,11 +188,6 @@ package
 			else if (colorValue[0] is uint)
 			{
 				color = colorValue[0] as uint;
-				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
-			}
-			else if ("Color" in colorValue)
-			{
-				color = (colorValue as Object).Color;
 				sprite.transform.colorTransform = UtilityFunctions.CreateColorTransformFromHex(color >>> 8, color & 0xFF);
 			}
 			else if (colorValue is ColorMatrixFilter)

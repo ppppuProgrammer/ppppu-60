@@ -314,14 +314,17 @@ package menu
 		private function RemoveEventListeners(reloadVersion:Boolean):void
 		{
 			this.visible = true;
-			creatingSubmenus = false;
+			creatingSubmenus = false;			
 			
 			if (reloadVersion)
 			{
-				removeEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
-				removeEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
-				SwitchSubmenu(currentSubmenu);
-				signal1.dispatch("MainMenu_MenuReloadFinished");
+				CONFIG::debug
+				{
+					removeEventListener(Event.COMPLETE, MenusReloadReadyCheck, true);
+					removeEventListener(IOErrorEvent.IO_ERROR, MenuReloadFailed, true);
+					SwitchSubmenu(currentSubmenu);
+					signal1.dispatch("MainMenu_MenuReloadFinished");
+				}
 			}
 			else
 			{
@@ -329,7 +332,6 @@ package menu
 				removeEventListener(IOErrorEvent.IO_ERROR, MenuLoadFailed, true);
 				signal1.dispatch("MenuFinishedInitializing");
 			}
-			
 		}
 		
 		private function CreateSubmenu(menuClass:Class):ISubMenu
@@ -343,6 +345,7 @@ package menu
 			return submenu;
 		}
 		
+		//Menu reloading related functions. Only available in debug mode.
 		CONFIG::debug {
 			public function ReloadSubMenus(app:AppCore):void
 			{

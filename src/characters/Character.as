@@ -80,6 +80,17 @@
 							}
 						}
 					}
+					
+					//Color group aliasing
+					if (colorGroup == "IrisColor") {
+						//Make a clone array for the left iris
+						data.Color["LeftIrisColor"] = UtilityFunctions.CloneObject(data.Color.IrisColor) as Array;
+						//Use the original array for the right iris
+						data.Color["RightIrisColor"] = data.Color.IrisColor;
+						//Delete IrisColor as it should not be used from this point
+						data.Color.IrisColor = null;
+						delete data.Color.IrisColor;
+					}
 				}
 			}
 			
@@ -195,6 +206,14 @@
 		}
 		
 		public function ChangeLinkedColorGroupNumber(colorGroupName:String, colorPoint:int, linkedGroupNumber:int):void {
+			if (!(colorGroupName in data.LinkedColorGroup)) {
+				//Check if the color group even has color values. If it doesn't, give it 4 values of 0
+				if (!(colorGroupName in data.Color)) {
+					data.Color[colorGroupName] = [0, 0, 0, 0]; 
+				}
+				//Assign unlinked (-1) values to the 4 color points of this color group.
+				data.LinkedColorGroup[colorGroupName] = [ -1, -1, -1, -1];
+			}
 			data.LinkedColorGroup[colorGroupName][colorPoint] = linkedGroupNumber;
 		}
 		
@@ -233,7 +252,7 @@
 						{
 							colorSettings[currentGroup][i] = colorValues[i];	
 						}
-						else if (linkedGroupNumber == colorGroupsToChange[colorPointChanged] && currentGroup in colorSettings) {
+						else if (linkedGroupNumber > 0 && linkedGroupNumber == colorGroupsToChange[colorPointChanged] && currentGroup in colorSettings) {
 							var originalColor:uint = colorSettings[currentGroup][i];
 							//Preserve the alpha value
 							var alpha:uint = originalColor & 0xFF;

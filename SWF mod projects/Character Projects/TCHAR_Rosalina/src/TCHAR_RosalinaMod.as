@@ -1,6 +1,5 @@
 package
 {
-	import characters.ColorValueMaster;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.ColorTransform;
@@ -17,27 +16,45 @@ package
 		{
 			characterName = "Rosalina";
 			
-			characterData.Color.Iris = 0x36BDC1FF;
-			characterData.Color.Skin = 0xFFDCC6FF;
-			characterData.Color.Lip =  UtilityFunctions.CreateColorTransformFromHex(0xFF99CC, 51);
-			characterData.Color.Legging = [0xFFFFFFFF, 0xC5F7EBFF];	
-			characterData.Color.SkinHighlight = 0xFFFFFFFF;
-			//characterData.Color.Hair = 0xF3B69AFF;
-			//characterData.Color.HairAngled = 0xFEA972FF;//UtilityFunctions.GetColorUintValue(243, 182, 154, 255);
-			characterData.Color.Hair = 0xfffc7dFF;
-			characterData.Color.HairAngled = 0xfea972FF;//UtilityFunctions.GetColorUintValue(243, 182, 154, 255);
-			//var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243, 182, 154, 255));
+			characterData.Color.IrisColor = 0x36BDC1FF;
+			characterData.Color.SkinColor = 0xFFDCC6FF;
+			characterData.Color.SkinHighlightColor = 0xFFFFFFFF;
+			characterData.Color.LipColor =  UtilityFunctions.GetColorUintValue(0xFF, 0x99, 0xCC, 51);// UtilityFunctions.CreateColorTransformFromHex(0xFF99CC, 51);
+			characterData.Color.LeggingColor = [0xFFFFFFFF, 0xC5F7EBFF];	
+			characterData.Color.SkinHighlightColor = 0xFFFFFFFF;
+			//characterData.Color.HairColor = 0xF3B69AFF;
+			//characterData.Color.HairAngledColor = 0xFEA972FF;//UtilityFunctions.GetColorUintValue(243, 182, 154, 255);
+			characterData.Color.HairColor = 0xfffc7dFF;
+			characterData.Color.HairAngledColor = 0xfea972FF;//UtilityFunctions.GetColorUintValue(243, 182, 154, 255);
+			//var skinGradientEndPoint:ColorValueMasterColor = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243, 182, 154, 255));
 			
-			//var standardGradientEndPoint:uint = UtilityFunctions.GetColorUintFromRGB(243,182,154);
-			characterData.Color.Eyelid = 0xF0A586FF;
-			characterData.Color.Nipple = 0xFFAFFFFF;
-			characterData.Color.Areola = [0xFFAFFFFF, 0xFFAFFF00];
-			characterData.Color.Face = [0xFFDCC6FF, {ID: "SkinGradientEnd", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//2
-			characterData.Color.Ear = [{ID: "SkinGradientEnd", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}, 0xFFDCC6FF];//2
-			characterData.Color.Breast = [0xFFDCC6FF,0xFFDCC6FF, {ID: "SkinGradientEnd", Color: UtilityFunctions.GetColorUintValue(243, 182, 154, 255)}];//3
-			characterData.Color.Vulva = [0xF3B69AFF,0xFFDCC6FF];//2
-			characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159, 255), 0xFFDCC6FF];//2
-			characterData.Color.SkinLine = 0x7A2810FF;
+			//var standardGradientEndPoint:uintColor = UtilityFunctions.GetColorUintFromRGB(243,182,154);
+			characterData.Color.ScleraColor = 0xFFFFFFFF;
+			characterData.Color.EyelidColor = 0xF0A586FF;
+			characterData.Color.NippleColor = 0xFFAFFFFF;
+			characterData.Color.AreolaColor = [0xFFAFFFFF, 0xFFAFFF00];
+			characterData.Color.FaceColor = [0xFFDCC6FF, UtilityFunctions.GetColorUintValue(243, 182, 154, 255)];//2
+			characterData.Color.EarColor = [UtilityFunctions.GetColorUintValue(243, 182, 154, 255), 0xFFDCC6FF];//2
+			characterData.Color.BreastColor = [0xFFDCC6FF,0xFFDCC6FF, UtilityFunctions.GetColorUintValue(243, 182, 154, 255)];//3
+			characterData.Color.VulvaColor = [0xF3B69AFF,0xFFDCC6FF];//2
+			characterData.Color.AnusColor = [UtilityFunctions.GetColorUintValue(255, 166, 159, 255), 0xFFDCC6FF];//2
+			characterData.Color.SkinLineColor = 0x7A2810FF;
+			characterData.Color.MaleSkinColor = 0xE6AE8AFF;
+			
+			//linked color group 1 (Skin 2) is for 243, 182, 154 or 0xF3B69A
+			characterData.LinkedColorGroup.FaceColor = [ 2, 1, -1, -1];
+			characterData.LinkedColorGroup.EarColor = [ 1, 2, -1, -1];
+			characterData.LinkedColorGroup.BreastColor = [ 2, 2, 1, -1];
+			//linked color group 2 (Skin) is for 255, 220, 198 or 0xFFDCC6
+			characterData.LinkedColorGroup.VulvaColor = [1, 2, -1, -1];//2
+			characterData.LinkedColorGroup.SkinColor = [2, -1, -1, -1];
+			characterData.LinkedColorGroup.AnusColor = [ -1, 2, -1, -1];
+			//linked group 3 is 255, 175, 255
+			characterData.LinkedColorGroup.NippleColor = [3,-1,-1,-1];
+			characterData.LinkedColorGroup.AreolaColor = [3, 3, -1, -1];
+			//Linked group 4 (Iris) is 54, 189, 193 or 0x36BDC1
+			characterData.LinkedColorGroup.LeftIrisColor = [4,-1,-1,-1];
+			characterData.LinkedColorGroup.RightIrisColor = [4,-1,-1,-1];
 			
 			characterData.GraphicSets = ["Standard", "Headwear_Rosalina", "Earring_Rosalina", "Hair_Rosalina"];
 			

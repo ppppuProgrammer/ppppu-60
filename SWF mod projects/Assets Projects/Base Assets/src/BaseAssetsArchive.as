@@ -15,12 +15,13 @@ package
 		
 		public function BaseAssetsArchive() 
 		{
+			var noShowProperties:Object = { ShowInMenus: false };
 			var skinColorProperties:Object = { Group: "SkinColor", Target: "Skin" };
 			var skinWithHighlightColorProperties:Object = { Group: ["SkinColor", "SkinHighlightColor"], Target: ["Skin", "SkinHighlight"] };
 			/* Eye related */
-			var eyeballColorProperties:Object = { Group: ["IrisColor", "PupilColor"], Target: ["Iris", "Pupil"] };
-			modsList[modsList.length] = new AssetsMod(new Eyeball, "EyeballL", "Standard", 1, { Colorable: eyeballColorProperties } );
-			modsList[modsList.length] = new AssetsMod(new Eyeball, "EyeballR", "Standard", 1, { Colorable: eyeballColorProperties } );
+			//var eyeballColorProperties:Object = { Group: ["IrisColor", "PupilColor"], Target: ["Iris", "Pupil"] };
+			modsList[modsList.length] = new AssetsMod(new Eyeball, "EyeballL", "Standard", 1, { Colorable: { Group: ["LeftIrisColor", "PupilColor"], Target: ["Iris", "Pupil"] } } );
+			modsList[modsList.length] = new AssetsMod(new Eyeball, "EyeballR", "Standard", 1, { Colorable: { Group: ["RightIrisColor", "PupilColor"], Target: ["Iris", "Pupil"] } } );
 			
 			var scleraColorProperties:Object = { Group: ["EyelidColor", "ScleraColor"], Target: ["EyelidColor", "ScleraColor"] };
 			modsList[modsList.length] = new AssetsMod(new Sclera, "ScleraL", "Standard", 1, { Colorable: scleraColorProperties } );
@@ -198,17 +199,18 @@ package
 			modsList[modsList.length] = new AssetsMod(new BackVulva, "BackVulva", "Standard", 1, { Colorable: { Group: ["VulvaColor", "SkinLineColor"], Target: ["VulvaColor", "SkinLine"] } } );
 			
 			/* Male */
-			modsList[modsList.length] = new AssetsMod(new MalePenisHead, "MalePenisHead", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new MaleShaft, "MaleShaft", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new MaleShaft2, "MaleShaft2", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new MaleGroin, "MaleGroin", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new MaleLeg, "MaleLegL", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new MaleLeg, "MaleLegR", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new MaleBody, "MaleBody", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new ShaftMask, "ShaftMask", "Standard", Actor.LAYER_MAIN, null);
-			modsList[modsList.length] = new AssetsMod(new ShaftMask2, "ShaftMask2", "Standard", Actor.LAYER_MAIN, null);
+			var maleColorProperties:Object = { Group: "MaleSkinColor", Target: "MaleSkin" };
+			modsList[modsList.length] = new AssetsMod(new MalePenisHead, "MalePenisHead", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});	
+			modsList[modsList.length] = new AssetsMod(new MaleShaft, "MaleShaft", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});
+			modsList[modsList.length] = new AssetsMod(new MaleShaft2, "MaleShaft2", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});
+			modsList[modsList.length] = new AssetsMod(new MaleGroin, "MaleGroin", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});
+			modsList[modsList.length] = new AssetsMod(new MaleLeg, "MaleLegL", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});
+			modsList[modsList.length] = new AssetsMod(new MaleLeg, "MaleLegR", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});
+			modsList[modsList.length] = new AssetsMod(new MaleBody, "MaleBody", "Standard", Actor.LAYER_MAIN, { Colorable:maleColorProperties});
+			modsList[modsList.length] = new AssetsMod(new ShaftMask, "ShaftMask", "Standard", Actor.LAYER_MAIN, noShowProperties);
+			modsList[modsList.length] = new AssetsMod(new ShaftMask2, "ShaftMask2", "Standard", Actor.LAYER_MAIN, noShowProperties);
 			//Not sure if highlights should be in base assets or in the standard graphic set
-			modsList[modsList.length] =  new AssetsMod(new PenisHighlight, "PenisHighlight", "Standard", Actor.LAYER_MAIN, {ShowInMenus: false});
+			modsList[modsList.length] =  new AssetsMod(new PenisHighlight, "PenisHighlight", "Standard", Actor.LAYER_MAIN, noShowProperties);
 			//modsList[modsList.length] = [new , "", Actor.LAYER_MAIN, null];
 			
 			

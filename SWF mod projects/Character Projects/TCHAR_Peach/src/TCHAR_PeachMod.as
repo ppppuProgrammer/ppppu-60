@@ -16,6 +16,7 @@ package
 		{
 			characterName = "Peach";
 			
+			//Will be used to create the LeftIrisColor and RightIrisColor groups
 			characterData.Color.IrisColor = 0x3671C1FF;
 			characterData.Color.SkinColor = 0xFFDCC6FF;
 			characterData.Color.SkinHighlightColor = 0xFFFFFFFF;
@@ -26,6 +27,7 @@ package
 			//var skinGradientEndPoint:ColorValueMaster = new ColorValueMaster(UtilityFunctions.GetColorUintValue(243, 182, 154, 255));
 			
 			//var standardGradientEndPoint:uint = UtilityFunctions.GetColorUintFromRGB(243,182,154);
+			characterData.Color.ScleraColor = 0xFFFFFFFF;
 			characterData.Color.EyelidColor = 0xF0A586FF;
 			characterData.Color.NippleColor = 0xFFAFFFFF;
 			characterData.Color.AreolaColor = [0xFFAFFFFF, 0xFFAFFF00];
@@ -34,20 +36,25 @@ package
 			characterData.Color.BreastColor = [0xFFDCC6FF,0xFFDCC6FF, UtilityFunctions.GetColorUintValue(243, 182, 154, 255)];//3
 			characterData.Color.VulvaColor = [0xF3B69AFF,0xFFDCC6FF];//2
 			characterData.Color.SkinLineColor = 0x7A2810FF;
+			characterData.Color.AnusColor = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
+			characterData.Color.MaleSkinColor = 0xE6AE8AFF;
 			
-			//linked color group 1 is for 243, 182, 154 or 0xF3B69A
+			//linked color group 1 (Skin 2) is for 243, 182, 154 or 0xF3B69A
 			characterData.LinkedColorGroup.FaceColor = [ 2, 1, -1, -1];
 			characterData.LinkedColorGroup.EarColor = [ 1, 2, -1, -1];
 			characterData.LinkedColorGroup.BreastColor = [ 2, 2, 1, -1];
-			//linked color group 2 is for 255, 220, 198 or 0xFFDCC6
+			//linked color group 2 (Skin) is for 255, 220, 198 or 0xFFDCC6
 			characterData.LinkedColorGroup.VulvaColor = [1, 2, -1, -1];//2
 			characterData.LinkedColorGroup.SkinColor = [2, -1, -1, -1];
 			characterData.LinkedColorGroup.AnusColor = [ -1, 2, -1, -1];
 			//linked group 3 is 255, 175, 255
 			characterData.LinkedColorGroup.NippleColor = [3,-1,-1,-1];
-			characterData.LinkedColorGroup.AreolaColor = [3, 3,-1,-1];
+			characterData.LinkedColorGroup.AreolaColor = [3, 3, -1, -1];
+			//Linked group 4 (Iris) is 54, 113, 193, 255 or 0x3671C1FF
+			characterData.LinkedColorGroup.LeftIrisColor = [4,-1,-1,-1];
+			characterData.LinkedColorGroup.RightIrisColor = [4,-1,-1,-1];
 			
-			//characterData.Color.Anus = [UtilityFunctions.GetColorUintValue(255, 166, 159), 0xFFDCC6];//2
+			
 			
 			characterData.GraphicSets = ["Standard", "Headwear_Peach", "Earring_Peach", "Hair_Peach"];
 			animationPresets[animationPresets.length] = ["Cowgirl", 0, true, "Female (Standard)", true, "Male (Standard)", false, "Crown", false, "Left Earring", false, "Right Earring", false, "Left Eye Variant 1", false, "Right Eye Variant 1", false, "Mouth Variant 1", false, "Peach Hair"];

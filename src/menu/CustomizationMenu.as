@@ -403,6 +403,27 @@ package menu
 			}
 		}
 		
+		public function SelectEventHandler(target:Object):void
+		{
+			if(target.name == "actorSelector") {
+				SendActorAssetListRequest();		
+			}
+			else if (target.name == "backgroundSelector") {	
+				SendBackgroundAssetsRequest();				
+			} 
+			else if (target.name == "linkedColorGroupSelector") {
+				var linkedGroupSelector:ComboBox = target as ComboBox;				
+				var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
+				if (colorGroupText && linkedGroupSelector) {
+					var linkedColorGroupChangeMessage:MessageData = new MessageData;
+					linkedColorGroupChangeMessage.stringData[0] = colorGroupText.text + "Color";
+					linkedColorGroupChangeMessage.intData[0] = WhichColorPointIsSelected();
+					linkedColorGroupChangeMessage.intData[1] = linkedGroupSelector.selectedItem as int;
+					signal2.dispatch("CustomMenu_ChangeLinkedColorGroupNumber", linkedColorGroupChangeMessage);
+				}				
+			}
+		}
+		
 		public function ChangeEventHandler(target:Object):void
 		{
 			if (target.name == "assetSelectSlider")
@@ -478,20 +499,7 @@ package menu
 					messageData.intData[1] = -1;
 				}
 				signal2.dispatch("CustomMenu_ChangeBackgroundAsset", messageData);
-			}
-			else if (target.name == "linkedColorGroupSelector") {
-				var linkedGroupSelector:ComboBox = target as ComboBox;				
-				var colorGroupText:TextArea = config.getCompById("currentColorGroupText") as TextArea;
-				if (colorGroupText && linkedGroupSelector)
-				{
-					var linkedColorGroupChangeMessage:MessageData = new MessageData;
-					linkedColorGroupChangeMessage.stringData[0] = colorGroupText.text + "Color";
-					linkedColorGroupChangeMessage.intData[0] = WhichColorPointIsSelected();
-					linkedColorGroupChangeMessage.intData[1] = linkedGroupSelector.selectedItem as int;
-					signal2.dispatch("CustomMenu_ChangeLinkedColorGroupNumber", linkedColorGroupChangeMessage);
-				}
-				
-			}
+			}			
 			else if (target is RGBAMenu)
 			{
 				//Need to know what color point is being edited.
@@ -528,20 +536,6 @@ package menu
 				}
 			}
 			return -1;
-		}
-		
-		public function SelectEventHandler(target:Object):void
-		{
-			if(target.name == "actorSelector")
-			{
-				SendActorAssetListRequest();		
-			}
-			else if (target.name == "backgroundSelector")
-			{	
-				SendBackgroundAssetsRequest();
-				
-			}
-			
 		}
 		
 		private function SendActorAssetListRequest():void

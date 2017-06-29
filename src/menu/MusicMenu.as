@@ -54,6 +54,7 @@ package menu
 		public function onSignal2(targetName:*, value:*):void
 		{
 			var command:String = targetName as String;
+			var recievedMessageData:MessageData = value as MessageData;
 			if (command == "ClickEvent")
 			{
 				if (!value) { return;}
@@ -90,15 +91,22 @@ package menu
 				var musicSelectDroplist:ComboBox = config.getCompById("musicSelectDroplist") as ComboBox;
 				if (musicSelectDroplist)
 				{
-					musicSelectDroplist.selectedIndex = value as int;
+					musicSelectDroplist.selectedIndex = recievedMessageData.intData[0];
 				}
 			}
 			else if (command == "MusicMenu_ListOfMusicToAdd")
 			{
-				var musicList:MessageData = value as MessageData;
-				for (var i:int = 0, l:int = musicList.stringData.length; i < l; i++) 
+				//var musicList:MessageData = value as MessageData;
+				for (var i:int = 0, l:int = recievedMessageData.stringData.length; i < l; i++) 
 				{
-					AddMusicNameToDropList(musicList.stringData[i]);
+					AddMusicNameToDropList(recievedMessageData.stringData[i]);
+				}
+			}
+			else if (command == "MusicMenu_UpdateMusicVolumeSlider")
+			{
+				var musicSlider:HUISlider = config.getCompById("musicVolumeSlider") as HUISlider;
+				if (musicSlider) {
+					musicSlider.value = recievedMessageData.floatData[0] * 100.0;
 				}
 			}
 		}
@@ -131,7 +139,9 @@ package menu
 			if (target.name == "musicVolumeSlider")
 			{
 				var musicSlider:HUISlider = target as HUISlider;
-				signal2.dispatch("MusicMenu_ChangeMusicVolumeRequest", musicSlider.value/100.0);
+				var musicVolumeMessage:MessageData = new MessageData;
+				musicVolumeMessage.floatData[0] = musicSlider.value / 100.0;
+				signal2.dispatch("MusicMenu_ChangeMusicVolumeRequest", musicVolumeMessage);
 			}
 		}
 		public function SelectEventHandler(target:Object):void

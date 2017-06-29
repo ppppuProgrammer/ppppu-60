@@ -1,6 +1,6 @@
 <comps>
 	<VBox>
-		<Window id="musicPlayerWindow" title="Music Player" x="0" y="0" width="480" height="200" draggable="false">
+		<Window id="musicPlayerWindow" title="Music Player" x="0" y="0" width="480" height="180" draggable="false">
 			<VBox x="5">
 				<HBox>
 					<!---<Label text="Selected" />--->
@@ -8,11 +8,12 @@
 					<PushButton id="previewMusicButton" width="80" label="Preview Song"/>
 					<PushButton id="testMusicLoopButton" width="90" label="Test Song Loop"/>
 				</HBox>
-				<HUISlider id="musicVolumeSlider" width="200" value="100" maximum="100" minimum="0" label="Volume:" labelprecision="0" tick="1" />
+				<HUISlider id="musicVolumeSlider" width="260" value="100" maximum="100" minimum="0" label="Music Volume:" labelPrecision="0" tick="1.0" />
 			</VBox>
 		</Window>
 		
 		<Window id="charAudioWindow" title="Character Sounds" x="0" y="200" width="480" height="200" enabled="false" draggable="false">
+			<HUISlider id="soundVolumeSlider" width="260" value="100" maximum="100" minimum="0" label="Sound Volume:" labelPrecision="0" tick="1.0" />
 		</Window>
 	</VBox>
 	

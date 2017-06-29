@@ -716,12 +716,22 @@ package
 				CONFIG::NX
 				{
 				removeChild(mainMenu);
+				
 				musicPlayer.PlayMusic(musicPlayer.GetMusicIdByName(userSettings.globalSongTitle), 0);
 				ToggleMenuMode();
 				
-				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", musicPlayer.GetMusicIdByName(userSettings.globalSongTitle));
-				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", characterManager.GetSelectMode());
-				menuSignal2.dispatch("CharMenu_CharacterHasChanged", characterManager.GetCharacterIdByName(userSettings.currentCharacterName));
+				
+				
+				var outgoingMessage:MessageData = new MessageData;
+				outgoingMessage.intData[0] = musicPlayer.GetMusicIdByName(userSettings.globalSongTitle);
+				outgoingMessage.floatData[0] = userSettings.musicVolume / 100.0;
+				musicPlayer.ControlBGMVolume(outgoingMessage.floatData[0]);
+				menuSignal2.dispatch("MusicMenu_UpdateMusicVolumeSlider", outgoingMessage);
+				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", outgoingMessage);
+				outgoingMessage.intData[0] = characterManager.GetSelectMode();
+				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", outgoingMessage);
+				outgoingMessage.intData[0] = characterManager.GetCharacterIdByName(userSettings.currentCharacterName);
+				menuSignal2.dispatch("CharMenu_CharacterHasChanged", outgoingMessage);
 				}
 			}			
 			else if (target == "MainMenu_MenuReloadFinished")
@@ -750,6 +760,13 @@ package
 				
 				messsageData.stringData = canvas.GetListOfGraphicSetNames();
 				menuSignal2.dispatch("CustomMenu_AddGraphicSetNames", messsageData);
+				
+				messsageData.intData[0] = musicPlayer.GetMusicIdByName(userSettings.globalSongTitle)
+				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", messsageData);
+				messsageData.intData[0] = characterManager.GetSelectMode();
+				menuSignal2.dispatch("CharMenu_UpdateSwitchMode", messsageData);
+				messsageData.intData[0] = characterManager.GetCharacterIdByName(userSettings.currentCharacterName);
+				menuSignal2.dispatch("CharMenu_CharacterHasChanged", messsageData);
 				
 			}
 			CONFIG::debug
@@ -959,7 +976,9 @@ package
 			}
 			else if (targetName == "MusicMenu_ChangeMusicVolumeRequest")
 			{
-				musicPlayer.ControlBGMVolume(value as Number);
+				//messageData.floatData[0];
+				//musicPlayer.ControlBGMVolume(messageData.floatData[0]);
+				userSettings.UpdateMusicVolume(musicPlayer.ControlBGMVolume(messageData.floatData[0])*100);
 			}
 			else if (targetName == "MusicMenu_PreviewMusic")
 			{
@@ -975,7 +994,10 @@ package
 				musicPlayer.ChangeMusicToPlay(idOfSelectedMusic);
 				//Don't assume that the title of the music is what was received from the message.  
 				userSettings.globalSongTitle = musicPlayer.GetNameOfCurrentMusic();
-				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", musicPlayer.GetMusicIdByName(userSettings.globalSongTitle));
+				
+				/*var musicChangeMessage:MessageData = new MessageData;
+				musicChangeMessage.intData[0] = idOfSelectedMusic;
+				menuSignal2.dispatch("MusicMenu_ChangeSelectedMusicResult", musicChangeMessage);*/
 			}
 			else if (targetName == "LoadMenu_LoadedSVGAsset")
 			{
@@ -1083,7 +1105,9 @@ package
 				menuSignal2.dispatch("CustomMenu_GetLinkedColorGroupNumberResponse", messageData);
 			}
 			else if (targetName == "CustomMenu_ChangeLinkedColorGroupNumber") {
-				characterManager.ChangeLinkedColorGroupNumberForCharacter(characterManager.GetCurrentCharacterId(), messageData.stringData[0], messageData.intData[0], messageData.intData[1]);
+				var charId:int = characterManager.GetCurrentCharacterId();
+				characterManager.ChangeLinkedColorGroupNumberForCharacter(charId, messageData.stringData[0], messageData.intData[0], messageData.intData[1]);
+				userSettings.UpdateLinkedColorGroupSettingsForCharacter(characterManager.GetCurrentCharacterName(), characterManager.GetCharacterLinkedColorGroupData(charId));
 			}
 		}
 		}

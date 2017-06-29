@@ -350,6 +350,19 @@ package characters
 				}
 			}
 			
+			if ("linkedColorGroup" in settings)
+			{
+				character.data.LinkedColorGroup = settings.LinkedColorGroup;
+			}
+			else
+			{
+				//There was no colorize data in the settings, so update the settings to have the colorize data in the character if that exists.
+				if ("linkedColorGroup" in character.data)
+				{
+					settings.LinkedColorGroup = character.data.LinkedColorGroup;
+				}
+			}
+			
 			character.DeserializeAnimationLists(settings.animationLists);
 			/*var lockedAnimationCount:int = 0;
 			
@@ -500,6 +513,11 @@ package characters
 			{
 				m_Characters[charId].ModifyColorData(colorGroupName, colorValues, colorPointChanged);
 			}
+		}
+		
+		public function GetCharacterLinkedColorGroupData(charId:int):Object
+		{
+			return m_Characters[charId].data.LinkedColorGroup;
 		}
 		
 		public function GetLinkedColorGroupNumberForCharacter(charId:int, colorGroup:String, colorPoint:int):int

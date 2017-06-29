@@ -263,52 +263,6 @@ package audio
 			}
 		}
 		
-		/*public function PauseMusic():void
-		{
-			if (currentlyPlayingMusicId > -1 )
-			{
-				musicCollection[currentlyPlayingMusicId].Stop();
-				if (mainSoundChannel != null)
-				{
-					mainSoundChannel.stop();
-					mainSoundChannel = null;
-				}
-				
-				//trace(musicCollection[currentlyPlayingMusicId].GetPlayheadPosition());
-			}
-		}*/
-		
-		//public function ResumeMusic(currentTimeIntoAnimation:Number=0.0):void
-		//{
-			//if (currentlyPlayingMusicId > -1)
-			//{
-				//if (mainSoundChannel != null){
-					//mainSoundChannel.stop;
-				//}
-				//var bgm:Music = musicCollection[currentlyPlayingMusicId];
-				//var playheadPosition:Number = bgm.GetPlayheadPosition();
-				////Round down the playhead position to the last frame.
-				//var musicPositionInAnimation:Number = playheadPosition % MUSICSEGMENTTIMEMILLI;
-//
-				///*if (musicPositionInAnimation <= currentTimeIntoAnimation){
-					//bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
-				//}
-				//else{
-					//bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
-				//}*/
-				///*if (musicPositionInAnimation <= currentTimeIntoAnimation){
-					//bgm.SetPlayheadPosition(playheadPosition + (currentTimeIntoAnimation - musicPositionInAnimation));
-				//}
-				//else */if (musicPositionInAnimation > currentTimeIntoAnimation)
-				//{
-					//bgm.SetPlayheadPosition(playheadPosition - (musicPositionInAnimation - currentTimeIntoAnimation));
-				//}
-				////trace(bgm.GetPlayheadPosition());
-				//mainSoundChannel = bgm.Play();
-				//
-			//}
-		//}
-		
 		[inline]
 		private function AlignMusicToAnimationPosition(currentTimeIntoAnimation:Number):void
 		{
@@ -316,22 +270,22 @@ package audio
 		}
 		
 		//Adjusts the volume of the sound globally.
-		public function ControlVolume(musicVolume:Number):void
+		/*public function ControlVolume(musicVolume:Number):void
 		{
 			var soundT:SoundTransform = new SoundTransform();
 			soundT.volume = musicVolume;
 			SoundMixer.soundTransform = soundT;
-		}
+		}*/
 		
 		//SMLSE: Adjusts volume of only BGM (other audio, such as sounds from characters, left at full volume)
-		public function ControlBGMVolume(musicVolume:Number):void
+		public function ControlBGMVolume(musicVolume:Number):Number
 		{
 			//var soundT:SoundTransform = new SoundTransform();
-			bgmSoundTransform.volume = musicVolume
-			if (mainSoundChannel)
-			{
-			mainSoundChannel.soundTransform = bgmSoundTransform;
+			bgmSoundTransform.volume = musicVolume;
+			if (mainSoundChannel) {
+				mainSoundChannel.soundTransform = bgmSoundTransform;
 			}
+			return bgmSoundTransform.volume;
 		}
 		
 		public function ChangeToPrevMusic(animationTime:Number):String
