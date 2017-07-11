@@ -110,6 +110,9 @@
 					}
 				}
 			}
+			else if (data && !("LinkedColorGroup" in data)) {
+				data.LinkedColorGroup = { };
+			}
 			
 			SetAnimationLists(presetAnimationLists);
 			//if(animationList

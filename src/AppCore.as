@@ -503,10 +503,17 @@ package
 					{
 					if (newCharacterId > -1)
 					{
+						if (totalRunTime > 0) { TryToLoadCharacterSettings(charName); } 
+						
 						menuSignal2.dispatch("AddNewCharacter", characterManager.GetCharacterNameById(newCharacterId));
-					}
-					}
-					
+						//
+						
+						/*if (userSettings.CheckIfCharacterHasSettings(charName))
+						{
+							
+						}*/
+					}					
+					}					
 					/*if (characterManager.CheckIfCharacterCanBeAdded(character))
 					{
 						characterManager.AddCharacter(character);
@@ -931,7 +938,8 @@ package
 				{
 					var characterId:int = characterManager.GetCharacterIdByName(charName);
 					userSettings.UpdateSettingForCharacter_AnimationLists(charName, characterManager.GetAnimationListsForCharacterInBinaryFormat(characterId));
-					userSettings.UpdateColorSettingsForCharacter(charName, characterManager.GetCharacterColorData(characterId));					
+					var colorSettings:Object = characterManager.GetCharacterColorData(characterId);
+					userSettings.UpdateColorSettingsForCharacter(charName, colorSettings);	
 				}
 				menuSignal2.dispatch("CharMenu_DeleteCharacterResult", delResetResult);
 			}

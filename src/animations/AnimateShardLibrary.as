@@ -78,6 +78,8 @@ package animations
 		{
 			var targetCollection:Vector.<Dictionary> = shardTypeIsBase ? baseShardsCollection : additionalShardsCollection;
 			
+			if (!(animationId in targetCollection)) { return null;}
+			
 			var shard:AnimateShard = targetCollection[animationId][shardName];
 			return shard;
 		}
