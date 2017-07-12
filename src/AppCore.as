@@ -717,7 +717,7 @@ package
 				ToggleMenuMode();*/
 				InitializeSettingsForCharactersLoadedAtStartup();
 				
-				ChangeCharacter(userSettings.currentCharacterName);
+				ChangeCharacterByName(userSettings.currentCharacterName);
 				
 				//Change menus to reflect the loaded settings
 				CONFIG::NX
@@ -819,7 +819,7 @@ package
 			else if (targetName == "characterSelector")
 			{
 				//SwitchCharacter(value as int);
-				ChangeCharacter(characterManager.GetCharacterNameById(value as int));
+				ChangeCharacterByName(characterManager.GetCharacterNameById(value as int));
 			}
 			else if (targetName == "shardTypeSelector" || targetName == "animationSelector")
 			{
@@ -881,7 +881,7 @@ package
 			}
 			else if (targetName == "CharMenu_SwitchCharacterRequest")
 			{
-				ChangeCharacter(value as String);
+				ChangeCharacterByName(value as String);
 				/*characterManager.SwitchToCharacter(characterManager.GetCharacterIdByName(value as String), true);
 				colorizer.ChangeColorsUsingCharacterData(characterManager.GetCurrentCharacterColorData());
 				canvas.ChangeActorAssetsUsingCharacterData(characterManager.GetCurrentCharacterGraphicSets());
@@ -1140,33 +1140,18 @@ package
 			
 		}
 		
-		private function ChangeCharacter(characterName:String):void
+		private function ChangeCharacterByName(characterName:String):void
 		{
 			var charId:int = characterManager.GetCharacterIdByName(characterName);
 			if (charId > -1)
 			{
-				characterManager.SwitchToCharacter(charId, true);
-				colorizer.ChangeColorsUsingCharacterData(characterManager.GetCharacterColorData(charId));
-				var charGraphicSettings:Object = characterManager.GetCharacterGraphicSettings(charId);
-				if (charGraphicSettings )
-				{
-					//canvas.ClearAllActors();
-					canvas.ChangeActorAssetsUsingCharacterData(charGraphicSettings);
-				}
-				else
-				{
-					canvas.ClearAllActors();
-					canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCharacterGraphicSets(charId));
-					//Update user settings to have the new graphic settings for the character
-					userSettings.UpdateAllGraphicSettingsForCharacter(characterName, characterManager.GetCharacterGraphicSettings(charId));
-				}
+				ChangeCharacter(charId, characterName);
 				CONFIG::NX
 				{
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(characterName));
 				menuSignal2.dispatch("AnimMenu_UpdateAnimationListing", characterManager.GetCurrentCharacterAnimationStates());
 				menuSignal2.dispatch("CustomMenu_CharacterHasChanged", null);
 				}
-				userSettings.UpdateCurrentCharacterName(characterName);
 			}
 		}
 		
@@ -1174,27 +1159,37 @@ package
 		{
 			if (charId > -1)
 			{
-				characterManager.SwitchToCharacter(charId, true);
-				colorizer.ChangeColorsUsingCharacterData(characterManager.GetCharacterColorData(charId));
-				var charGraphicSettings:Object = characterManager.GetCharacterGraphicSettings(charId);
-				if (charGraphicSettings )
-				{
-					//canvas.ClearAllActors();
-					canvas.ChangeActorAssetsUsingCharacterData(charGraphicSettings);
-				}
-				else
-				{
-					canvas.ClearAllActors();
-					canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCharacterGraphicSets(charId));
-				}
 				var characterName:String = characterManager.GetCharacterNameById(charId);
+				ChangeCharacter(charId, characterName);
+				
 				CONFIG::NX
 				{
 				menuSignal2.dispatch("CharMenu_CharacterInfoDelivery", characterManager.GetCharacterInfo(characterName));
 				menuSignal2.dispatch("AnimMenu_UpdateAnimationListing", characterManager.GetCurrentCharacterAnimationStates());
 				}
-				userSettings.UpdateCurrentCharacterName(characterName);
+				
 			}
+		}
+
+		[inline]
+		private function ChangeCharacter(charId:int, characterName:String):void
+		{
+			characterManager.SwitchToCharacter(charId, true);
+			colorizer.ChangeColorsUsingCharacterData(characterManager.GetCharacterColorData(charId));
+			var charGraphicSettings:Object = characterManager.GetCharacterGraphicSettings(charId);
+			if (charGraphicSettings )
+			{
+				//canvas.ClearAllActors();
+				canvas.ChangeActorAssetsUsingCharacterData(charGraphicSettings);
+			}
+			else
+			{
+				canvas.ClearAllActors();
+				canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCharacterGraphicSets(charId));
+				//Update user settings to have the new graphic settings for the character
+				userSettings.UpdateAllGraphicSettingsForCharacter(characterName, characterManager.GetCharacterGraphicSettings(charId));
+			}
+			userSettings.UpdateCurrentCharacterName(characterName);
 		}
 		
 		
@@ -1371,6 +1366,12 @@ package
 			{
 				//Set up character to use those settings.
 				characterManager.InitializeSettingsForCharacter(charId, charSettings);
+				//Update user settings as the character's data may have changed.
+				userSettings.UpdateAllGraphicSettingsForCharacter(characterName, characterManager.GetCharacterGraphicSettings(charId));
+				userSettings.UpdateColorSettingsForCharacter(characterName, characterManager.GetCharacterColorData(charId));
+				userSettings.UpdateLinkedColorGroupSettingsForCharacter(characterName, characterManager.GetCharacterLinkedColorGroupData(charId));
+				userSettings.UpdateSettingForCharacter_AnimationLists(characterName, characterManager.GetAnimationListsForCharacterInBinaryFormat(charId));
+				
 				//Insert something here for menu to update
 				//mainMenu.SetupMenusForCharacter(charId, charSettings);
 			}

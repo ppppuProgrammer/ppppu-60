@@ -7,6 +7,7 @@
 	import flash.media.Sound;
 	import flash.utils.ByteArray;
 	import flash.net.registerClassAlias;
+	import flash.utils.Dictionary;
 	
 	public class Character 
 	{
@@ -48,6 +49,21 @@
 		
 		protected var animationLists:Vector.<AnimationList>;
 		
+		protected static var linkedColorGroupDefaults:Dictionary = new Dictionary;
+		//linked color group 1 (Skin)
+		linkedColorGroupDefaults["FaceColor"] = [1, 2, -1, -1];
+		linkedColorGroupDefaults["SkinColor"] = [1, -1, -1, -1];
+		linkedColorGroupDefaults["AnusColor"] = [-1, 1, -1, -1];		
+		linkedColorGroupDefaults["BreastColor"] = [1, 1, 2, -1];
+		//linked color group 2 (Skin 2)
+		linkedColorGroupDefaults["VulvaColor"] = [2, 1, -1, -1];//2
+		linkedColorGroupDefaults["EarColor"] = [2, 1, -1, -1];
+		//linked group 3 (nipple and areola)
+		linkedColorGroupDefaults["NippleColor"] = [3,-1,-1,-1];
+		linkedColorGroupDefaults["AreolaColor"] = [3, 3, -1, -1];
+		//Linked group 4 (Iris)
+		linkedColorGroupDefaults["LeftIrisColor"] = [4,-1,-1,-1];
+		linkedColorGroupDefaults["RightIrisColor"] = [4,-1,-1,-1];
 		//Indicates whether the animation in the animationLists vector of the corresponding index is a regular animation or an end-link animation. True indicates a regular animation (that can possibly transition to an end link type).
 		protected var animationTypes:Vector.<int> = new Vector.<int>();
 		
@@ -61,58 +77,8 @@
 			{
 				data = charData;
 			}
-			if (data && "Color" in data)
-			{
-				for (var colorGroup:String in data.Color) 
-				{
-					//Need to put the uint into a 4 index array as the color group may be used for gradients at a later time.
-					if (data.Color[colorGroup] is uint)
-					{
-						data.Color[colorGroup] = [data.Color[colorGroup], 0x00000000, 0x00000000, 0x00000000];
-					}
-					else if (data.Color[colorGroup] is Array)
-					{
-						if ((data.Color[colorGroup] as Array).length < 4)
-						{
-							for (var i:int = (data.Color[colorGroup] as Array).length; i < 4; i++) 
-							{
-								data.Color[colorGroup][i] = 0x00000000;
-							}
-						}
-					}
-					
-					//Color group aliasing
-					if (colorGroup == "IrisColor") {
-						//Make a clone array for the left iris
-						data.Color["LeftIrisColor"] = UtilityFunctions.CloneObject(data.Color.IrisColor) as Array;
-						//Use the original array for the right iris
-						data.Color["RightIrisColor"] = data.Color.IrisColor;
-						//Delete IrisColor as it should not be used from this point
-						data.Color.IrisColor = null;
-						delete data.Color.IrisColor;
-					}
-				}
-			}
+			ValidateAndCorrectCharacterData();
 			
-			if (data && "LinkedColorGroup" in data)
-			{
-				for (var colorGroup:String in data.LinkedColorGroup) 
-				{
-					if (data.Color[colorGroup] is Array)
-					{
-						if ((data.Color[colorGroup] as Array).length < 4)
-						{
-							for (var i:int = (data.Color[colorGroup] as Array).length; i < 4; i++) 
-							{
-								data.Color[colorGroup][i] = -1;
-							}
-						}
-					}
-				}
-			}
-			else if (data && !("LinkedColorGroup" in data)) {
-				data.LinkedColorGroup = { };
-			}
 			
 			SetAnimationLists(presetAnimationLists);
 			//if(animationList
@@ -121,6 +87,80 @@
 				defaultSettings = ExportCharacterDataForStorage();
 			}
 			
+			
+		}
+		
+		//Goes through the data for the character to ensure that all necessary properties are set.
+		public function ValidateAndCorrectCharacterData():void
+		{
+			//Make sure that the graphic settings field exists.
+			if (!("graphicSettings" in data) || data.graphicSettings == null) { data.graphicSettings = { }; }
+			
+			//Make sure the color field exists
+			if (!("Color" in data) || data.Color == null) { data.Color = { }; }
+			
+			//Make sure that each color group holds an array of 4 uints for color values.
+			for (var colorGroup:String in data.Color) 
+			{
+				//Need to put the uint into a 4 index array as the color group may be used for gradients at a later time.
+				if (data.Color[colorGroup] is uint)
+				{
+					data.Color[colorGroup] = [data.Color[colorGroup], 0x00000000, 0x00000000, 0x00000000];
+				}
+				else if (data.Color[colorGroup] is Array)
+				{
+					if ((data.Color[colorGroup] as Array).length < 4)
+					{
+						for (var i:int = (data.Color[colorGroup] as Array).length; i < 4; i++) 
+						{
+							data.Color[colorGroup][i] = 0x00000000;
+						}
+					}
+				}
+				
+				//Color group aliasing
+				if (colorGroup == "IrisColor") {
+					//Make a clone array for the left iris
+					data.Color["LeftIrisColor"] = UtilityFunctions.CloneObject(data.Color.IrisColor) as Array;
+					//Use the original array for the right iris
+					data.Color["RightIrisColor"] = data.Color.IrisColor;
+					//Delete IrisColor as it should not be used from this point
+					data.Color.IrisColor = null;
+					delete data.Color.IrisColor;
+				}
+			}
+			
+			//Make sure the LinkedColorGroup field exists.
+			if (!("LinkedColorGroup" in data) || data.LinkedColorGroup == null) { data.LinkedColorGroup = { }; }
+
+			//Make sure each color group in the linked groups have an array of 4 values, defaulting to -1 (not linked) if an index is empty.
+			for (var colorGroup:String in data.LinkedColorGroup) 
+			{
+				if (data.Color[colorGroup] is Array)
+				{
+					if ((data.Color[colorGroup] as Array).length < 4)
+					{
+						for (var i:int = (data.Color[colorGroup] as Array).length; i < 4; i++) 
+						{
+							data.Color[colorGroup][i] = -1;
+						}
+					}
+				}
+			}
+			
+			//Set up default linked groups for a character.
+			for (var colorGroup:String in linkedColorGroupDefaults)	{
+				//If the color group isn't in the linkedColorGroup then create the key for it and set an array of four -1s to it
+				if (!(colorGroup in data.LinkedColorGroup)) {
+					data.LinkedColorGroup[colorGroup] = [ -1, -1, -1, -1];
+				}
+				for (var i:int = 0; i < 4; i++) {
+					//Only overwrite the value of the character's linked group if it is not linked and the default value has a non -1 value.
+					if (data.LinkedColorGroup[colorGroup][i] == -1 && linkedColorGroupDefaults[colorGroup][i] != -1) {
+						data.LinkedColorGroup[colorGroup][i] = linkedColorGroupDefaults[colorGroup][i];
+					}
+				}
+			}
 			
 		}
 		
@@ -197,10 +237,6 @@
 		
 		public function UpdateGraphicSetting(actorName:String, setName:String, layer:int):void
 		{
-			if (!("graphicSettings" in data))
-			{
-				data.graphicSettings = new Object();
-			}
 			if (!(actorName in data.graphicSettings))
 			{
 				data.graphicSettings[actorName] = ["", "", ""];

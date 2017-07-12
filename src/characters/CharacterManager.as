@@ -363,6 +363,9 @@ package characters
 				}
 			}
 			
+			//Make sure that user settings did not screw up the character's data.
+			character.ValidateAndCorrectCharacterData();
+			
 			character.DeserializeAnimationLists(settings.animationLists);
 			/*var lockedAnimationCount:int = 0;
 			
@@ -426,6 +429,7 @@ package characters
 				character.SetRandomizeAnimation(false);
 				character.ChangeAnimationIndexToPlay(animSelect);
 			}*/
+			
 		}
 		
 		public function SetSelectMode(mode:int):int
@@ -535,10 +539,10 @@ package characters
 			var characterData:Object = m_Characters[charId].data;
 			if (characterData && "graphicSettings" in characterData)
 			{
-				for (var name:String in characterData.graphicSettings) 
-				{
+				//for (var name:String in characterData.graphicSettings) 
+				//{
 					return characterData.graphicSettings;
-				}
+				//}
 			}
 			return null;
 		}
