@@ -12,7 +12,7 @@
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#0C0046" />
-    <movie preferredSDK="Apache Flex 4.15.0 FP20.0 AIR20.0 en_US;4.15.0;" />
+    <movie preferredSDK="AIR 21.0.0;21.0.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -22,7 +22,7 @@
   <!-- Build options -->
   <build>
     <option accessible="False" />
-    <option advancedTelemetry="True" />
+    <option advancedTelemetry="False" />
     <option allowSourcePathOverlap="False" />
     <option benchmark="False" />
     <option es="False" />
@@ -54,8 +54,8 @@
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
-    <element path="ppppu60.swc" />
     <element path="lib\TurboSignals.swc" />
+    <element path="ppppu60.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
@@ -71,7 +71,7 @@
   </intrinsics>
   <!-- Assets to embed into the output SWF -->
   <library>
-    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
+    <asset path="bin\Assets\ARCH_BaseAssets.swf" />
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
@@ -82,13 +82,13 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>cmd /C python "$(ProjectDir)\BuildModsSwf.py" "$(CompilerPath)" "$(FDBuild)" "$(BuildConfig)"</preBuildCommand>
+  <preBuildCommand />
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False">cmd.exe /C python "$(ProjectDir)\MakeBuildCopy.py" "$(OutputDir)" "$(OutputName)" "$(BuildConfig)" "$(TimeStamp)"</postBuildCommand>
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="Default" />
+    <option testMovie="Unknown" />
     <option testMovieCommand="" />
   </options>
   <!-- Plugin storage -->

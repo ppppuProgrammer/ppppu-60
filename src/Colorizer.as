@@ -123,7 +123,6 @@ package
 				if (property in colorizeGroups)
 				{
 					var spritesToColorize:Vector.<Sprite> = colorizeGroups[property] as Vector.<Sprite>;
-					
 					for (var i:int = 0, l:int = spritesToColorize.length; i < l; i++) 
 					{
 						ModifyColorOfSprite(spritesToColorize[i], value)

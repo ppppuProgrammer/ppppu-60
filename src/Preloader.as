@@ -1,6 +1,7 @@
 package
 {
 	import flash.display.DisplayObject;
+	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
 	import flash.display.StageAlign;
@@ -26,6 +27,8 @@ package
 	import com.greensock.events.LoaderEvent;
 	import modifications.MusicMod;
 	import mx.logging.*;
+	CONFIG::FPS60
+	import flash.display.Loader;
 	/**
 	 * The entry way into the program. First checks that the Flash Player version can support
 	 * the program then it reads the ModsList text file to know what mods to load.
@@ -49,11 +52,39 @@ package
 		CONFIG::debug
 		private const modLoadList:String = "DebugModsList.txt" ;
 		
-		//CONFIG::FPS60
-		//{
-			//[Embed Source=""]
+		CONFIG::FPS60
+		{
+		private var loadsCompleted = 0;
+		private var loadsPending = 0;
+		private var loaders:Vector.<Loader>  = new Vector.<Loader>();
+			[Embed(source="../bin/Characters/TCHAR_Peach.swf", mimeType="application/octet-stream")]
+			private const PeachCharacterClass:Class;
+			[Embed(source = "../bin/Characters/TCHAR_Rosalina.swf", mimeType = "application/octet-stream")]
+			private const RosalinaCharacterClass:Class;
+			[Embed(source = "../bin/Animations/ARCH_Cowgirl.swf", mimeType = "application/octet-stream")]
+			private const Anim1Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_Anim2.swf", mimeType = "application/octet-stream")]
+			private const Anim2Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_Anim3.swf", mimeType = "application/octet-stream")]
+			private const Anim3Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_anim4.swf", mimeType = "application/octet-stream")]
+			private const Anim4Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_RevCowgirl.swf", mimeType = "application/octet-stream")]
+			private const Anim5Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_Blowjob.swf", mimeType = "application/octet-stream")]
+			private const Anim6Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_Paizuri.swf", mimeType = "application/octet-stream")]
+			private const Anim7Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_Anim8.swf", mimeType = "application/octet-stream")]
+			private const Anim8Class:Class;
+			[Embed(source = "../bin/Animations/ARCH_Anim9.swf", mimeType = "application/octet-stream")]
+			private const Anim9Class:Class;
+			[Embed(source="../bin/Music/M_BeepBlockSkyway.swf", mimeType="application/octet-stream")]
+			private const BbsMusicClass:Class;
+			[Embed(source="../bin/Assets/ARCH_BaseAssets.swf", mimeType="application/octet-stream")]
+			private const AssetsClass:Class;
 			//private const modLoadList:String = "ppppu60ModsList.txt";
-		//}
+		}
 		private var majorVer:int;
 		private var minorVer:int;
 		
@@ -135,7 +166,10 @@ package
 				modsListLoader.autoLoad = true;
 				try
 				{
+					CONFIG::NX
+					{
 					modsListLoader.append(new DataLoader(modLoadList));
+					}
 					mouseEnabled = false;
 					//Add background
 					var preloaderBackground:Sprite = new PlanetBackground();
@@ -164,6 +198,14 @@ package
 					" or greater is required to run this flash application. \nYour current Flash Player version is " + majorVer + "." + minorVer +
 					"\nPlease update your Flash Player to a supported version and try again.";
 				StopPreloaderAndDisplayErrorMessage(notSupportedFPmsg);
+			}
+			
+			CONFIG::FPS60
+			{
+				StartFPS60ModLoads();
+				
+				//swfPreloader.append(new SWFLoader(PeachCharacterClass))
+				//swfPreloader.load();
 			}
 		}
 		
@@ -252,6 +294,20 @@ package
 			addChild(main as DisplayObject);
 		}
 		
+		private function ParseLoadingMod(mod:Mod):void
+		{
+			if (mod == null)
+			{
+				//logger.warn(e.target.url + " is not a ppppuXi mod. Content loaded type is " + getQualifiedClassName(e.target.content.rawContent));
+			}
+			else
+			{
+				addChild(mod);
+				startupMods[startupMods.length] = mod;
+				removeChild(mod);
+			}
+		}
+		
 		private function FinishedLoadingMod(e:LoaderEvent):void
 		{
 			var mod:Mod;
@@ -270,13 +326,8 @@ package
 			{
 				mod = (e.target.content.rawContent as Mod);
 			}
-
-			if (mod == null)
-			{
-				//logger.warn(e.target.url + " is not a ppppuXi mod. Content loaded type is " + getQualifiedClassName(e.target.content.rawContent));
-			}
-			else
-			{
+			
+			if (mod){
 				var classType:String = getQualifiedSuperclassName(mod);
 				classType = classType.substring(classType.lastIndexOf(":") + 1);
 				mod.UrlLoadedFrom = e.target.url;
@@ -293,15 +344,15 @@ package
 						modLoadedMessage = "Successfully added MusicMod created from " + e.target.url;
 					}
 					//logger.info(modLoadedMessage);
-					addChild(mod);
-					startupMods[startupMods.length] = mod;
-					removeChild(mod);
+					ParseLoadingMod(mod);
 				}
 				else
 				{
 					//logger.warn(getQualifiedClassName(mod) +"(" + e.target.url +")" + " is not a valid mod (Super class is " + classType + ")");
 				}
+				
 			}
+			
 			mod = null;
 		}
 		
@@ -365,6 +416,61 @@ package
 			//logger.error(errorMsg);
 			addChild(errorDisplay);
 		}
-	}
-	
+		
+		CONFIG::FPS60
+		{
+		private function StartFPS60ModLoads():void
+		{
+			loaders[loaders.length] = AddSwfLoader(AssetsClass);
+			loaders[loaders.length] = AddSwfLoader(PeachCharacterClass);
+			loaders[loaders.length] = AddSwfLoader( RosalinaCharacterClass);
+			loaders[loaders.length] = AddSwfLoader( BbsMusicClass);
+			loaders[loaders.length] = AddSwfLoader( Anim1Class);
+			loaders[loaders.length] = AddSwfLoader( Anim2Class);
+			loaders[loaders.length] = AddSwfLoader( Anim3Class);
+			loaders[loaders.length] = AddSwfLoader( Anim4Class);
+			loaders[loaders.length] = AddSwfLoader( Anim5Class);
+			loaders[loaders.length] = AddSwfLoader( Anim6Class);
+			loaders[loaders.length] = AddSwfLoader( Anim7Class);
+			loaders[loaders.length] = AddSwfLoader( Anim8Class);
+			loaders[loaders.length] = AddSwfLoader( Anim9Class);
+			this.addEventListener(Event.ENTER_FRAME, WaitForAnnoyingLoads);
+			//AddSwfLoader( PeachCharacterClass);
+		}
+		
+		private function AddSwfLoader(swfClass:Class):Loader
+		{
+			var loader = new Loader();
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, AnnoyingSwfLoadCompleted);
+			loader.loadBytes(new swfClass);
+			loadsPending++;
+			return loader;
+		}
+		
+		private function AnnoyingSwfLoadCompleted(e:Event):void
+		{
+			var info:LoaderInfo = e.target as LoaderInfo;
+			var swfMod:Mod = info.content as Mod;
+			if (swfMod)	{
+				ParseLoadingMod(swfMod);
+			}
+			info.loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, AnnoyingSwfLoadCompleted);
+			loaders[loaders.indexOf(info.loader)] = null;
+			++loadsCompleted;
+		}
+		private function WaitForAnnoyingLoads(e:Event):void
+		{
+			if (loadsCompleted < loadsPending) {
+				return;
+			}
+			this.removeEventListener(Event.ENTER_FRAME, WaitForAnnoyingLoads);
+			AllAnnoyingLoadsCompleted();
+		}
+		private function AllAnnoyingLoadsCompleted():void
+		{
+			removeChildren();
+			Startup();
+		}
+		}
+	}	
 }

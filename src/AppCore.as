@@ -191,7 +191,7 @@ package
 			modsLoadedAtStartUp = startupMods;
 			
 			LoadUserSettings();
-			if(CONFIG::NX)
+			CONFIG::NX
 			{
 				//Allows svg data to be used in flash
 				ProcessExecutor.instance.initialize(stage); 
@@ -204,7 +204,7 @@ package
 				mainMenu.x = 480;
 				
 			}
-			else
+			CONFIG::FPS60
 			{
 				FinalPreparations();
 				//ChangeCharacter("Peach");
@@ -498,6 +498,11 @@ package
 					
 					//var character:Character = new Character(charName, tcharacter.GetCharacterData(), true, charPresetAnimations);
 					var newCharacterId:int = characterManager.AddNewCharacter(charName, tcharacter.GetCharacterData(), true, charPresetAnimations);
+					
+					//CONFIG::FPS60
+					//{
+						//character
+					//}
 					
 					CONFIG::NX
 					{
@@ -1175,11 +1180,13 @@ package
 		private function ChangeCharacter(charId:int, characterName:String):void
 		{
 			characterManager.SwitchToCharacter(charId, true);
-			colorizer.ChangeColorsUsingCharacterData(characterManager.GetCharacterColorData(charId));
+			
+			CONFIG::NX
+			{
 			var charGraphicSettings:Object = characterManager.GetCharacterGraphicSettings(charId);
 			if (charGraphicSettings )
 			{
-				//canvas.ClearAllActors();
+				canvas.ClearAllActors();
 				canvas.ChangeActorAssetsUsingCharacterData(charGraphicSettings);
 			}
 			else
@@ -1190,6 +1197,14 @@ package
 				userSettings.UpdateAllGraphicSettingsForCharacter(characterName, characterManager.GetCharacterGraphicSettings(charId));
 			}
 			userSettings.UpdateCurrentCharacterName(characterName);
+			}
+			
+			CONFIG::FPS60
+			{
+			canvas.ClearAllActors();
+			canvas.ChangeActorAssetsUsingSetNames(characterManager.GetCharacterGraphicSets(charId));
+			}
+			colorizer.ChangeColorsUsingCharacterData(characterManager.GetCharacterColorData(charId));
 		}
 		
 		
@@ -1208,7 +1223,7 @@ package
 		
 		private function LoadUserSettings():void
 		{
-			if(CONFIG::NX)
+			CONFIG::NX
 			{
 				//logger.info("Loading user settings");
 				if (settingsSaveFile.data.ppppuSettings != null)
@@ -1236,7 +1251,8 @@ package
 					settingsSaveFile.data.ppppuSettings = userSettings;
 				}
 			}
-			else
+			
+			CONFIG::FPS60
 			{
 				userSettings = new UserSettings(); 
 			}
@@ -1249,7 +1265,7 @@ package
 				//ToggleHelpScreen(); //Show the help screen
 				//ShowMenu(true);
 				userSettings.firstTimeRun = false;
-				if (CONFIG::NX)
+				CONFIG::NX
 				{
 					settingsSaveFile.data.ppppuSettings = userSettings;
 					settingsSaveFile.flush();
